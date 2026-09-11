@@ -30,20 +30,20 @@ export const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-white text-[#333840] min-h-screen font-body selection:bg-[#181d26] selection:text-white">
+    <div className="bg-white text-slate-700 min-h-screen font-sans selection:bg-slate-900 selection:text-white">
       {/* ── 00. COMPACT EMERGENCY NOTICE STRIP ── */}
-      <div className="border-b border-[#dddddd] bg-[#f8fafc] px-6 sm:px-8 lg:px-12 py-2">
+      <div className="border-b border-slate-200/80 bg-slate-50/70 px-6 sm:px-8 lg:px-12 py-2.5">
         <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-[#41454d]">
-            <span className="w-2 h-2 rounded-full bg-[#aa2d00] shrink-0" />
-            <strong className="text-[#181d26] font-semibold">
+          <div className="flex items-center gap-2 text-slate-600">
+            <span className="w-2 h-2 rounded-full bg-orange-600 shrink-0" />
+            <strong className="text-slate-900 font-semibold">
               {t('notice_banner_title')}
             </strong>
-            <span className="hidden md:inline text-[#41454d]">
+            <span className="hidden md:inline text-slate-500">
               {t('notice_banner_desc')}
             </span>
           </div>
-          <div className="flex items-center gap-3 font-mono text-[11px] text-[#41454d]">
+          <div className="flex items-center gap-3 font-mono text-[11px] text-slate-500">
             <span>{t('notice_ndrf')}</span>
             <span>•</span>
             <span>{t('notice_police')}</span>
@@ -56,25 +56,25 @@ export const LandingPage: React.FC = () => {
       </div>
 
       {/* ── 01. HERO SECTION: ASYMMETRIC EDITORIAL NARRATIVE + OPERATIONAL RECONCILIATION DOSSIER ── */}
-      <section className="py-12 sm:py-16 lg:py-20 border-b border-[#dddddd]">
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-slate-200/80">
         <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             {/* Left: Narrative & Structured Action Hierarchy */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Plain Eyebrow Metadata (No Pill) */}
-              <div className="text-[11px] font-mono tracking-widest uppercase text-[#9297a0] font-semibold flex items-center gap-2">
+              {/* Plain Eyebrow Metadata */}
+              <div className="text-[11px] font-mono tracking-wider uppercase text-slate-400 font-semibold flex items-center gap-2">
                 <span>{t('hero_network_tag')}</span>
                 <span>•</span>
                 <span>{t('hero_simulated_tag')}</span>
               </div>
 
               {/* Editorial Headline */}
-              <h1 className="font-display font-normal text-4xl sm:text-5xl lg:text-6xl text-[#181d26] tracking-tight leading-[1.08]">
+              <h1 className="font-sans font-bold text-4xl sm:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-[1.1]">
                 {t('hero_title')}
               </h1>
 
               {/* Supporting Statement */}
-              <p className="text-base sm:text-lg text-[#333840] leading-relaxed max-w-2xl font-normal">
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl font-normal">
                 {t('hero_subtitle')}
               </p>
 
@@ -103,25 +103,25 @@ export const LandingPage: React.FC = () => {
                 {/* Tertiary CTA: Quiet Text Link */}
                 <Link
                   to="/cases"
-                  className="px-4 py-3 text-sm font-medium text-[#181d26] hover:text-[#aa2d00] hover:underline transition-colors flex items-center gap-1.5"
+                  className="px-4 py-3 text-sm font-semibold text-slate-700 hover:text-orange-600 transition-colors flex items-center gap-1.5"
                 >
-                  <Search className="w-4 h-4 text-[#9297a0]" />
+                  <Search className="w-4 h-4 text-slate-400" />
                   {t('hero_cta_search')}
                 </Link>
               </div>
 
               {/* Operational Capabilities Footnote */}
-              <div className="pt-4 border-t border-[#dddddd] flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-[#9297a0] font-mono">
-                <span className="flex items-center gap-1.5 text-[#41454d]">
+              <div className="pt-4 border-t border-slate-200/80 flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-slate-500 font-mono">
+                <span className="flex items-center gap-1.5 text-slate-600">
                   <CheckCircle2 className="w-3.5 h-3.5 text-orange-600" /> {t('hero_trust_offline')}
                 </span>
                 <span>•</span>
-                <span className="flex items-center gap-1.5 text-[#41454d]">
-                  <Lock className="w-3.5 h-3.5 text-[#181d26]" /> {t('hero_trust_privacy')}
+                <span className="flex items-center gap-1.5 text-slate-600">
+                  <Lock className="w-3.5 h-3.5 text-slate-800" /> {t('hero_trust_privacy')}
                 </span>
                 <span>•</span>
-                <span className="flex items-center gap-1.5 text-[#41454d]">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#aa2d00]" /> {t('hero_trust_safeguard')}
+                <span className="flex items-center gap-1.5 text-slate-600">
+                  <ShieldCheck className="w-3.5 h-3.5 text-orange-600" /> {t('hero_trust_safeguard')}
                 </span>
               </div>
             </div>
@@ -135,9 +135,9 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ── 02. COMPACT OPERATIONAL STATUS STRIP ── */}
-      <section className="border-b border-orange-100 bg-orange-50/25 py-3.5 px-6 sm:px-8 lg:px-12">
-        <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-6 text-xs font-mono text-[#41454d]">
-          <div className="flex items-center gap-2 text-[#181d26] font-semibold">
+      <section className="border-b border-orange-200/60 bg-orange-50/30 py-3.5 px-6 sm:px-8 lg:px-12">
+        <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-6 text-xs font-mono text-slate-600">
+          <div className="flex items-center gap-2 text-slate-900 font-semibold">
             <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse" />
             <span>{t('status_operational_mesh')}</span>
           </div>
@@ -149,68 +149,68 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── 03. THE PROBLEM: INFORMATION CHAOS IN DISASTERS (Editorial Section, NO cards) ── */}
-      <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd]">
+      {/* ── 03. THE PROBLEM: INFORMATION CHAOS IN DISASTERS ── */}
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-slate-200/80">
         <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             {/* Left: Problem Narrative */}
             <div className="lg:col-span-5 space-y-4">
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-600">
                 {t('problem_tag')}
               </span>
-              <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+              <h2 className="font-sans font-bold text-3xl sm:text-4xl text-slate-900 leading-tight">
                 {t('problem_title')}
               </h2>
-              <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 {t('problem_desc')}
               </p>
             </div>
 
             {/* Right: Connective Diagram of Fragmented Field Signals Converging */}
             <div className="lg:col-span-7 space-y-4">
-              <div className="border border-orange-100 rounded-xl p-6 sm:p-8 bg-orange-50/20 space-y-6">
-                <div className="text-[11px] font-mono uppercase tracking-wider text-orange-950/60 font-semibold">
+              <div className="border border-orange-200/70 rounded-2xl p-6 sm:p-8 bg-orange-50/20 space-y-6 shadow-sm">
+                <div className="text-[11px] font-mono uppercase tracking-wider text-orange-950/70 font-semibold">
                   FRAGMENTED FIELD SIGNALS GENERATED DURING EVACUATION
                 </div>
 
                 {/* 4 Fragmented Signals */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-                  <div className="p-3 bg-white border border-orange-100 rounded-lg space-y-1">
-                    <span className="text-[#aa2d00] font-bold block">{t('problem_family_label')}</span>
-                    <p className="text-[#181d26] font-body text-xs">
+                  <div className="p-4 bg-white border border-orange-100 rounded-xl space-y-1 shadow-sm">
+                    <span className="text-orange-700 font-bold block">{t('problem_family_label')}</span>
+                    <p className="text-slate-800 font-sans text-xs leading-relaxed">
                       {t('problem_family_desc')}
                     </p>
                   </div>
 
-                  <div className="p-3 bg-white border border-orange-100 rounded-lg space-y-1">
+                  <div className="p-4 bg-white border border-orange-100 rounded-xl space-y-1 shadow-sm">
                     <span className="text-orange-600 font-bold block">{t('problem_field_label')}</span>
-                    <p className="text-[#181d26] font-body text-xs">
+                    <p className="text-slate-800 font-sans text-xs leading-relaxed">
                       {t('problem_field_desc')}
                     </p>
                   </div>
 
-                  <div className="p-3 bg-white border border-orange-100 rounded-lg space-y-1">
-                    <span className="text-[#254fad] font-bold block">{t('problem_hospital_label')}</span>
-                    <p className="text-[#181d26] font-body text-xs">
+                  <div className="p-4 bg-white border border-orange-100 rounded-xl space-y-1 shadow-sm">
+                    <span className="text-blue-700 font-bold block">{t('problem_hospital_label')}</span>
+                    <p className="text-slate-800 font-sans text-xs leading-relaxed">
                       {t('problem_hospital_desc')}
                     </p>
                   </div>
 
-                  <div className="p-3 bg-white border border-orange-100 rounded-lg space-y-1">
-                    <span className="text-[#181d26] font-bold block">{t('problem_milan_core')}</span>
-                    <p className="text-[#181d26] font-body text-xs">
+                  <div className="p-4 bg-white border border-orange-100 rounded-xl space-y-1 shadow-sm">
+                    <span className="text-slate-900 font-bold block">{t('problem_milan_core')}</span>
+                    <p className="text-slate-800 font-sans text-xs leading-relaxed">
                       {t('problem_milan_desc')}
                     </p>
                   </div>
                 </div>
 
                 {/* Visual Convergence Indicator */}
-                <div className="pt-2 border-t border-orange-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
-                  <span className="text-[#41454d]">
+                <div className="pt-2 border-t border-orange-200/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
+                  <span className="text-slate-600">
                     WEIGHTED MULTI-ATTRIBUTE RECONCILIATION ENGINE
                   </span>
-                  <span className="text-orange-800 font-bold flex items-center gap-1 bg-orange-100/70 border border-orange-200 px-2.5 py-1 rounded">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-orange-600" /> RECONCILED INTO ONE UNIFIED CANDIDATE
+                  <span className="text-orange-800 font-bold flex items-center gap-1.5 bg-orange-100/80 border border-orange-200 px-3 py-1.5 rounded-lg shadow-sm">
+                    <CheckCircle2 className="w-4 h-4 text-orange-600" /> RECONCILED INTO ONE UNIFIED CANDIDATE
                   </span>
                 </div>
               </div>
@@ -220,16 +220,16 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ── 04. DATA TRANSFORMATION: CHAOS TO STRUCTURED ATTRIBUTES ── */}
-      <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd] bg-[#f8fafc]">
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 bg-slate-50/60">
         <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-10">
           <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-600">
               {t('trans_tag')}
             </span>
-            <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl text-slate-900 leading-tight">
               {t('trans_title')}
             </h2>
-            <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
               {t('trans_desc')}
             </p>
           </div>
@@ -239,17 +239,17 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── 05. CONTINUOUS RECONCILIATION PIPELINE (Single Flow, NO card soup) ── */}
-      <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd]">
+      {/* ── 05. CONTINUOUS RECONCILIATION PIPELINE ── */}
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-slate-200/80">
         <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-12">
           <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-600">
               {t('pipeline_tag')}
             </span>
-            <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl text-slate-900 leading-tight">
               {t('pipeline_title')}
             </h2>
-            <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
               {t('pipeline_desc')}
             </p>
           </div>
@@ -259,18 +259,18 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── 06. HUMAN VERIFICATION & CHILD ANTI-TRAFFICKING (Trust Differentiator) ── */}
-      <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd] bg-[#f8fafc]">
+      {/* ── 06. HUMAN VERIFICATION & CHILD ANTI-TRAFFICKING ── */}
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-slate-200/80 bg-slate-50/60">
         <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-10">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="max-w-3xl space-y-3">
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-600">
                 {t('safeguards_tag')}
               </span>
-              <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+              <h2 className="font-sans font-bold text-3xl sm:text-4xl text-slate-900 leading-tight">
                 {t('safeguards_title')}
               </h2>
-              <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 {t('safeguards_desc')}
               </p>
             </div>
@@ -291,17 +291,17 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ── 07. THREE OPERATIONAL WORKSPACES (Distinct Editorial Rows, NOT 3 clone cards) ── */}
-      <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd]">
+      {/* ── 07. THREE OPERATIONAL WORKSPACES ── */}
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-slate-200/80">
         <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-12">
           <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-600">
               {t('domains_tag')}
             </span>
-            <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+            <h2 className="font-sans font-bold text-3xl sm:text-4xl text-slate-900 leading-tight">
               {t('domains_title')}
             </h2>
-            <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
               {t('domains_desc')}
             </p>
           </div>
@@ -309,18 +309,18 @@ export const LandingPage: React.FC = () => {
           {/* 3 Distinct Full-Width Rows */}
           <div className="space-y-6">
             {/* Domain 1: Family */}
-            <div className="p-6 sm:p-8 border border-[#dddddd] rounded-xl bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="p-6 sm:p-8 border border-slate-200/90 rounded-2xl bg-white shadow-card hover:shadow-card-hover hover:border-slate-300 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2 max-w-2xl">
                 <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-[#aa2d00]" />
-                  <span className="font-mono text-xs font-bold uppercase text-[#aa2d00]">
+                  <Phone className="w-4 h-4 text-orange-600" />
+                  <span className="font-mono text-xs font-bold uppercase text-orange-600">
                     STAKEHOLDER 01 / FAMILY & NEXT-OF-KIN
                   </span>
                 </div>
-                <h3 className="font-display text-xl font-normal text-[#181d26]">
+                <h3 className="font-sans text-xl font-semibold text-slate-900">
                   {t('domains_family_title')}
                 </h3>
-                <p className="text-sm text-[#41454d] leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   {t('domains_family_desc')}
                 </p>
               </div>
@@ -336,7 +336,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Domain 2: Field Rescue (NDRF / Army) */}
-            <div className="p-6 sm:p-8 border border-[#dddddd] rounded-xl bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="p-6 sm:p-8 border border-slate-200/90 rounded-2xl bg-white shadow-card hover:shadow-card-hover hover:border-slate-300 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2 max-w-2xl">
                 <div className="flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-orange-600" />
@@ -344,10 +344,10 @@ export const LandingPage: React.FC = () => {
                     STAKEHOLDER 02 / FIELD RESCUE & ARMY NDRF
                   </span>
                 </div>
-                <h3 className="font-display text-xl font-normal text-[#181d26]">
+                <h3 className="font-sans text-xl font-semibold text-slate-900">
                   {t('domains_rescue_title')}
                 </h3>
-                <p className="text-sm text-[#41454d] leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   {t('domains_rescue_desc')}
                 </p>
               </div>
@@ -363,18 +363,18 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Domain 3: Hospital & Trauma Units */}
-            <div className="p-6 sm:p-8 border border-[#dddddd] rounded-xl bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="p-6 sm:p-8 border border-slate-200/90 rounded-2xl bg-white shadow-card hover:shadow-card-hover hover:border-slate-300 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2 max-w-2xl">
                 <div className="flex items-center gap-2">
-                  <Stethoscope className="w-4 h-4 text-[#254fad]" />
-                  <span className="font-mono text-xs font-bold uppercase text-[#254fad]">
+                  <Stethoscope className="w-4 h-4 text-blue-600" />
+                  <span className="font-mono text-xs font-bold uppercase text-blue-600">
                     STAKEHOLDER 03 / HOSPITAL & CLINICAL TRIAGE
                   </span>
                 </div>
-                <h3 className="font-display text-xl font-normal text-[#181d26]">
+                <h3 className="font-sans text-xl font-semibold text-slate-900">
                   {t('domains_hospital_title')}
                 </h3>
-                <p className="text-sm text-[#41454d] leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   {t('domains_hospital_desc')}
                 </p>
               </div>
@@ -393,18 +393,18 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ── 08. 1-CLICK STAKEHOLDER PERSONA EVALUATION STRIP ── */}
-      <section className="py-12 sm:py-16 border-b border-orange-100 bg-orange-50/20">
+      <section className="py-12 sm:py-16 border-b border-orange-200/60 bg-orange-50/20">
         <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#9297a0]">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
                 {t('personas_tag')}
               </span>
-              <h2 className="font-display font-normal text-2xl text-[#181d26]">
+              <h2 className="font-sans font-bold text-2xl text-slate-900">
                 {t('personas_title')}
               </h2>
             </div>
-            <span className="text-xs font-mono text-[#9297a0]">
+            <span className="text-xs font-mono text-slate-500">
               {t('personas_desc')}
             </span>
           </div>
@@ -417,17 +417,17 @@ export const LandingPage: React.FC = () => {
                 <button
                   key={r}
                   onClick={() => handleLaunchRole(r, '/dashboard')}
-                  className={`p-3.5 rounded-lg border text-left transition-colors select-none ${
+                  className={`p-3.5 rounded-xl border text-left transition-all select-none ${
                     isCurrent
                       ? 'bg-orange-600 text-white border-orange-600 font-semibold shadow-sm'
-                      : 'bg-white border-orange-100 text-[#181d26] hover:bg-orange-50/50 hover:border-orange-300'
+                      : 'bg-white border-slate-200/90 text-slate-800 hover:border-orange-300 hover:bg-orange-50/50 shadow-sm'
                   }`}
                 >
-                  <div className={`text-[10px] font-bold uppercase tracking-wider ${isCurrent ? 'text-white/80' : 'text-[#9297a0]'}`}>
+                  <div className={`text-[10px] font-bold uppercase tracking-wider ${isCurrent ? 'text-white/80' : 'text-slate-400'}`}>
                     {r.replace('_', ' ')}
                   </div>
                   <div className="text-xs font-semibold truncate mt-1">{user.fullName}</div>
-                  <div className={`text-[10px] truncate mt-0.5 ${isCurrent ? 'text-white/70' : 'text-[#41454d]'}`}>
+                  <div className={`text-[10px] truncate mt-0.5 ${isCurrent ? 'text-white/70' : 'text-slate-500'}`}>
                     {user.orgName?.split(' ')[0] || r}
                   </div>
                 </button>
@@ -440,15 +440,15 @@ export const LandingPage: React.FC = () => {
       {/* ── 09. CLOSING EDITORIAL CALL TO ACTION ── */}
       <section className="py-16 sm:py-24">
         <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="border border-[#dddddd] rounded-xl p-8 sm:p-14 bg-white space-y-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          <div className="border border-slate-200/90 rounded-2xl p-8 sm:p-14 bg-white shadow-card space-y-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div className="space-y-3 max-w-2xl">
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-600">
                 OPEN HUMANITARIAN INFRASTRUCTURE
               </span>
-              <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+              <h2 className="font-sans font-bold text-3xl sm:text-4xl text-slate-900 leading-tight">
                 {t('closing_title')}
               </h2>
-              <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 {t('closing_desc')}
               </p>
             </div>

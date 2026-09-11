@@ -133,8 +133,8 @@ export const VoiceIntakePage: React.FC = () => {
   if (mode === 'submitted' && submittedUid) {
     return (
       <div className="max-w-xl mx-auto my-12 px-4">
-        <div className="bg-white border border-[#dddddd] rounded-xl p-8 sm:p-10 shadow-elevation-2 text-center space-y-6">
-          <div className="w-16 h-16 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full flex items-center justify-center mx-auto">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-8 sm:p-10 shadow-card text-center space-y-6">
+          <div className="w-16 h-16 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
             <CheckCircle2 className="w-8 h-8" />
           </div>
 
@@ -142,23 +142,23 @@ export const VoiceIntakePage: React.FC = () => {
             <span className="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
               Case Registered
             </span>
-            <h2 className="text-2xl font-semibold text-[#181d26] pt-1">
+            <h2 className="text-2xl font-semibold text-slate-900 tracking-tight pt-1">
               Field Audio Intake Registered
             </h2>
-            <p className="text-xs text-[#41454d] max-w-sm mx-auto leading-relaxed">
+            <p className="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
               The speech parser extracted {parseResult?.extractedEntities.length || 0} forensic entities with{' '}
               {parseResult?.confidence || 0}% transcription confidence. The case is now registered in the live reconciliation pipeline.
             </p>
           </div>
 
-          <div className="p-5 bg-[#f8fafc] border border-[#dddddd] rounded-xl space-y-1 max-w-sm mx-auto">
-            <div className="text-[11px] font-mono font-semibold uppercase tracking-widest text-[#9297a0]">
+          <div className="p-5 bg-slate-50 border border-slate-200/90 rounded-xl space-y-1 max-w-sm mx-auto">
+            <div className="text-[11px] font-mono font-semibold uppercase tracking-widest text-slate-400">
               Milan Master Case UID
             </div>
-            <div className="text-2xl font-mono font-bold text-[#181d26]">
+            <div className="text-2xl font-mono font-bold text-slate-900">
               {submittedUid}
             </div>
-            <div className="text-[11px] text-[#41454d] pt-0.5">
+            <div className="text-[11px] text-slate-500 pt-0.5">
               Deterministic verification ready for review
             </div>
           </div>
@@ -166,7 +166,7 @@ export const VoiceIntakePage: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link to="/review" className="w-full sm:w-auto">
               <Button
-                variant="primary"
+                variant="brand"
                 size="md"
                 leftIcon={<Shield className="w-4 h-4" />}
                 className="w-full"
@@ -189,60 +189,60 @@ export const VoiceIntakePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#ffffff] text-[#181d26] pb-16">
+    <div className="min-h-screen bg-[#ffffff] text-slate-900 pb-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Page Header */}
-        <div className="border-b border-[#dddddd] pb-6 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-[#9297a0]">
-            <Radio className="w-3.5 h-3.5 text-[#181d26]" />
+        <div className="border-b border-slate-200/90 pb-6 space-y-2">
+          <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-slate-400">
+            <Radio className="w-3.5 h-3.5 text-orange-600" />
             <span>MILAN // Automated Field Audio Intake</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold text-[#181d26] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight">
             Voice & Radio Dispatch Intake
           </h1>
-          <p className="text-sm text-[#41454d] max-w-2xl leading-relaxed">
+          <p className="text-sm text-slate-600 max-w-2xl leading-relaxed">
             Dictate naturally in the field or paste emergency radio transcripts. MILAN extracts standardized forensic entities without external cloud dependencies.
           </p>
         </div>
 
         {/* Mode Step Stepper Bar */}
         <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="inline-flex items-center p-1 bg-[#f1f3f5] border border-[#dddddd] rounded-lg">
+          <div className="inline-flex items-center p-1 bg-slate-100 border border-slate-200/90 rounded-xl">
             <button
               type="button"
               onClick={() => mode !== 'submitted' && setMode('input')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-colors ${
                 mode === 'input'
-                  ? 'bg-white text-[#181d26] shadow-sm font-semibold'
-                  : 'text-[#41454d] hover:text-[#181d26]'
+                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Mic className="w-3.5 h-3.5" />
+              <Mic className="w-3.5 h-3.5 text-orange-600" />
               <span>1. Voice & Text Intake</span>
             </button>
             <button
               type="button"
               onClick={() => editableData && mode !== 'submitted' && setMode('review')}
               disabled={!editableData}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-colors ${
                 mode === 'review'
-                  ? 'bg-white text-[#181d26] shadow-sm font-semibold'
+                  ? 'bg-white text-slate-900 shadow-sm font-semibold'
                   : editableData
-                  ? 'text-[#41454d] hover:text-[#181d26]'
-                  : 'text-[#9297a0] opacity-50 cursor-not-allowed'
+                  ? 'text-slate-600 hover:text-slate-900'
+                  : 'text-slate-400 opacity-50 cursor-not-allowed'
               }`}
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>2. Forensic Extraction & Review</span>
               {editableData && (
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-orange-50 text-orange-700 border border-orange-200">
                   Ready
                 </span>
               )}
             </button>
           </div>
 
-          <div className="text-xs font-mono text-[#9297a0]">
+          <div className="text-xs font-mono text-slate-400">
             Deterministic Zero-Dependency NLP
           </div>
         </div>
@@ -251,7 +251,7 @@ export const VoiceIntakePage: React.FC = () => {
         {/* 1. INPUT MODE */}
         {/* ============================================================ */}
         {mode === 'input' && (
-          <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1">
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-card">
             <VoiceInputPanel onParseComplete={handleParseComplete} />
           </div>
         )}
@@ -743,7 +743,7 @@ export const VoiceIntakePage: React.FC = () => {
             </div>
 
             {/* Sticky Bottom Action Bar */}
-            <div className="sticky bottom-6 z-30 p-4 rounded-xl shadow-elevation-2 bg-white/95 backdrop-blur-md border border-[#dddddd] flex items-center justify-between flex-wrap gap-4">
+            <div className="sticky bottom-6 z-30 p-4 rounded-2xl shadow-dropdown bg-white/95 backdrop-blur-md border border-slate-200/90 flex items-center justify-between flex-wrap gap-4">
               <Button
                 variant="secondary"
                 size="md"
@@ -754,11 +754,11 @@ export const VoiceIntakePage: React.FC = () => {
               </Button>
 
               <div className="flex items-center gap-3">
-                <span className="text-xs text-[#9297a0] hidden sm:inline">
+                <span className="text-xs text-slate-400 hidden sm:inline font-mono">
                   Verified attributes will enter matching pipeline
                 </span>
                 <Button
-                  variant="primary"
+                  variant="brand"
                   size="md"
                   onClick={handleSubmit}
                   isLoading={submitting}

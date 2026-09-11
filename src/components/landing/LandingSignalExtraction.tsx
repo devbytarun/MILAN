@@ -53,7 +53,7 @@ export const LandingSignalExtraction: React.FC = () => {
   ];
 
   return (
-    <div className="relative rounded-2xl bg-white text-[#181d26] border border-orange-200 shadow-xl overflow-hidden font-body select-none">
+    <div className="relative rounded-2xl bg-white text-slate-900 border border-orange-200/90 shadow-card overflow-hidden font-sans select-none">
       {/* Subtle Background Ambience */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -65,10 +65,10 @@ export const LandingSignalExtraction: React.FC = () => {
             <Cpu className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[#181d26]">
+            <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-900">
               Signal Extraction & Normalization
             </h3>
-            <span className="text-[11px] text-[#41454d] block">
+            <span className="text-[11px] text-slate-500 block">
               Converting unstructured voice, handwritten notes, and field reports into identity signals
             </span>
           </div>
@@ -84,12 +84,12 @@ export const LandingSignalExtraction: React.FC = () => {
       <div className="relative grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-orange-100">
         {/* Left: Unstructured Field Signal */}
         <div className="lg:col-span-5 p-6 sm:p-8 space-y-5">
-          <div className="flex items-center justify-between text-xs font-mono text-[#41454d]">
-            <span className="flex items-center gap-1.5 text-[#181d26] font-semibold">
+          <div className="flex items-center justify-between text-xs font-mono text-slate-500">
+            <span className="flex items-center gap-1.5 text-slate-900 font-semibold">
               <Volume2 className="w-3.5 h-3.5 text-orange-600" />
               {t('trans_raw_title')}
             </span>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600 font-semibold">
+            <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-600 font-semibold">
               FIELD INPUT
             </span>
           </div>
@@ -112,7 +112,7 @@ export const LandingSignalExtraction: React.FC = () => {
               <span className="w-1 h-2 bg-current rounded-full" />
             </div>
 
-            <div className="text-xs text-[#181d26] leading-relaxed font-body italic border-t border-orange-100 pt-3">
+            <div className="text-xs text-slate-800 leading-relaxed font-sans italic border-t border-orange-100 pt-3">
               "Rescue team intake report: Adult male survivor located near riverine evacuation zone. Approximate age 28 years. Wearing blue denim jacket and dark trousers. Distinct scar observed near left eyebrow. Survivor is in shock and unable to communicate home details."
             </div>
           </div>
@@ -122,7 +122,7 @@ export const LandingSignalExtraction: React.FC = () => {
               <CheckCircle2 className="w-3.5 h-3.5 text-orange-600" />
               <span>Multi-Dialect NLP & Phonetic Parsing</span>
             </div>
-            <p className="text-xs text-[#41454d] leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed">
               Field personnel operate in noisy, torrential conditions. MILAN automatically parses free-form Hindi, Hinglish, Bengali, Tamil, and 20 other regional languages into uniform attribute vectors.
             </p>
           </div>
@@ -131,7 +131,7 @@ export const LandingSignalExtraction: React.FC = () => {
         {/* Right: Normalized Structured Evidence Clues */}
         <div className="lg:col-span-7 p-6 sm:p-8 space-y-4">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-[#181d26] font-semibold flex items-center gap-1.5">
+            <span className="text-slate-900 font-semibold flex items-center gap-1.5">
               <Layers className="w-3.5 h-3.5 text-orange-600" />
               {t('trans_table_title')}
             </span>
@@ -161,7 +161,7 @@ export const LandingSignalExtraction: React.FC = () => {
                 <div className="col-span-8 flex items-center justify-between gap-2">
                   <span
                     className={`font-semibold ${
-                      clue.isHighlight ? 'text-orange-950 font-bold' : 'text-[#181d26]'
+                      clue.isHighlight ? 'text-slate-900 font-bold' : 'text-slate-900'
                     }`}
                   >
                     {clue.extracted}

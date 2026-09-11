@@ -40,7 +40,7 @@ const ScoreGauge: React.FC<{ score: number; size?: number }> = ({ score, size = 
   }, [score]);
 
   const color =
-    score >= 75 ? '#006400' : score >= 50 ? '#d9a441' : '#aa2d00';
+    score >= 75 ? '#059669' : score >= 50 ? '#d97706' : '#dc2626';
 
   return (
     <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
@@ -50,7 +50,7 @@ const ScoreGauge: React.FC<{ score: number; size?: number }> = ({ score, size = 
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#f1f3f5"
+          stroke="#f1f5f9"
           strokeWidth="7"
         />
         <circle
@@ -67,8 +67,8 @@ const ScoreGauge: React.FC<{ score: number; size?: number }> = ({ score, size = 
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-display font-bold text-[#181d26]">{animatedScore}</span>
-        <span className="text-[10px] font-mono font-semibold text-[#9297a0] uppercase tracking-wider">/ 100</span>
+        <span className="text-3xl font-bold tracking-tight text-slate-900">{animatedScore}</span>
+        <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider">/ 100</span>
       </div>
     </div>
   );
@@ -78,42 +78,42 @@ const ScoreGauge: React.FC<{ score: number; size?: number }> = ({ score, size = 
 const EvidenceBar: React.FC<{ field: FieldComparison }> = ({ field }) => {
   const pct = Math.round(field.score * 100);
   const barColor =
-    field.status === 'match' ? 'bg-[#006400]' :
-    field.status === 'partial' ? 'bg-[#d9a441]' :
-    field.status === 'mismatch' ? 'bg-[#aa2d00]' : 'bg-[#9297a0]';
+    field.status === 'match' ? 'bg-emerald-600' :
+    field.status === 'partial' ? 'bg-amber-500' :
+    field.status === 'mismatch' ? 'bg-rose-600' : 'bg-slate-400';
   const textColor =
-    field.status === 'match' ? 'text-[#006400]' :
-    field.status === 'partial' ? 'text-[#d9a441]' :
-    field.status === 'mismatch' ? 'text-[#aa2d00]' : 'text-[#9297a0]';
+    field.status === 'match' ? 'text-emerald-700' :
+    field.status === 'partial' ? 'text-amber-700' :
+    field.status === 'mismatch' ? 'text-rose-700' : 'text-slate-500';
   const StatusIcon =
     field.status === 'match' ? CheckCircle2 :
     field.status === 'partial' ? AlertTriangle :
     field.status === 'mismatch' ? XCircle : HelpCircle;
 
   return (
-    <div className="p-3 hover:bg-[#f8fafc] rounded-lg transition-colors border-b border-[#f1f3f5] last:border-b-0 space-y-1.5">
+    <div className="p-3.5 hover:bg-slate-50/80 rounded-xl transition-colors border-b border-slate-100 last:border-b-0 space-y-1.5">
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
           <StatusIcon className={`w-3.5 h-3.5 ${textColor} shrink-0`} />
-          <span className="font-mono text-xs font-semibold text-[#181d26] uppercase tracking-wide">
+          <span className="font-mono text-xs font-semibold text-slate-800 uppercase tracking-wide">
             {field.field.replace(/_/g, ' ')}
           </span>
         </div>
         <span className={`font-mono text-xs font-bold ${textColor}`}>{pct}%</span>
       </div>
-      <div className="h-2 bg-[#f1f3f5] rounded-full overflow-hidden">
+      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full ${barColor} transition-all duration-1000 ease-out`}
           style={{ width: `${pct}%` }}
         />
       </div>
       {(field.sourceValue || field.candidateValue) && (
-        <div className="flex items-center justify-between text-[11px] text-[#41454d] pt-0.5 font-body">
+        <div className="flex items-center justify-between text-[11px] text-slate-600 pt-0.5">
           <span className="truncate max-w-[48%]">
-            <span className="text-[#9297a0] font-mono text-[10px] uppercase">Source:</span> {field.sourceValue || '—'}
+            <span className="text-slate-400 font-mono text-[10px] uppercase">Source:</span> {field.sourceValue || '—'}
           </span>
           <span className="truncate max-w-[48%] text-right">
-            <span className="text-[#9297a0] font-mono text-[10px] uppercase">Candidate:</span> {field.candidateValue || '—'}
+            <span className="text-slate-400 font-mono text-[10px] uppercase">Candidate:</span> {field.candidateValue || '—'}
           </span>
         </div>
       )}
@@ -128,17 +128,17 @@ const AlertCard: React.FC<{ alert: DiscrepancyAlert }> = ({ alert }) => {
 
   return (
     <div
-      className={`p-4 rounded-lg border transition-colors ${
+      className={`p-4 rounded-xl border transition-colors ${
         isCritical
-          ? 'bg-rose-50/60 border-rose-200'
+          ? 'bg-rose-50/70 border-rose-200'
           : isGap
-          ? 'bg-[#f8fafc] border-[#dddddd]'
-          : 'bg-[#f5e9d4]/50 border-[#e0d0b5]'
+          ? 'bg-slate-50/80 border-slate-200/90'
+          : 'bg-amber-50/70 border-amber-200'
       }`}
     >
       <div className="flex items-start gap-3">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-          isCritical ? 'bg-rose-100 text-[#aa2d00]' : isGap ? 'bg-[#e0e2e6] text-[#41454d]' : 'bg-[#f5e9d4] text-[#d9a441]'
+        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+          isCritical ? 'bg-rose-100 text-rose-700' : isGap ? 'bg-slate-200 text-slate-700' : 'bg-amber-100 text-amber-700'
         }`}>
           {isCritical ? (
             <AlertOctagon className="w-4 h-4" />
@@ -150,29 +150,29 @@ const AlertCard: React.FC<{ alert: DiscrepancyAlert }> = ({ alert }) => {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
-              isCritical ? 'bg-rose-100 text-[#aa2d00]' :
-              isGap ? 'bg-[#e0e2e6] text-[#41454d]' :
-              'bg-[#f5e9d4] text-[#8a5d11]'
+            <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
+              isCritical ? 'bg-rose-100 text-rose-800' :
+              isGap ? 'bg-slate-200 text-slate-700' :
+              'bg-amber-100 text-amber-800'
             }`}>
               {alert.severity.replace(/_/g, ' ')}
             </span>
-            <span className="text-[10px] font-mono text-[#9297a0] uppercase">{alert.field}</span>
+            <span className="text-[10px] font-mono text-slate-400 uppercase">{alert.field}</span>
           </div>
-          <h4 className="text-sm font-semibold text-[#181d26]">{alert.title}</h4>
-          <p className="text-xs text-[#41454d] mt-1 leading-relaxed">{alert.description}</p>
+          <h4 className="text-sm font-semibold text-slate-900">{alert.title}</h4>
+          <p className="text-xs text-slate-600 mt-1 leading-relaxed">{alert.description}</p>
           {(alert.sourceValue || alert.candidateValue) && (
             <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
               {alert.sourceValue && (
-                <span className="text-[11px] bg-white px-2 py-0.5 rounded border border-[#dddddd] text-[#41454d]">
-                  <span className="text-[#9297a0] font-mono text-[10px] uppercase">Source:</span>{' '}
-                  <strong className="text-[#181d26] font-medium">{alert.sourceValue}</strong>
+                <span className="text-[11px] bg-white px-2 py-0.5 rounded-md border border-slate-200 text-slate-700 shadow-xs">
+                  <span className="text-slate-400 font-mono text-[10px] uppercase">Source:</span>{' '}
+                  <strong className="text-slate-900 font-medium">{alert.sourceValue}</strong>
                 </span>
               )}
               {alert.candidateValue && (
-                <span className="text-[11px] bg-white px-2 py-0.5 rounded border border-[#dddddd] text-[#41454d]">
-                  <span className="text-[#9297a0] font-mono text-[10px] uppercase">Candidate:</span>{' '}
-                  <strong className="text-[#181d26] font-medium">{alert.candidateValue}</strong>
+                <span className="text-[11px] bg-white px-2 py-0.5 rounded-md border border-slate-200 text-slate-700 shadow-xs">
+                  <span className="text-slate-400 font-mono text-[10px] uppercase">Candidate:</span>{' '}
+                  <strong className="text-slate-900 font-medium">{alert.candidateValue}</strong>
                 </span>
               )}
             </div>
@@ -323,11 +323,11 @@ export const DossierPage: React.FC = () => {
   if (!dossier) {
     return (
       <div className="max-w-3xl mx-auto py-16 text-center space-y-4">
-        <div className="w-16 h-16 bg-[#f8fafc] border border-[#dddddd] rounded-full flex items-center justify-center mx-auto">
-          <ShieldCheck className="w-8 h-8 text-[#9297a0]" />
+        <div className="w-16 h-16 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-center mx-auto">
+          <ShieldCheck className="w-8 h-8 text-slate-400" />
         </div>
-        <h2 className="text-xl font-semibold text-[#181d26]">Generating Forensic Dossier...</h2>
-        <p className="text-sm text-[#41454d]">Retrieving case records and calculating attribute matrix.</p>
+        <h2 className="text-xl font-bold tracking-tight text-slate-900">Generating Forensic Dossier...</h2>
+        <p className="text-sm text-slate-600">Retrieving case records and calculating attribute matrix.</p>
       </div>
     );
   }
@@ -335,26 +335,29 @@ export const DossierPage: React.FC = () => {
   const recConfig =
     dossier.recommendation === 'APPROVE_RECOMMENDED'
       ? {
-          bg: 'bg-[#f0fdf4]',
-          border: 'border-[#bbf7d0]',
-          text: 'text-[#0a2e0e]',
+          bg: 'bg-emerald-50/80',
+          border: 'border-emerald-200',
+          text: 'text-emerald-900',
           badgeText: 'RECOMMENDED FOR APPROVAL',
           icon: CheckCircle2,
+          iconColor: 'text-emerald-600',
         }
       : dossier.recommendation === 'REJECT_RECOMMENDED'
       ? {
-          bg: 'bg-rose-50',
+          bg: 'bg-rose-50/80',
           border: 'border-rose-200',
-          text: 'text-[#aa2d00]',
+          text: 'text-rose-900',
           badgeText: 'REJECT RECOMMENDED',
           icon: XCircle,
+          iconColor: 'text-rose-600',
         }
       : {
-          bg: 'bg-[#f5e9d4]',
-          border: 'border-[#e0d0b5]',
-          text: 'text-[#181d26]',
+          bg: 'bg-amber-50/80',
+          border: 'border-amber-200',
+          text: 'text-amber-900',
           badgeText: 'MANUAL REVIEW REQUIRED',
           icon: Clock,
+          iconColor: 'text-amber-600',
         };
 
   const RecIcon = recConfig.icon;
@@ -363,27 +366,27 @@ export const DossierPage: React.FC = () => {
   const gapCount = dossier.discrepancyAlerts.filter((a) => a.severity === 'DATA_GAP').length;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pb-12 font-body text-[#333840]">
+    <div className="max-w-5xl mx-auto space-y-6 pb-12 text-slate-700">
       {/* Top Breadcrumb Navigation */}
       <div className="flex items-center justify-between">
         <Link
           to="/review"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#41454d] hover:text-[#181d26] transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Match Review Queue</span>
         </Link>
-        <div className="text-xs font-mono text-[#9297a0]">
-          CASE ID: <strong className="text-[#181d26]">{dossier.sourceCaseId}</strong> ⟷ <strong className="text-[#181d26]">{dossier.candidateCaseId}</strong>
+        <div className="text-xs font-mono text-slate-400">
+          CASE ID: <strong className="text-slate-900">{dossier.sourceCaseId}</strong> ⟷ <strong className="text-slate-900">{dossier.candidateCaseId}</strong>
         </div>
       </div>
 
       {/* 01. Hero Dossier Summary Card */}
-      <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#dddddd] gap-2">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-card space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
           <div className="flex items-center gap-2.5">
-            <ShieldCheck className="w-5 h-5 text-[#181d26]" />
-            <h1 className="font-display font-normal text-xl sm:text-2xl text-[#181d26]">
+            <ShieldCheck className="w-5 h-5 text-orange-600" />
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
               Forensic Verification Dossier
             </h1>
           </div>
@@ -398,46 +401,46 @@ export const DossierPage: React.FC = () => {
 
           {/* Stats KPI Boxes */}
           <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-3 w-full">
-            <div className="p-3.5 bg-[#f8fafc] rounded-lg border border-[#dddddd] text-center">
-              <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#9297a0] mb-1">
+            <div className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80 text-center">
+              <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 mb-1">
                 Confidence
               </div>
               <div
                 className={`text-lg font-bold font-mono ${
                   dossier.confidenceTier === 'HIGH'
-                    ? 'text-[#006400]'
+                    ? 'text-emerald-700'
                     : dossier.confidenceTier === 'MEDIUM'
-                    ? 'text-[#d9a441]'
-                    : 'text-[#aa2d00]'
+                    ? 'text-amber-700'
+                    : 'text-rose-700'
                 }`}
               >
                 {dossier.confidenceTier}
               </div>
             </div>
 
-            <div className="p-3.5 bg-[#f8fafc] rounded-lg border border-[#dddddd] text-center">
-              <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#9297a0] mb-1">
+            <div className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80 text-center">
+              <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 mb-1">
                 Completeness
               </div>
-              <div className="text-lg font-bold font-mono text-[#181d26]">
+              <div className="text-lg font-bold font-mono text-slate-900">
                 {dossier.dataCompleteness}%
               </div>
             </div>
 
-            <div className="p-3.5 bg-[#f8fafc] rounded-lg border border-[#dddddd] text-center">
-              <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#9297a0] mb-1">
+            <div className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80 text-center">
+              <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 mb-1">
                 Evidence Fields
               </div>
-              <div className="text-lg font-bold font-mono text-[#181d26]">
+              <div className="text-lg font-bold font-mono text-slate-900">
                 {dossier.evidenceBreakdown.matched.length + dossier.evidenceBreakdown.conflicting.length}
               </div>
             </div>
 
-            <div className="p-3.5 bg-[#f8fafc] rounded-lg border border-[#dddddd] text-center">
-              <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#9297a0] mb-1">
+            <div className="p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80 text-center">
+              <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400 mb-1">
                 Alerts
               </div>
-              <div className="text-lg font-bold font-mono text-[#181d26]">
+              <div className="text-lg font-bold font-mono text-slate-900">
                 {dossier.discrepancyAlerts.length}
               </div>
             </div>
@@ -445,23 +448,23 @@ export const DossierPage: React.FC = () => {
         </div>
 
         {/* Operational Recommendation Banner */}
-        <div className={`p-4 rounded-lg border ${recConfig.bg} ${recConfig.border} flex items-start gap-3`}>
-          <RecIcon className="w-5 h-5 text-[#181d26] shrink-0 mt-0.5" />
+        <div className={`p-4 rounded-xl border ${recConfig.bg} ${recConfig.border} flex items-start gap-3`}>
+          <RecIcon className={`w-5 h-5 ${recConfig.iconColor} shrink-0 mt-0.5`} />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <strong className="text-sm font-semibold text-[#181d26]">
+              <strong className={`text-sm font-semibold ${recConfig.text}`}>
                 {recConfig.badgeText}
               </strong>
             </div>
-            <p className="text-xs text-[#41454d] mt-0.5 leading-relaxed">
+            <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
               {dossier.summaryRationale}
             </p>
           </div>
         </div>
 
         {/* Action Controls & Metadata */}
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-[#dddddd] gap-3">
-          <div className="text-xs font-mono text-[#9297a0]">
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-4 border-t border-slate-100 gap-3">
+          <div className="text-xs font-mono text-slate-400">
             Generated: {new Date(dossier.generatedAt).toLocaleString()}
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -475,11 +478,11 @@ export const DossierPage: React.FC = () => {
               Print Dossier
             </Button>
             <Button
-              variant="primary"
+              variant="brand"
               size="sm"
               onClick={handleDownload}
               leftIcon={<Download className="w-3.5 h-3.5" />}
-              className="flex-1 sm:flex-none"
+              className="flex-1 sm:flex-none shadow-sm"
             >
               Download (.txt)
             </Button>
@@ -488,20 +491,20 @@ export const DossierPage: React.FC = () => {
       </div>
 
       {/* 02. Evidence Breakdown Matrix */}
-      <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-[#dddddd]">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-card space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-[#181d26]" />
-            <h2 className="text-base font-semibold text-[#181d26]">
+            <TrendingUp className="w-4 h-4 text-orange-600" />
+            <h2 className="text-base font-semibold text-slate-900">
               Deterministic Evidence Matrix
             </h2>
           </div>
-          <span className="text-xs font-mono text-[#9297a0]">
+          <span className="text-xs font-mono text-slate-400">
             {dossier.evidenceBreakdown.matched.length} matched • {dossier.evidenceBreakdown.conflicting.length} conflicting • {dossier.evidenceBreakdown.missing.length} data gaps
           </span>
         </div>
 
-        <div className="divide-y divide-[#dddddd]">
+        <div className="divide-y divide-slate-100">
           {[...dossier.evidenceBreakdown.matched, ...dossier.evidenceBreakdown.conflicting]
             .sort((a, b) => b.score - a.score)
             .map((field, idx) => (
@@ -511,15 +514,15 @@ export const DossierPage: React.FC = () => {
 
         {/* Missing Fields Note */}
         {dossier.evidenceBreakdown.missing.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-[#dddddd] space-y-2">
-            <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[#9297a0]">
+          <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
+            <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400">
               Unavailable Fields (Normalized Weight Redistribution):
             </div>
             <div className="flex flex-wrap gap-1.5">
               {dossier.evidenceBreakdown.missing.map((f) => (
                 <span
                   key={f}
-                  className="text-xs font-mono px-2.5 py-1 bg-[#f8fafc] text-[#41454d] rounded border border-[#dddddd]"
+                  className="text-xs font-mono px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md border border-slate-200/80"
                 >
                   {f.replace(/_/g, ' ')}
                 </span>
@@ -531,27 +534,27 @@ export const DossierPage: React.FC = () => {
 
       {/* 03. Investigation Alerts */}
       {dossier.discrepancyAlerts.length > 0 && (
-        <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-[#dddddd]">
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-card space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-[#aa2d00]" />
-              <h2 className="text-base font-semibold text-[#181d26]">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
+              <h2 className="text-base font-semibold text-slate-900">
                 Investigation Alerts & Safeguard Gates
               </h2>
             </div>
             <div className="flex items-center gap-2">
               {criticalCount > 0 && (
-                <span className="text-[10px] font-mono font-bold bg-rose-50 text-[#aa2d00] border border-rose-200 px-2 py-0.5 rounded">
+                <span className="text-[10px] font-mono font-bold bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-md">
                   {criticalCount} CRITICAL
                 </span>
               )}
               {benignCount > 0 && (
-                <span className="text-[10px] font-mono font-bold bg-[#f5e9d4] text-[#8a5d11] border border-[#e0d0b5] px-2 py-0.5 rounded">
+                <span className="text-[10px] font-mono font-bold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-md">
                   {benignCount} BENIGN
                 </span>
               )}
               {gapCount > 0 && (
-                <span className="text-[10px] font-mono font-bold bg-[#f8fafc] text-[#41454d] border border-[#dddddd] px-2 py-0.5 rounded">
+                <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded-md">
                   {gapCount} GAPS
                 </span>
               )}
@@ -566,19 +569,19 @@ export const DossierPage: React.FC = () => {
       )}
 
       {/* 04. Official Printable Verification Certificate Preview */}
-      <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-4">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-card space-y-4">
         <button
           type="button"
           onClick={() => setShowRawDossier(!showRawDossier)}
-          className="flex items-center justify-between w-full text-left transition-colors"
+          className="flex items-center justify-between w-full text-left transition-colors group"
         >
           <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-[#181d26]" />
-            <h3 className="text-sm font-semibold text-[#181d26]">
+            <Lock className="w-4 h-4 text-slate-700 group-hover:text-orange-600 transition-colors" />
+            <h3 className="text-sm font-semibold text-slate-900 group-hover:text-orange-600 transition-colors">
               Official Handover Certificate & Forensic Audit Log
             </h3>
           </div>
-          <span className="text-xs font-mono text-[#9297a0] flex items-center gap-1">
+          <span className="text-xs font-mono text-slate-400 flex items-center gap-1 group-hover:text-slate-600 transition-colors">
             {showRawDossier ? (
               <>
                 Collapse <ChevronUp className="w-3.5 h-3.5" />
@@ -593,7 +596,7 @@ export const DossierPage: React.FC = () => {
 
         {showRawDossier && (
           <div className="pt-2 animate-fade-in">
-            <pre className="p-4 bg-[#f8fafc] text-[#181d26] border border-[#dddddd] rounded-lg text-[11px] font-mono leading-relaxed whitespace-pre-wrap max-h-[500px] overflow-auto">
+            <pre className="p-4 bg-slate-900 text-slate-100 border border-slate-800 rounded-xl text-[11px] font-mono leading-relaxed whitespace-pre-wrap max-h-[500px] overflow-auto shadow-inner">
               {dossier.officialDossierText}
             </pre>
           </div>

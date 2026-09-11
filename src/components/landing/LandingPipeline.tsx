@@ -59,7 +59,7 @@ export const LandingPipeline: React.FC = () => {
   ];
 
   return (
-    <div className="w-full space-y-8 select-none font-body">
+    <div className="w-full space-y-8 select-none font-sans">
       {/* Visual Pipeline Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 relative">
         {steps.map((item, idx) => {
@@ -69,14 +69,14 @@ export const LandingPipeline: React.FC = () => {
           return (
             <div
               key={idx}
-              className="relative p-5 rounded-xl bg-white border border-orange-100 shadow-sm hover:border-orange-400 hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
+              className="relative p-5 rounded-2xl bg-white border border-slate-200/90 shadow-card hover:border-orange-300 hover:shadow-card-hover transition-all flex flex-col justify-between space-y-4 group"
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className={`w-8 h-8 rounded-lg flex items-center justify-center border ${item.accent}`}>
+                  <span className={`w-9 h-9 rounded-xl flex items-center justify-center border shadow-xs ${item.accent}`}>
                     <Icon className="w-4 h-4" />
                   </span>
-                  <span className="font-mono text-xs font-bold text-orange-950/40">
+                  <span className="font-mono text-xs font-bold text-slate-300">
                     {item.step}
                   </span>
                 </div>
@@ -85,20 +85,20 @@ export const LandingPipeline: React.FC = () => {
                   <div className="text-[10px] font-mono uppercase tracking-wider text-orange-600 font-semibold">
                     {item.tag}
                   </div>
-                  <h3 className="font-display font-normal text-base text-[#181d26] mt-0.5">
+                  <h3 className="font-sans font-semibold text-base text-slate-900 mt-0.5">
                     {item.title}
                   </h3>
                 </div>
 
-                <p className="text-xs text-[#41454d] leading-relaxed">
+                <p className="text-xs text-slate-600 leading-relaxed">
                   {item.desc}
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-orange-50 flex items-center justify-between text-[11px] font-mono text-[#9297a0]">
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-400">
                 <span>Phase {item.step}</span>
                 {!isLast && (
-                  <ArrowRight className="w-3.5 h-3.5 text-orange-400 group-hover:translate-x-0.5 transition-transform" />
+                  <ArrowRight className="w-3.5 h-3.5 text-orange-500 group-hover:translate-x-1 transition-transform" />
                 )}
                 {isLast && (
                   <span className="text-orange-600 font-semibold flex items-center gap-1">

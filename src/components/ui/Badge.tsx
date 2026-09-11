@@ -1,6 +1,7 @@
 import React from 'react';
 
 export type BadgeVariant =
+  | 'brand'
   | 'mint'
   | 'shade'
   | 'dark'
@@ -31,30 +32,30 @@ export const Badge: React.FC<BadgeProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center gap-1.5 font-body font-medium uppercase tracking-wider rounded-md select-none';
+  const baseStyles = 'inline-flex items-center gap-1.5 font-mono font-semibold uppercase tracking-wider rounded-md select-none transition-colors';
 
   const variantStyles: Record<BadgeVariant, string> = {
-    // Airtable signature surfaces
-    'mint': 'bg-[#a8d8c4]/30 text-[#006400] border border-[#a8d8c4] font-semibold',
-    'shade': 'bg-[#f8fafc] text-[#333840] border border-[#dddddd]',
-    'dark': 'bg-[#181d26] text-white border border-[#181d26] font-semibold',
-    'outline': 'bg-transparent text-[#181d26] border border-[#dddddd]',
-    'verified': 'bg-[#a8d8c4]/30 text-[#006400] border border-[#a8d8c4] font-semibold',
-    'pending': 'bg-[#f5e9d4] text-[#181d26] border border-[#e0d0b5] font-semibold',
-    'critical': 'bg-[#aa2d00]/10 text-[#aa2d00] border border-[#aa2d00]/30 font-semibold',
-    'info': 'bg-[#254fad]/10 text-[#254fad] border border-[#458fff]/40 font-semibold',
-    'offline': 'bg-[#e0e2e6] text-[#41454d] border border-[#dddddd] font-semibold',
-    'rescue': 'bg-[#0a2e0e]/10 text-[#0a2e0e] border border-[#0a2e0e]/30 font-semibold',
-    'hospital': 'bg-[#f5e9d4] text-[#181d26] border border-[#e0d0b5] font-semibold',
-    'coral': 'bg-[#aa2d00]/10 text-[#aa2d00] border border-[#aa2d00]/30 font-semibold',
-    'forest': 'bg-[#0a2e0e]/10 text-[#0a2e0e] border border-[#0a2e0e]/30 font-semibold',
-    'cream': 'bg-[#f5e9d4] text-[#181d26] border border-[#e0d0b5] font-semibold',
-    'peach': 'bg-[#fcab79]/30 text-[#aa2d00] border border-[#fcab79] font-semibold',
+    'brand': 'bg-orange-50 text-orange-700 border border-orange-200',
+    'mint': 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+    'verified': 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+    'pending': 'bg-amber-50 text-amber-800 border border-amber-200',
+    'critical': 'bg-rose-50 text-rose-700 border border-rose-200',
+    'coral': 'bg-orange-50 text-orange-700 border border-orange-200',
+    'info': 'bg-blue-50 text-blue-700 border border-blue-200',
+    'offline': 'bg-slate-100 text-slate-600 border border-slate-200',
+    'shade': 'bg-slate-50 text-slate-700 border border-slate-200',
+    'outline': 'bg-transparent text-slate-700 border border-slate-200',
+    'dark': 'bg-slate-900 text-white border border-slate-900',
+    'rescue': 'bg-orange-50 text-orange-800 border border-orange-200',
+    'hospital': 'bg-blue-50 text-blue-800 border border-blue-200',
+    'forest': 'bg-slate-900 text-white border border-slate-900',
+    'cream': 'bg-amber-50 text-amber-900 border border-amber-200',
+    'peach': 'bg-orange-50 text-orange-800 border border-orange-200',
   };
 
   const sizeStyles = {
-    'sm': 'text-[10px] py-0.5 px-2 rounded-xs',
-    'md': 'text-xs py-1 px-2.5 rounded-sm',
+    'sm': 'text-[10px] py-0.5 px-2 rounded',
+    'md': 'text-[11px] py-0.5 px-2.5 rounded-md',
   };
 
   return (

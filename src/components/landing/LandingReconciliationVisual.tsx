@@ -49,7 +49,7 @@ export const LandingReconciliationVisual: React.FC = () => {
   ];
 
   return (
-    <div className="relative rounded-2xl bg-white text-[#181d26] border border-orange-200 shadow-xl overflow-hidden font-body select-none">
+    <div className="relative rounded-2xl bg-white text-slate-900 border border-orange-200/90 shadow-card overflow-hidden font-sans select-none">
       {/* Subtle Warm Amber Glow */}
       <div className="absolute top-0 right-0 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -61,7 +61,7 @@ export const LandingReconciliationVisual: React.FC = () => {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500" />
           </span>
-          <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#181d26]">
+          <span className="font-mono text-xs font-bold tracking-wider uppercase text-slate-900">
             {t('dossier_title')}
           </span>
         </div>
@@ -80,8 +80,8 @@ export const LandingReconciliationVisual: React.FC = () => {
               <span>{t('dossier_source_a')}</span>
               <span className="text-orange-600 font-bold">FAMILY DESK</span>
             </div>
-            <div className="text-sm font-semibold text-[#181d26]">Missing Person Report</div>
-            <div className="text-xs text-[#41454d] font-mono">
+            <div className="text-sm font-semibold text-slate-900">Missing Person Report</div>
+            <div className="text-xs text-slate-500 font-mono">
               Approx. 28 Yrs • Male • Relative Registry
             </div>
           </div>
@@ -92,7 +92,7 @@ export const LandingReconciliationVisual: React.FC = () => {
               <span>{t('dossier_source_b')}</span>
               <span className="text-orange-700 font-bold">SHELTER INTAKE</span>
             </div>
-            <div className="text-sm font-bold text-orange-950">Rescue Shelter Arrival</div>
+            <div className="text-sm font-bold text-slate-900">Rescue Shelter Arrival</div>
             <div className="text-xs text-orange-900/70 font-mono">
               Approx. 27 Yrs • Male • Evacuation Camp
             </div>
@@ -102,7 +102,7 @@ export const LandingReconciliationVisual: React.FC = () => {
         {/* Convergence Indicator Bar (Warm Orange Accent, NO numeric scores) */}
         <div className="p-3.5 rounded-xl bg-orange-500/10 border border-orange-300/80 space-y-2">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-[#181d26] font-medium flex items-center gap-1.5">
+            <span className="text-slate-900 font-medium flex items-center gap-1.5">
               <GitCompare className="w-3.5 h-3.5 text-orange-600" />
               {t('dossier_confidence_label')}
             </span>
@@ -115,7 +115,7 @@ export const LandingReconciliationVisual: React.FC = () => {
           <div className="w-full bg-orange-200/70 h-2 rounded-full overflow-hidden flex">
             <div className="bg-orange-500 h-full rounded-full w-4/5 animate-pulse" />
           </div>
-          <div className="text-[11px] text-[#41454d] flex items-center justify-between font-mono pt-0.5">
+          <div className="text-[11px] text-slate-600 flex items-center justify-between font-mono pt-0.5">
             <span>Deterministic Attribute Alignment</span>
             <span className="text-orange-700 font-bold">Candidate Flagged</span>
           </div>
@@ -130,8 +130,8 @@ export const LandingReconciliationVisual: React.FC = () => {
             className="px-5 py-2.5 flex items-center justify-between gap-3 hover:bg-orange-50/30 transition-colors"
           >
             <div className="min-w-0 flex-1">
-              <span className="font-semibold text-[#181d26] block truncate">{item.label}</span>
-              <span className="text-[11px] text-[#41454d] truncate block">{item.detail}</span>
+              <span className="font-semibold text-slate-900 block truncate">{item.label}</span>
+              <span className="text-[11px] text-slate-500 truncate block">{item.detail}</span>
             </div>
             <span
               className={`font-mono text-[10px] font-semibold px-2 py-0.5 rounded border shrink-0 ${item.statusColor}`}
@@ -148,13 +148,13 @@ export const LandingReconciliationVisual: React.FC = () => {
           <UserCheck className="w-4 h-4" />
         </div>
         <div className="space-y-0.5 min-w-0">
-          <div className="text-xs font-semibold text-[#181d26] flex items-center gap-1.5">
+          <div className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
             <span>Human Verification Required</span>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-orange-100 text-orange-800 border border-orange-200 font-semibold">
               MANDATORY
             </span>
           </div>
-          <p className="text-[11px] text-[#41454d] leading-relaxed">
+          <p className="text-[11px] text-slate-600 leading-relaxed">
             Automated algorithms never confirm reunions alone. An authorized disaster reviewer audits physical evidence and photo verification before family contact.
           </p>
         </div>

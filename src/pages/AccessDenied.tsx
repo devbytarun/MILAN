@@ -25,23 +25,23 @@ export const AccessDenied: React.FC<AccessDeniedProps> = ({
   const effectiveMessage = reason || message;
 
   return (
-    <div className="max-w-xl mx-auto my-16 p-8 bg-white border border-[#dddddd] rounded-xl shadow-elevation-1 text-center space-y-5 font-body">
-      <div className="w-12 h-12 rounded-full bg-[#f8fafc] border border-[#dddddd] flex items-center justify-center mx-auto text-[#181d26]">
-        <ShieldAlert className="w-6 h-6 text-[#aa2d00]" />
+    <div className="max-w-xl mx-auto my-16 p-8 bg-white border border-slate-200/90 rounded-2xl shadow-card text-center space-y-5 font-body">
+      <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200/80 flex items-center justify-center mx-auto text-rose-600 shadow-sm">
+        <ShieldAlert className="w-7 h-7 text-rose-600" />
       </div>
 
       <div className="space-y-1.5">
         <div className="flex justify-center mb-1">
-          <Badge variant="shade" size="sm">
+          <Badge variant={isFamily ? 'critical' : 'shade'} size="sm">
             {isFamily ? 'Operational Quarantine' : 'Access Restricted'}
           </Badge>
         </div>
-        <h1 className="font-display text-2xl font-normal text-[#181d26]">
+        <h1 className="font-display text-2xl font-semibold text-slate-900 tracking-tight">
           {isFamily ? 'Operational Module Restricted' : 'Restricted Access Module'}
         </h1>
       </div>
 
-      <div className="text-xs text-[#41454d] leading-relaxed max-w-md mx-auto">
+      <div className="text-xs text-slate-600 leading-relaxed max-w-md mx-auto">
         {effectiveMessage ? (
           <p>{effectiveMessage}</p>
         ) : isFamily ? (
@@ -51,15 +51,17 @@ export const AccessDenied: React.FC<AccessDeniedProps> = ({
         ) : (
           <p>
             Your current authenticated role (
-            <span className="font-semibold text-[#181d26]">{profile?.role || 'Guest'}</span>
+            <span className="font-semibold text-slate-900">{profile?.role || 'Guest'}</span>
             ) does not hold authorization credentials to access {requiredModule ? `the ${requiredModule}` : 'this module'}. If this is required for field operations, contact your nodal coordinator.
           </p>
         )}
       </div>
 
-      <div className="p-4 bg-[#f8fafc] rounded-lg border border-[#dddddd] text-left text-xs text-[#41454d] space-y-1.5">
-        <div className="font-semibold text-[#181d26]">Security & Privacy Protocol:</div>
-        <p className="text-[11px] text-[#9297a0] leading-normal">
+      <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200/80 text-left text-xs text-slate-600 space-y-1.5">
+        <div className="font-semibold text-slate-900 flex items-center gap-1.5">
+          <span>Security & Privacy Protocol</span>
+        </div>
+        <p className="text-[11px] text-slate-500 leading-normal">
           MILAN enforces strict role-based data quarantine to protect vulnerable disaster survivors from unauthorized data harvesting, trafficking risks, and misinformation.
         </p>
       </div>
@@ -76,7 +78,7 @@ export const AccessDenied: React.FC<AccessDeniedProps> = ({
 
         <Link to="/dashboard">
           <Button
-            variant="primary"
+            variant="brand"
             size="sm"
             leftIcon={isFamily ? <FileText className="w-4 h-4" /> : <Home className="w-4 h-4" />}
           >

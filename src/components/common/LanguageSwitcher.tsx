@@ -79,30 +79,30 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           type="button"
           ref={triggerRef}
           onClick={() => setIsOpen((open) => !open)}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-[#dddddd] bg-white text-[#181d26] text-xs font-medium hover:border-[#9297a0] hover:bg-[#f8fafc] transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-800 text-xs font-medium hover:border-slate-300 hover:bg-slate-50 transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-orange-500/20 outline-none"
           aria-haspopup="dialog"
           aria-expanded={isOpen}
           aria-controls={isOpen ? menuId : undefined}
           aria-label={triggerLabel}
           title={triggerLabel}
         >
-          <Languages className="w-3.5 h-3.5 text-[#181d26] shrink-0" aria-hidden="true" />
+          <Languages className="w-3.5 h-3.5 text-slate-700 shrink-0" aria-hidden="true" />
           <span>{currentLanguageInfo.label}</span>
-          <span className="text-[10px] text-[#9297a0]">({currentLanguageInfo.englishName})</span>
+          <span className="text-[10px] text-slate-400">({currentLanguageInfo.englishName})</span>
         </button>
       ) : (
         <button
           type="button"
           ref={triggerRef}
           onClick={() => setIsOpen((open) => !open)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill border border-[#dddddd] bg-white text-[#181d26] text-xs font-semibold hover:border-[#9297a0] hover:bg-[#f8fafc] transition-all shadow-sm active:scale-95"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-white text-slate-800 text-xs font-semibold hover:border-slate-300 hover:bg-slate-50 transition-all shadow-sm active:scale-95 focus-visible:ring-2 focus-visible:ring-orange-500/20 outline-none"
           aria-haspopup="dialog"
           aria-expanded={isOpen}
           aria-controls={isOpen ? menuId : undefined}
           aria-label={triggerLabel}
           title={triggerLabel}
         >
-          <Languages className="w-3.5 h-3.5 text-[#181d26] shrink-0" aria-hidden="true" />
+          <Languages className="w-3.5 h-3.5 text-slate-700 shrink-0" aria-hidden="true" />
           <span>{currentLanguageInfo.label}</span>
         </button>
       )}
@@ -113,18 +113,18 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           id={menuId}
           role="dialog"
           aria-label="Choose a language"
-          className={`absolute ${placementClasses} z-[60] w-[calc(100vw-2rem)] max-w-72 max-h-[calc(100dvh-5rem)] bg-white border border-[#dddddd] rounded-xl shadow-elevation-3 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150`}
+          className={`absolute ${placementClasses} z-[60] w-[calc(100vw-2rem)] max-w-72 max-h-[calc(100dvh-5rem)] bg-white border border-slate-200 rounded-xl shadow-dropdown overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150`}
         >
           {/* Integrated Search Bar */}
-          <div className="p-2 border-b border-[#dddddd] bg-[#f8fafc]">
+          <div className="p-2 border-b border-slate-100 bg-slate-50/70">
             <div className="relative flex items-center">
-              <Search className="w-3.5 h-3.5 text-[#9297a0] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search language / भाषा खोजें..."
-                className="w-full !h-8 !min-h-0 !pl-8 !pr-7 !py-1 text-xs border border-[#dddddd] rounded-md bg-white text-[#181d26] placeholder:text-[#9297a0] focus:!border-[#181d26] focus:!ring-0 outline-none !shadow-none transition-colors"
+                className="w-full !h-8 !min-h-0 !pl-8 !pr-7 !py-1 text-xs border border-slate-200 rounded-lg bg-white text-slate-900 placeholder:text-slate-400 focus:!border-orange-500 focus:!ring-2 focus:!ring-orange-500/10 outline-none !shadow-none transition-colors"
                 aria-label="Search languages"
                 autoFocus
               />
@@ -132,7 +132,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9297a0] hover:text-[#181d26] p-0.5"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 p-0.5"
                   aria-label="Clear language search"
                 >
                   <X className="w-3.5 h-3.5" aria-hidden="true" />
@@ -142,7 +142,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           </div>
 
           {/* Language Options Grid */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-1.5 divide-y divide-[#f1f3f5]">
+          <div className="flex-1 min-h-0 overflow-y-auto p-1.5 divide-y divide-slate-100">
             {filteredLanguages.length > 0 ? (
               filteredLanguages.map((l) => {
                 const isSelected = l.code === language;
@@ -156,27 +156,27 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                     aria-current={isSelected ? 'true' : undefined}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-start text-xs transition-colors ${
                       isSelected
-                        ? 'bg-[#f8fafc] text-[#181d26] font-semibold border border-[#dddddd]'
-                        : 'text-[#333840] hover:bg-[#f8fafc]'
+                        ? 'bg-orange-50/80 text-orange-800 font-semibold border border-orange-200/60'
+                        : 'text-slate-700 hover:bg-slate-50'
                     }`}
                   >
                     <div>
-                      <div className="text-xs font-bold leading-tight">{l.label}</div>
-                      <div className="text-[10px] text-[#9297a0] font-normal">{l.englishName} {l.isRTL ? '(RTL)' : ''}</div>
+                      <div className="text-xs font-semibold leading-tight">{l.label}</div>
+                      <div className="text-[10px] text-slate-400 font-normal">{l.englishName} {l.isRTL ? '(RTL)' : ''}</div>
                     </div>
-                    {isSelected && <Check className="w-4 h-4 text-[#181d26] shrink-0" aria-hidden="true" />}
+                    {isSelected && <Check className="w-4 h-4 text-orange-600 shrink-0" aria-hidden="true" />}
                   </button>
                 );
               })
             ) : (
-              <div className="p-4 text-center text-xs text-[#9297a0]">
+              <div className="p-4 text-center text-xs text-slate-400">
                 No matching language found
               </div>
             )}
           </div>
 
-          <div className="p-2 bg-[#f8fafc] border-t border-[#dddddd] text-center">
-            <span className="text-[10px] text-[#41454d] font-medium">
+          <div className="p-2 bg-slate-50/70 border-t border-slate-100 text-center">
+            <span className="text-[10px] text-slate-500 font-medium">
               22 Eighth Schedule Languages + English (23 Total)
             </span>
           </div>
