@@ -72,7 +72,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   const triggerLabel = `Choose language. Current language: ${currentLanguageInfo.englishName}`;
 
   return (
-    <div className={`relative inline-block text-left ${className}`} ref={dropdownRef}>
+    <div className={`relative inline-block text-start ${className}`} ref={dropdownRef}>
       {/* Trigger Button */}
       {variant === 'footer' ? (
         <button

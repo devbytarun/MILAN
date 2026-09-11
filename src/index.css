@@ -121,6 +121,9 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
   }
 
   body {
@@ -130,6 +133,16 @@
     line-height: 1.5;
     color: var(--color-body);
     background-color: var(--color-canvas);
+    min-height: 100vh;
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+  }
+
+  #root {
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
     min-height: 100vh;
   }
 

@@ -16,6 +16,7 @@ import {
   Search,
   Radio,
   FileText,
+  PlusCircle,
 } from 'lucide-react';
 import { Button } from '../ui/Button.tsx';
 import { Badge } from '../ui/Badge.tsx';
@@ -29,8 +30,10 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
+  const [intakeMenuOpen, setIntakeMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const intakeMenuRef = useRef<HTMLDivElement>(null);
 
   const role = profile?.role;
   const isFamily = role === 'FAMILY';
@@ -50,10 +53,11 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on route change
+  // Close menus on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setRoleSwitcherOpen(false);
+    setIntakeMenuOpen(false);
   }, [location.pathname]);
 
   // Handle escape key and click outside
@@ -62,11 +66,15 @@ export const Navbar: React.FC = () => {
       if (e.key === 'Escape') {
         setMobileMenuOpen(false);
         setRoleSwitcherOpen(false);
+        setIntakeMenuOpen(false);
       }
     };
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setRoleSwitcherOpen(false);
+      }
+      if (intakeMenuRef.current && !intakeMenuRef.current.contains(e.target as Node)) {
+        setIntakeMenuOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -90,12 +98,12 @@ export const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-40 h-16 bg-white border-b border-[#dddddd] transition-shadow duration-150 ${
+      className={`sticky top-0 z-40 h-16 bg-white border-b border-[#dddddd] w-full max-w-full overflow-x-clip transition-shadow duration-150 ${
         scrolled ? 'shadow-elevation-1' : ''
       }`}
     >
-      <div className="w-full px-4 sm:px-6 lg:px-8 h-full">
-        <div className="flex items-center justify-between h-full gap-4">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-full max-w-full">
+        <div className="flex items-center justify-between h-full gap-2 sm:gap-4">
           {/* Brand Logo & Live Status */}
           <div className="flex items-center gap-3 shrink-0">
             <Link
@@ -110,17 +118,17 @@ export const Navbar: React.FC = () => {
                 DISASTER GRID
               </Badge>
             </Link>
-            <div className="hidden xl:block border-l border-[#dddddd] pl-3 shrink-0">
+            <div className="hidden 2xl:block border-l border-[#dddddd] pl-3 shrink-0">
               <LiveStatusBeacon />
             </div>
           </div>
 
-          {/* Desktop Nav Links (Single line, whitespace-nowrap, Airtable neutral styles) */}
+          {/* Desktop Nav Links (Streamlined, role-aware, overflow-free) */}
           <nav className="hidden lg:flex items-center gap-1 shrink-0" aria-label="Main Navigation">
             {profile && (
               <Link
                 to="/dashboard"
-                className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap px-2.5 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                   isActive('/dashboard')
                     ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
                     : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
@@ -133,7 +141,7 @@ export const Navbar: React.FC = () => {
             {canViewCases && (
               <Link
                 to="/cases"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                   isActive('/cases')
                     ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
                     : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
@@ -144,11 +152,11 @@ export const Navbar: React.FC = () => {
               </Link>
             )}
 
-            {/* Role-Specific Action Links */}
-            {canReportMissing && (
+            {/* If FAMILY: single direct link to Report Missing */}
+            {isFamily && canReportMissing && (
               <Link
                 to="/report/missing"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                   isActive('/report/missing')
                     ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
                     : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
@@ -159,38 +167,90 @@ export const Navbar: React.FC = () => {
               </Link>
             )}
 
-            {canReportFound && (
-              <Link
-                to="/report/found"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive('/report/found')
-                    ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
-                    : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
-                }`}
-              >
-                <FilePlus className="w-3.5 h-3.5" />
-                <span>{t('nav_report_found')}</span>
-              </Link>
-            )}
+            {/* If OPERATIONAL: consolidated Intake Forms dropdown */}
+            {!isFamily && (canReportMissing || canReportFound || canReportHospital || canVoice) && (
+              <div className="relative" ref={intakeMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIntakeMenuOpen(!intakeMenuOpen)}
+                  className={`whitespace-nowrap flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
+                    isActive('/report/missing') ||
+                    isActive('/report/found') ||
+                    isActive('/report/hospital') ||
+                    isActive('/report/voice')
+                      ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
+                      : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
+                  }`}
+                  aria-expanded={intakeMenuOpen}
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  <span>Intake Forms</span>
+                  <ChevronDown className="w-3 h-3 opacity-60" />
+                </button>
 
-            {canReportHospital && (
-              <Link
-                to="/report/hospital"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive('/report/hospital')
-                    ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
-                    : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
-                }`}
-              >
-                <Building2 className="w-3.5 h-3.5" />
-                <span>{t('nav_report_hospital')}</span>
-              </Link>
+                {intakeMenuOpen && (
+                  <div className="absolute left-0 mt-2 w-64 rounded-xl shadow-elevation-3 py-1.5 z-50 border border-[#dddddd] bg-white text-[#181d26]">
+                    {canReportMissing && (
+                      <Link
+                        to="/report/missing"
+                        onClick={() => setIntakeMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3.5 py-2 text-xs hover:bg-[#f8fafc] transition-colors"
+                      >
+                        <FilePlus className="w-3.5 h-3.5 text-[#aa2d00]" />
+                        <div>
+                          <span className="font-semibold block">{t('nav_report_missing')}</span>
+                          <span className="text-[10px] text-[#9297a0]">Family missing person report</span>
+                        </div>
+                      </Link>
+                    )}
+                    {canReportFound && (
+                      <Link
+                        to="/report/found"
+                        onClick={() => setIntakeMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3.5 py-2 text-xs hover:bg-[#f8fafc] transition-colors"
+                      >
+                        <FilePlus className="w-3.5 h-3.5 text-[#006400]" />
+                        <div>
+                          <span className="font-semibold block">{t('nav_report_found')}</span>
+                          <span className="text-[10px] text-[#9297a0]">Field rescue shelter intake</span>
+                        </div>
+                      </Link>
+                    )}
+                    {canReportHospital && (
+                      <Link
+                        to="/report/hospital"
+                        onClick={() => setIntakeMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3.5 py-2 text-xs hover:bg-[#f8fafc] transition-colors"
+                      >
+                        <Building2 className="w-3.5 h-3.5 text-[#1b61c9]" />
+                        <div>
+                          <span className="font-semibold block">{t('nav_report_hospital')}</span>
+                          <span className="text-[10px] text-[#9297a0]">Clinical patient triage</span>
+                        </div>
+                      </Link>
+                    )}
+                    {canVoice && (
+                      <Link
+                        to="/report/voice"
+                        onClick={() => setIntakeMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3.5 py-2 text-xs hover:bg-[#f8fafc] transition-colors border-t border-[#f1f3f5] mt-1 pt-1.5"
+                      >
+                        <Radio className="w-3.5 h-3.5 text-[#181d26]" />
+                        <div>
+                          <span className="font-semibold block">{t('nav_voice_ai')}</span>
+                          <span className="text-[10px] text-[#9297a0]">Radio dispatch & voice parser</span>
+                        </div>
+                      </Link>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
 
             {canReview && (
               <Link
                 to="/review"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                   isActive('/review')
                     ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
                     : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
@@ -201,24 +261,10 @@ export const Navbar: React.FC = () => {
               </Link>
             )}
 
-            {canVoice && (
-              <Link
-                to="/report/voice"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive('/report/voice')
-                    ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
-                    : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
-                }`}
-              >
-                <Radio className="w-3.5 h-3.5 text-[#181d26]" />
-                <span>{t('nav_voice_ai')}</span>
-              </Link>
-            )}
-
             {canDossier && (
               <Link
                 to="/dossier"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                   isActive('/dossier')
                     ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
                     : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
@@ -231,7 +277,7 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Right Controls (Language / Role Switcher / Profile) */}
-          <div className="hidden lg:flex items-center gap-2.5 shrink-0">
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
             {/* Language Switcher */}
             <LanguageSwitcher variant="pill" />
 
@@ -298,8 +344,8 @@ export const Navbar: React.FC = () => {
             {/* Profile or Auth CTAs */}
             {profile ? (
               <div className="flex items-center gap-2 pl-2 border-l border-[#dddddd] shrink-0">
-                <div className="text-right whitespace-nowrap">
-                  <div className="text-xs font-semibold text-[#181d26] leading-tight">
+                <div className="hidden 2xl:block text-right whitespace-nowrap">
+                  <div className="text-xs font-semibold text-[#181d26] leading-tight truncate max-w-[110px]">
                     {profile.full_name || 'Coordinator'}
                   </div>
                   <div className="text-[10px] text-[#9297a0] truncate max-w-[110px]">
