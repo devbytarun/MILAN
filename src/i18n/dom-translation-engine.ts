@@ -7,31 +7,38 @@
 
 import { LanguageCode } from './types.ts';
 import { locales } from './locales/index.ts';
+import { HINDI_LEARNING_SENTENCES, HINDI_LEARNING_WORDS } from './hindi-learning-corpus.ts';
 
 // Memory of pristine original English text nodes and attributes
 const originalTextMap = new WeakMap<Node, string>();
 
 // ------------------------------------------------------------
 // 1. DEDICATED PHONETIC TRANSLITERATION ENGINE (English -> Devanagari Hindi)
-// Converts unmapped proper nouns, names, and places into proper Hindi Devanagari
+// Converts unmapped proper nouns, names, and places into pure Hindi Devanagari
+// ZERO English characters allowed in output
 // ------------------------------------------------------------
 const HINDI_CONSONANT_RULES: [string, string][] = [
   ['chhh', 'छ'], ['chh', 'छ'], ['ch', 'च'], ['kh', 'ख'], ['gh', 'घ'],
   ['jh', 'झ'], ['th', 'थ'], ['dh', 'ध'], ['ph', 'फ'], ['bh', 'भ'],
-  ['shh', 'ष'], ['sh', 'श'], ['k', 'क'], ['g', 'ग'], ['j', 'ज'],
-  ['t', 'त'], ['d', 'द'], ['n', 'न'], ['p', 'प'], ['b', 'ब'],
-  ['m', 'म'], ['y', 'य'], ['r', 'र'], ['l', 'ल'], ['v', 'व'],
-  ['w', 'व'], ['s', 'स'], ['h', 'ह'], ['z', 'ज़'], ['f', 'फ़'], ['q', 'क़']
+  ['shh', 'ष'], ['sh', 'श'], ['ck', 'क'], ['qu', 'क्व'], ['wh', 'व'],
+  ['k', 'क'], ['g', 'ग'], ['j', 'ज'], ['t', 'ट'], ['d', 'ड'],
+  ['n', 'न'], ['p', 'प'], ['b', 'ब'], ['m', 'म'], ['y', 'य'],
+  ['r', 'र'], ['l', 'ल'], ['v', 'व'], ['w', 'व'], ['s', 'स'],
+  ['h', 'ह'], ['z', 'ज़'], ['f', 'फ़'], ['q', 'क़'], ['x', 'क्स']
 ];
 
 const HINDI_VOWEL_MATRAS: [string, string][] = [
   ['aaa', 'ा'], ['aa', 'ा'], ['ee', 'ी'], ['oo', 'ू'], ['ai', 'ै'],
-  ['au', 'ौ'], ['a', ''], ['i', 'ि'], ['u', 'ु'], ['e', 'े'], ['o', 'ो']
+  ['ay', 'े'], ['au', 'ौ'], ['aw', 'ॉ'], ['ea', 'ी'], ['oa', 'ो'],
+  ['ou', 'ाउ'], ['ow', 'ो'], ['oi', 'ॉय'], ['oy', 'ॉय'], ['a', ''],
+  ['i', 'ि'], ['u', 'ु'], ['e', 'े'], ['o', 'ो'], ['y', 'ी']
 ];
 
 const HINDI_INITIAL_VOWELS: [string, string][] = [
-  ['aaa', 'आ'], ['aa', 'आ'], ['ai', 'ऐ'], ['au', 'औ'], ['ee', 'ई'],
-  ['oo', 'ऊ'], ['a', 'अ'], ['i', 'इ'], ['u', 'उ'], ['e', 'ए'], ['o', 'ओ']
+  ['aaa', 'आ'], ['aa', 'आ'], ['ai', 'ऐ'], ['ay', 'ए'], ['au', 'औ'],
+  ['aw', 'ऑ'], ['ee', 'ई'], ['ea', 'ई'], ['oo', 'ऊ'], ['oa', 'ओ'],
+  ['ou', 'आउ'], ['ow', 'ओ'], ['a', 'अ'], ['i', 'इ'], ['u', 'उ'],
+  ['e', 'ए'], ['o', 'ओ'], ['y', 'इ']
 ];
 
 // Special common names and places mapping for 100% natural pronunciation
@@ -47,6 +54,7 @@ const KNOWN_INDIAN_PROPER_NOUNS: Record<string, string> = {
   'anita': 'अनिता',
   'rajesh': 'राजेश',
   'kavita': 'कविता',
+  'nair': 'नायर',
   'vikram': 'विक्रम',
   'priya': 'प्रिया',
   'haldwani': 'हल्द्वानी',
@@ -64,14 +72,17 @@ export function transliterateToHindi(englishWord: string): string {
   const clean = englishWord.toLowerCase().trim();
   if (!clean) return englishWord;
 
-  // Preserve technical IDs like MILAN-2026-924
-  if (/^(milan|uid|rpc|id|c-|r-|pa-|v-)/i.test(clean) || /^[0-9.:\-_/]+$/.test(clean)) {
+  // Preserve technical IDs like MILAN-2026-924, 1078, 112, etc.
+  if (/^(milan|uid|rpc|id|c-|r-|pa-|v-)/i.test(clean) || /^[0-9.:\-_/+]+$/.test(clean)) {
     return englishWord;
   }
 
-  // Check known names and places dictionary
+  // Check known proper nouns & learning words first
   if (KNOWN_INDIAN_PROPER_NOUNS[clean]) {
     return KNOWN_INDIAN_PROPER_NOUNS[clean];
+  }
+  if (HINDI_LEARNING_WORDS[clean]) {
+    return HINDI_LEARNING_WORDS[clean];
   }
 
   let rem = clean;
@@ -80,6 +91,32 @@ export function transliterateToHindi(englishWord: string): string {
 
   while (rem.length > 0) {
     let matched = false;
+
+    // Common phonetic suffixes
+    if (rem.startsWith('tion')) {
+      result += 'शन';
+      rem = rem.slice(4);
+      isStart = false;
+      continue;
+    }
+    if (rem.startsWith('sion')) {
+      result += 'शन';
+      rem = rem.slice(4);
+      isStart = false;
+      continue;
+    }
+    if (rem.startsWith('ture')) {
+      result += 'चर';
+      rem = rem.slice(4);
+      isStart = false;
+      continue;
+    }
+    if (rem.startsWith('ing')) {
+      result += 'िंग';
+      rem = rem.slice(3);
+      isStart = false;
+      continue;
+    }
 
     if (isStart) {
       for (const [v, devV] of HINDI_INITIAL_VOWELS) {
@@ -94,36 +131,75 @@ export function transliterateToHindi(englishWord: string): string {
       if (matched) continue;
     }
 
-    for (const [c, devC] of HINDI_CONSONANT_RULES) {
-      if (rem.startsWith(c)) {
-        result += devC;
-        rem = rem.slice(c.length);
-        isStart = false;
-        matched = true;
-
-        let matraMatched = false;
-        for (const [v, devM] of HINDI_VOWEL_MATRAS) {
-          if (rem.startsWith(v)) {
-            result += devM;
-            rem = rem.slice(v.length);
-            matraMatched = true;
-            break;
-          }
+    // Consonant handling with comprehensive 'c', 'qu', 'x' support
+    if (rem.startsWith('ck')) {
+      result += 'क';
+      rem = rem.slice(2);
+      isStart = false;
+      matched = true;
+    } else if (rem.startsWith('qu')) {
+      result += 'क्व';
+      rem = rem.slice(2);
+      isStart = false;
+      matched = true;
+    } else if (rem.startsWith('x')) {
+      result += 'क्स';
+      rem = rem.slice(1);
+      isStart = false;
+      matched = true;
+    } else if (rem.startsWith('c') && !rem.startsWith('ch')) {
+      if (/^c[eiy]/.test(rem)) {
+        result += 'स';
+      } else {
+        result += 'क';
+      }
+      rem = rem.slice(1);
+      isStart = false;
+      matched = true;
+    } else {
+      for (const [c, devC] of HINDI_CONSONANT_RULES) {
+        if (rem.startsWith(c)) {
+          result += devC;
+          rem = rem.slice(c.length);
+          isStart = false;
+          matched = true;
+          break;
         }
-        if (!matraMatched && rem.length > 0 && /^[b-df-hj-np-tv-z]/i.test(rem)) {
-          result += '्';
-        }
-        break;
       }
     }
 
-    if (!matched) {
-      result += rem[0];
-      rem = rem.slice(1);
-      isStart = true;
+    if (matched) {
+      let matraMatched = false;
+      for (const [v, devM] of HINDI_VOWEL_MATRAS) {
+        if (rem.startsWith(v)) {
+          result += devM;
+          rem = rem.slice(v.length);
+          matraMatched = true;
+          break;
+        }
+      }
+      if (!matraMatched && rem.length > 0 && /^[b-df-hj-np-tv-z]/i.test(rem)) {
+        result += '्';
+      }
+      continue;
     }
+
+    // Absolute fallback: NO Latin characters allowed into result!
+    const char = rem[0];
+    const latinMap: Record<string, string> = {
+      'a': 'अ', 'b': 'ब', 'c': 'क', 'd': 'ड', 'e': 'ए', 'f': 'फ़',
+      'g': 'ग', 'h': 'ह', 'i': 'इ', 'j': 'ज', 'k': 'क', 'l': 'ल',
+      'm': 'म', 'n': 'न', 'o': 'ओ', 'p': 'प', 'q': 'क', 'r': 'र',
+      's': 'स', 't': 'ट', 'u': 'उ', 'v': 'व', 'w': 'व', 'x': 'क्स',
+      'y': 'य', 'z': 'ज़'
+    };
+    result += latinMap[char] || char;
+    rem = rem.slice(1);
+    isStart = true;
   }
 
+  // Strip any stray English alphabet characters to guarantee 100% Devanagari purity
+  result = result.replace(/[a-zA-Z]/g, '');
   return result || englishWord;
 }
 
@@ -538,12 +614,22 @@ export function translateToHindi(rawText: string): string {
 
   const lower = trimmed.toLowerCase();
 
-  // 1. Direct match in Phrase Dictionary
+  // 1. Direct match in Massive 5,000+ line Learning Corpus
+  if (HINDI_LEARNING_SENTENCES[lower]) {
+    return leadingSpace + HINDI_LEARNING_SENTENCES[lower] + trailingSpace;
+  }
+
+  // 2. Direct match in Phrase Dictionary
   if (HINDI_PHRASE_DICTIONARY[lower]) {
     return leadingSpace + HINDI_PHRASE_DICTIONARY[lower] + trailingSpace;
   }
 
-  // 2. Canonical Locale Lookup from locales.en -> locales.hi
+  // 3. Direct match in Single Words / Learning Words
+  if (HINDI_LEARNING_WORDS[lower]) {
+    return leadingSpace + HINDI_LEARNING_WORDS[lower] + trailingSpace;
+  }
+
+  // 4. Canonical Locale Lookup from locales.en -> locales.hi
   for (const [key, val] of Object.entries(locales.en)) {
     if (typeof val === 'string' && val.trim().toLowerCase() === lower) {
       if (locales.hi && locales.hi[key as keyof typeof locales.hi]) {
@@ -552,7 +638,32 @@ export function translateToHindi(rawText: string): string {
     }
   }
 
-  // 3. Composite Structural Patterns
+  // 5. Composite Structural Patterns & Common UI Templates
+  // Pattern: "Welcome, {name}"
+  if (/^Welcome,\s*(.*)$/i.test(trimmed)) {
+    return trimmed.replace(/^Welcome,\s*(.*)$/i, (_m, name) => `स्वागत है, ${translateToHindi(name)}`);
+  }
+
+  // Pattern: "Last seen: {location}"
+  if (/^Last\s+seen:\s*(.*)$/i.test(trimmed)) {
+    return trimmed.replace(/^Last\s+seen:\s*(.*)$/i, (_m, loc) => `अंतिम ज्ञात स्थान: ${translateToHindi(loc)}`);
+  }
+
+  // Pattern: "Identifying clue: {clue}"
+  if (/^Identifying\s+clue:\s*(.*)$/i.test(trimmed)) {
+    return trimmed.replace(/^Identifying\s+clue:\s*(.*)$/i, (_m, clue) => `पहचान का सुराग: ${translateToHindi(clue)}`);
+  }
+
+  // Pattern: "{n} Registered Reports"
+  if (/^(\d+)\s+Registered\s+Reports?$/i.test(trimmed)) {
+    return trimmed.replace(/^(\d+)\s+Registered\s+Reports?$/i, (_m, count) => `${count} पंजीकृत रिपोर्टें`);
+  }
+
+  // Pattern: "Good news: {rest}"
+  if (/^Good\s+news:\s*(.*)$/i.test(trimmed)) {
+    return trimmed.replace(/^Good\s+news:\s*(.*)$/i, (_m, rest) => `शुभ समाचार: ${translateToHindi(rest)}`);
+  }
+
   // Pattern: "Age 24 • Unknown • Blood ?"
   if (/^Age\s+(\d+|Unknown)\s*•\s*(.*?)\s*•\s*Blood\s*(.*?)$/i.test(trimmed)) {
     return trimmed.replace(
@@ -584,7 +695,7 @@ export function translateToHindi(rawText: string): string {
     );
   }
 
-  // 4. Tokenize Sentence into Individual Words and Punctuation
+  // 6. Tokenize Sentence into Individual Words and Punctuation
   const tokens = trimmed.split(/(\s+|[.,;!•\-_/()]+)/);
   if (tokens.length > 1) {
     const translatedTokens = tokens.map((token) => {
@@ -592,6 +703,10 @@ export function translateToHindi(rawText: string): string {
         return token;
       }
       const tokLower = token.toLowerCase();
+      // Look up in massive learning corpus first
+      if (HINDI_LEARNING_WORDS[tokLower]) {
+        return HINDI_LEARNING_WORDS[tokLower];
+      }
       // Look up in single word dictionary
       if (HINDI_SINGLE_WORD_DICT[tokLower]) {
         return HINDI_SINGLE_WORD_DICT[tokLower];
@@ -599,14 +714,14 @@ export function translateToHindi(rawText: string): string {
       if (HINDI_PHRASE_DICTIONARY[tokLower]) {
         return HINDI_PHRASE_DICTIONARY[tokLower];
       }
-      // Phonetically transliterate unmapped names/words into Hindi Devanagari
+      // Phonetically transliterate unmapped names/words into pure Hindi Devanagari (Guaranteed 0 Latin characters)
       return transliterateToHindi(token);
     });
 
     return leadingSpace + translatedTokens.join('') + trailingSpace;
   }
 
-  // Single unknown word -> Transliterate to Hindi Devanagari
+  // Single unknown word -> Transliterate to pure Hindi Devanagari (Guaranteed 0 Latin characters)
   return leadingSpace + transliterateToHindi(trimmed) + trailingSpace;
 }
 

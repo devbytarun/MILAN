@@ -140,7 +140,7 @@ export const en: TranslationDictionary = {
   domains_title: 'Built Specifically for the Reality of Each Frontline Responder',
   domains_desc: 'Different stakeholders have radically different constraints. MILAN provides optimized interfaces for each.',
   domains_family_title: 'For Anxious Families',
-  domains_family_desc: 'Gentle, clear multi-step reporting in 23 regional Indian languages with transparent tracking status.',
+  domains_family_desc: 'Gentle, clear multi-step reporting in Hindi and English with transparent tracking status.',
   domains_family_cta: 'File Family Missing Report',
   domains_rescue_title: 'For Field Rescue Teams',
   domains_rescue_desc: 'Offline-capable intake forms with voice & radio parsing designed for muddy tablets in low-bandwidth zones.',

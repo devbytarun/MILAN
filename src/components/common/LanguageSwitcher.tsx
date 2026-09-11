@@ -177,7 +177,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 
           <div className="p-2 bg-[#f8fafc] border-t border-[#dddddd] text-center">
             <span className="text-[10px] text-[#41454d] font-medium">
-              22 Eighth Schedule Languages + English (23 Total)
+              English & हिन्दी (Hindi) Localization
             </span>
           </div>
         </div>

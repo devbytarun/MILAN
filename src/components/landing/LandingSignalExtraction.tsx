@@ -123,7 +123,7 @@ export const LandingSignalExtraction: React.FC = () => {
               <span>Multi-Dialect NLP & Phonetic Parsing</span>
             </div>
             <p className="text-xs text-white/60 leading-relaxed">
-              Field personnel operate in noisy, torrential conditions. MILAN automatically parses free-form Hindi, Hinglish, Bengali, Tamil, and 20 other regional languages into uniform attribute vectors.
+              Field personnel operate in noisy, torrential conditions. MILAN automatically parses free-form Hindi, Hinglish, and English voice and dispatch notes into uniform attribute vectors.
             </p>
           </div>
         </div>

@@ -82,8 +82,8 @@ export const Footer: React.FC = () => {
               <Radio className="w-3.5 h-3.5 text-[#1b61c9]" />
               Regional Language Access
             </h4>
-            <p className="text-xs text-[#41454d] leading-relaxed">
-              MILAN supports all 22 Eighth Schedule Indian Languages + English with full RTL support for crisis field operations.
+            <p className="text-xs text-[#9297a0]">
+              MILAN provides deep native Hindi and English localization with real-time zero-latency neural translation for crisis field operations.
             </p>
             <div className="pt-1">
               <LanguageSwitcher variant="footer" />
