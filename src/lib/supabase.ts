@@ -17,5 +17,9 @@ const supabaseAnonKey =
   (typeof (globalThis as any).process !== 'undefined' && (globalThis as any).process.env?.VITE_SUPABASE_ANON_KEY) ||
   'sb_publishable_-F_fGszZvtEYqN2T2u2jUA_tzCIHrin';
 
+export const isSupabaseConfigured = Boolean(
+  supabaseUrl && supabaseAnonKey && !supabaseUrl.includes('placeholder')
+);
+
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
