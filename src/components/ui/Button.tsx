@@ -4,13 +4,18 @@ import { Loader2 } from 'lucide-react';
 export type ButtonVariant =
   | 'primary'
   | 'secondary'
+  | 'secondary-on-dark'
   | 'outline-dark'
   | 'outline-light'
+  | 'coral'
+  | 'forest'
   | 'aloe'
   | 'rescue'
   | 'critical'
   | 'ghost'
-  | 'ghost-dark';
+  | 'ghost-dark'
+  | 'pill';
+
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -32,24 +37,34 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   disabled,
   ...props
 }, ref) => {
-  const baseStyles = 'inline-flex items-center justify-center font-body rounded-pill transition-all duration-150 select-none whitespace-nowrap active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+  // Airtable standard: 12px rounded (rounded-xl), modest 500 font-weight
+  const baseStyles = 'inline-flex items-center justify-center font-body text-base font-medium rounded-xl transition-colors duration-150 select-none whitespace-nowrap active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#458fff]';
 
   const variantStyles: Record<ButtonVariant, string> = {
-    'primary': 'bg-humanitarian-blue text-white hover:bg-blue-700 active:bg-blue-800 shadow-sm font-semibold',
-    'secondary': 'bg-slate-900 text-white hover:bg-slate-800 active:bg-slate-950 shadow-sm font-semibold',
-    'outline-dark': 'bg-transparent text-white border border-slate-600 hover:bg-white/10 active:bg-white/15 font-medium',
-    'outline-light': 'bg-white text-slate-900 border border-slate-300 hover:bg-slate-50 active:bg-slate-100 font-medium shadow-sm',
-    'aloe': 'bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 shadow-sm font-semibold',
-    'rescue': 'bg-teal-700 text-white hover:bg-teal-800 active:bg-teal-900 shadow-sm font-semibold',
-    'critical': 'bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 shadow-sm font-semibold',
-    'ghost': 'bg-transparent text-slate-800 hover:bg-slate-100 active:bg-slate-200 font-medium',
-    'ghost-dark': 'bg-transparent text-white hover:bg-white/10 active:bg-white/15 font-medium',
+    // Airtable Primary CTA: near-black ink #181d26 with white text
+    'primary': 'bg-[#181d26] text-white hover:bg-[#0d1218] active:bg-[#0d1218]',
+    // Airtable Secondary CTA: white button with 1px hairline border #dddddd
+    'secondary': 'bg-white text-[#181d26] border border-[#dddddd] hover:bg-[#f8fafc] active:bg-[#e0e2e6]',
+    // Secondary on dark / signature coral / forest cards: clean solid white
+    'secondary-on-dark': 'bg-white text-[#181d26] hover:bg-[#f8fafc] active:bg-[#e0e2e6] shadow-sm',
+    'outline-dark': 'bg-white text-[#181d26] hover:bg-[#f8fafc] active:bg-[#e0e2e6] shadow-sm',
+    'outline-light': 'bg-white text-[#181d26] border border-[#dddddd] hover:bg-[#f8fafc] active:bg-[#e0e2e6]',
+    // Airtable Signature Voltage: Coral #aa2d00 and Forest #0a2e0e
+    'coral': 'bg-[#aa2d00] text-white hover:bg-[#882400] active:bg-[#701e00]',
+    'forest': 'bg-[#0a2e0e] text-white hover:bg-[#061d09] active:bg-[#041406]',
+    'aloe': 'bg-[#0a2e0e] text-white hover:bg-[#061d09] active:bg-[#041406]',
+    'rescue': 'bg-[#0a2e0e] text-white hover:bg-[#061d09] active:bg-[#041406]',
+    'critical': 'bg-[#aa2d00] text-white hover:bg-[#882400] active:bg-[#701e00]',
+    'ghost': 'bg-transparent text-[#181d26] hover:bg-[#f8fafc] active:bg-[#e0e2e6]',
+    'ghost-dark': 'bg-transparent text-white hover:bg-white/10 active:bg-white/15',
+    // Pricing Sub-system Pill Button
+    'pill': 'bg-white text-[#1d1f25] border border-[#dddddd] rounded-pill hover:bg-[#f8fafc]',
   };
 
   const sizeStyles: Record<ButtonSize, string> = {
-    'sm': 'text-xs py-2 px-4 gap-1.5 min-h-[36px]',
-    'md': 'text-sm py-3 px-6 gap-2 min-h-[44px]',
-    'lg': 'text-base py-3.5 px-8 gap-2.5 min-h-[48px]',
+    'sm': 'text-xs py-2 px-3.5 gap-1.5 min-h-[36px] rounded-lg',
+    'md': 'text-sm py-3 px-5 gap-2 min-h-[44px] rounded-xl',
+    'lg': 'text-base py-4 px-6 gap-2.5 min-h-[48px] rounded-xl',
   };
 
   return (

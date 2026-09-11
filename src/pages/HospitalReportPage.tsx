@@ -6,7 +6,11 @@ import {
   CheckCircle2,
   Lock,
   Search,
+  Stethoscope,
+  Sparkles,
 } from 'lucide-react';
+import { VoiceIntakeModal } from '../components/common/VoiceIntakeModal.tsx';
+import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
 
 const HOSPITAL_STEPS: FormStep[] = [
   { id: 'triage', title: 'Hospital Referral & Triage', subtitle: 'Link existing Milan UID or register new clinical patient' },
@@ -21,6 +25,34 @@ export const HospitalReportPage: React.FC = () => {
 
   const [hasExistingUid, setHasExistingUid] = useState(false);
   const [existingUid, setExistingUid] = useState('');
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  const [voiceParseNotification, setVoiceParseNotification] = useState<string | null>(null);
+
+  const handleApplyVoice = (parsed: ParsedVoiceReport) => {
+    const a = parsed.attributes;
+    setFormData((prev) => ({
+      ...prev,
+      fullName: a.p_full_name || prev.fullName,
+      approximateAge: a.p_approximate_age !== undefined ? a.p_approximate_age.toString() : prev.approximateAge,
+      gender: a.p_gender || prev.gender,
+      bloodGroup: a.p_blood_group || prev.bloodGroup,
+      clothing: a.p_clothing || prev.clothing,
+      anatomicalFeatures: [
+        a.p_scars ? `Scars: ${a.p_scars}` : '',
+        a.p_birthmarks ? `Birthmarks: ${a.p_birthmarks}` : '',
+        a.p_tattoos ? `Tattoos: ${a.p_tattoos}` : '',
+        prev.anatomicalFeatures,
+      ].filter(Boolean).join('; '),
+      conditionStatus: a.p_condition_status ? `Status: ${a.p_condition_status}` : prev.conditionStatus,
+      reportNotes: parsed.rawTranscript
+        ? `${prev.reportNotes ? prev.reportNotes + '\n' : ''}[Paramedic / Clinical Voice Log]: ${parsed.rawTranscript}`
+        : prev.reportNotes,
+    }));
+    setVoiceParseNotification(
+      `Clinical voice log parsed ${parsed.extractedEntities.length} attributes (${parsed.confidence}% confidence). Review populated patient observations below.`
+    );
+    setVoiceModalOpen(false);
+  };
 
   const [formData, setFormData] = useState({
     hospitalName: 'City Trauma Center',
@@ -151,6 +183,48 @@ export const HospitalReportPage: React.FC = () => {
       badgeText="Hospital Clinical Intake"
       badgeColor="purple"
     >
+      {/* Clinical / Paramedic Voice Log Banner */}
+      <div className="mb-6 p-4 rounded-xl bg-purple-50/80 border border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+            <Stethoscope className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+              <span>Paramedic & Clinical Voice Log Assistant</span>
+              <span className="px-1.5 py-0.5 rounded bg-purple-200/70 text-purple-900 text-[10px] font-mono font-semibold">MEDICAL INTAKE</span>
+            </div>
+            <div className="text-xs text-slate-600 mt-0.5">
+              Dictate or transcribe paramedic admission notes to extract vital anatomical clues, blood group, and triage trauma findings.
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setVoiceModalOpen(true)}
+          className="shrink-0 px-3.5 py-2 rounded-lg bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Clinical Voice Log</span>
+        </button>
+      </div>
+
+      {voiceParseNotification && (
+        <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>{voiceParseNotification}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setVoiceParseNotification(null)}
+            className="text-emerald-700 hover:text-emerald-900 font-bold ml-2"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* STEP 1: Referral & Triage */}
       {currentStep === 0 && (
         <div className="space-y-4">
@@ -349,6 +423,11 @@ export const HospitalReportPage: React.FC = () => {
           </div>
         </div>
       )}
+      <VoiceIntakeModal
+        isOpen={voiceModalOpen}
+        onClose={() => setVoiceModalOpen(false)}
+        onApplyParsedData={handleApplyVoice}
+      />
     </FormStepWrapper>
   );
 };
