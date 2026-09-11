@@ -13,7 +13,10 @@ import {
 export const CaseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [caseData, setCaseData] = useState<FullCaseData | null>(null);
+  const [caseData, setCaseData] = useState<FullCaseData | null>(() => {
+    const all = getLocalCases();
+    return all.find((c) => c.case.id === id || c.case.case_uid === id) || null;
+  });
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'ATTRIBUTES' | 'RECONCILIATION'>('OVERVIEW');
 
   useEffect(() => {

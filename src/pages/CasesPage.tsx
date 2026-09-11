@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getLocalCases, FullCaseData } from '../services/caseService.ts';
 import {
@@ -11,14 +11,10 @@ import {
 } from 'lucide-react';
 
 export const CasesPage: React.FC = () => {
-  const [cases, setCases] = useState<FullCaseData[]>([]);
+  const [cases] = useState<FullCaseData[]>(() => getLocalCases());
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<'ALL' | 'MISSING' | 'FOUND'>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'VERIFIED_MATCH' | 'POSSIBLE_MATCH' | 'SEARCHING'>('ALL');
-
-  useEffect(() => {
-    setCases(getLocalCases());
-  }, []);
 
   const filtered = cases.filter((item) => {
     const { case: c, attributes: a, report: r } = item;

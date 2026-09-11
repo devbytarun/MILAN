@@ -14,7 +14,10 @@ import {
 export const FamilyStatusView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [caseData, setCaseData] = useState<FullCaseData | null>(null);
+  const [caseData, setCaseData] = useState<FullCaseData | null>(() => {
+    const all = getLocalCases();
+    return all.find((c) => c.case.id === id || c.case.case_uid === id) || null;
+  });
   const [lastRefreshed] = useState<string>('Just now');
 
   useEffect(() => {
