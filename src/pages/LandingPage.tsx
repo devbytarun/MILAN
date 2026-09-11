@@ -113,7 +113,7 @@ export const LandingPage: React.FC = () => {
               {/* Operational Capabilities Footnote */}
               <div className="pt-4 border-t border-[#dddddd] flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-[#9297a0] font-mono">
                 <span className="flex items-center gap-1.5 text-[#41454d]">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#006400]" /> {t('hero_trust_offline')}
+                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-600" /> {t('hero_trust_offline')}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1.5 text-[#41454d]">
@@ -135,10 +135,10 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ── 02. COMPACT OPERATIONAL STATUS STRIP ── */}
-      <section className="border-b border-[#dddddd] bg-[#f8fafc] py-3.5 px-6 sm:px-8 lg:px-12">
+      <section className="border-b border-orange-100 bg-orange-50/25 py-3.5 px-6 sm:px-8 lg:px-12">
         <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-6 text-xs font-mono text-[#41454d]">
           <div className="flex items-center gap-2 text-[#181d26] font-semibold">
-            <span className="w-2 h-2 rounded-full bg-[#006400] animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse" />
             <span>{t('status_operational_mesh')}</span>
           </div>
           <div>{t('status_sync_frequency')}</div>
@@ -168,35 +168,35 @@ export const LandingPage: React.FC = () => {
 
             {/* Right: Connective Diagram of Fragmented Field Signals Converging */}
             <div className="lg:col-span-7 space-y-4">
-              <div className="border border-[#dddddd] rounded-xl p-6 sm:p-8 bg-[#f8fafc] space-y-6">
-                <div className="text-[11px] font-mono uppercase tracking-wider text-[#9297a0] font-semibold">
+              <div className="border border-orange-100 rounded-xl p-6 sm:p-8 bg-orange-50/20 space-y-6">
+                <div className="text-[11px] font-mono uppercase tracking-wider text-orange-950/60 font-semibold">
                   FRAGMENTED FIELD SIGNALS GENERATED DURING EVACUATION
                 </div>
 
                 {/* 4 Fragmented Signals */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-                  <div className="p-3 bg-white border border-[#dddddd] rounded-lg space-y-1">
+                  <div className="p-3 bg-white border border-orange-100 rounded-lg space-y-1">
                     <span className="text-[#aa2d00] font-bold block">{t('problem_family_label')}</span>
                     <p className="text-[#181d26] font-body text-xs">
                       {t('problem_family_desc')}
                     </p>
                   </div>
 
-                  <div className="p-3 bg-white border border-[#dddddd] rounded-lg space-y-1">
-                    <span className="text-[#0a2e0e] font-bold block">{t('problem_field_label')}</span>
+                  <div className="p-3 bg-white border border-orange-100 rounded-lg space-y-1">
+                    <span className="text-orange-600 font-bold block">{t('problem_field_label')}</span>
                     <p className="text-[#181d26] font-body text-xs">
                       {t('problem_field_desc')}
                     </p>
                   </div>
 
-                  <div className="p-3 bg-white border border-[#dddddd] rounded-lg space-y-1">
+                  <div className="p-3 bg-white border border-orange-100 rounded-lg space-y-1">
                     <span className="text-[#254fad] font-bold block">{t('problem_hospital_label')}</span>
                     <p className="text-[#181d26] font-body text-xs">
                       {t('problem_hospital_desc')}
                     </p>
                   </div>
 
-                  <div className="p-3 bg-white border border-[#dddddd] rounded-lg space-y-1">
+                  <div className="p-3 bg-white border border-orange-100 rounded-lg space-y-1">
                     <span className="text-[#181d26] font-bold block">{t('problem_milan_core')}</span>
                     <p className="text-[#181d26] font-body text-xs">
                       {t('problem_milan_desc')}
@@ -205,12 +205,12 @@ export const LandingPage: React.FC = () => {
                 </div>
 
                 {/* Visual Convergence Indicator */}
-                <div className="pt-2 border-t border-[#dddddd] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
+                <div className="pt-2 border-t border-orange-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
                   <span className="text-[#41454d]">
                     WEIGHTED MULTI-ATTRIBUTE RECONCILIATION ENGINE
                   </span>
-                  <span className="text-[#006400] font-bold flex items-center gap-1 bg-[#f0fdf4] border border-[#bbf7d0] px-2.5 py-1 rounded">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> RECONCILED INTO ONE UNIFIED CANDIDATE
+                  <span className="text-orange-800 font-bold flex items-center gap-1 bg-orange-100/70 border border-orange-200 px-2.5 py-1 rounded">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-orange-600" /> RECONCILED INTO ONE UNIFIED CANDIDATE
                   </span>
                 </div>
               </div>
@@ -339,8 +339,8 @@ export const LandingPage: React.FC = () => {
             <div className="p-6 sm:p-8 border border-[#dddddd] rounded-xl bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2 max-w-2xl">
                 <div className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-[#0a2e0e]" />
-                  <span className="font-mono text-xs font-bold uppercase text-[#0a2e0e]">
+                  <Building2 className="w-4 h-4 text-orange-600" />
+                  <span className="font-mono text-xs font-bold uppercase text-orange-600">
                     STAKEHOLDER 02 / FIELD RESCUE & ARMY NDRF
                   </span>
                 </div>
@@ -393,7 +393,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ── 08. 1-CLICK STAKEHOLDER PERSONA EVALUATION STRIP ── */}
-      <section className="py-12 sm:py-16 border-b border-[#dddddd] bg-[#f8fafc]">
+      <section className="py-12 sm:py-16 border-b border-orange-100 bg-orange-50/20">
         <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
@@ -419,15 +419,15 @@ export const LandingPage: React.FC = () => {
                   onClick={() => handleLaunchRole(r, '/dashboard')}
                   className={`p-3.5 rounded-lg border text-left transition-colors select-none ${
                     isCurrent
-                      ? 'bg-[#181d26] text-white border-[#181d26] font-semibold'
-                      : 'bg-white border-[#dddddd] text-[#181d26] hover:bg-[#f8fafc]'
+                      ? 'bg-orange-600 text-white border-orange-600 font-semibold shadow-sm'
+                      : 'bg-white border-orange-100 text-[#181d26] hover:bg-orange-50/50 hover:border-orange-300'
                   }`}
                 >
-                  <div className={`text-[10px] font-bold uppercase tracking-wider ${isCurrent ? 'text-white/70' : 'text-[#9297a0]'}`}>
+                  <div className={`text-[10px] font-bold uppercase tracking-wider ${isCurrent ? 'text-white/80' : 'text-[#9297a0]'}`}>
                     {r.replace('_', ' ')}
                   </div>
                   <div className="text-xs font-semibold truncate mt-1">{user.fullName}</div>
-                  <div className={`text-[10px] truncate mt-0.5 ${isCurrent ? 'text-white/60' : 'text-[#41454d]'}`}>
+                  <div className={`text-[10px] truncate mt-0.5 ${isCurrent ? 'text-white/70' : 'text-[#41454d]'}`}>
                     {user.orgName?.split(' ')[0] || r}
                   </div>
                 </button>
