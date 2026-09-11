@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 import type { UserRole } from '../types/index.ts';
-import { LifeBuoy, UserPlus, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { UserPlus, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Button } from '../components/ui/Button.tsx';
+import { Input } from '../components/ui/Input.tsx';
+import { Badge } from '../components/ui/Badge.tsx';
 
 const ROLE_OPTIONS: { role: UserRole; title: string; desc: string; badge: string; autoApproved: boolean }[] = [
   {
@@ -16,21 +19,21 @@ const ROLE_OPTIONS: { role: UserRole; title: string; desc: string; badge: string
     role: 'NGO',
     title: 'Relief NGO / Red Cross',
     desc: 'Authorized field relief teams registering found survivors at camp shelters.',
-    badge: 'Requires Org Approval',
+    badge: 'Org Verification',
     autoApproved: false,
   },
   {
     role: 'ARMY_RESCUE',
     title: 'Army / NDRF / Rescue',
     desc: 'Military civil defense units conducting active evacuation and rescue triage.',
-    badge: 'Requires Org Approval',
+    badge: 'Org Verification',
     autoApproved: false,
   },
   {
     role: 'HOSPITAL',
     title: 'Hospital / Trauma Center',
     desc: 'Clinical intake, medical condition tagging, and survivor referral tracking.',
-    badge: 'Requires Org Approval',
+    badge: 'Org Verification',
     autoApproved: false,
   },
   {
@@ -71,20 +74,20 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto my-8 space-y-6">
+    <div className="max-w-2xl mx-auto my-12 space-y-6">
       <div className="text-center space-y-2">
-        <div className="inline-flex w-12 h-12 rounded-2xl bg-blue-600 text-white items-center justify-center shadow-lg shadow-blue-500/20 mb-2">
-          <LifeBuoy className="w-6 h-6" />
-        </div>
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Register for MILAN</h1>
-        <p className="text-xs text-slate-600">
+        <Badge variant="mint" size="sm">
+          Account Enrollment
+        </Badge>
+        <h1 className="type-display-md text-ink mt-2">Register for MILAN</h1>
+        <p className="type-caption text-shade-50">
           Select your operational role to establish proper data access and reporting authorization.
         </p>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 space-y-6">
         {error && (
-          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-xs text-rose-700">
+          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-md flex items-start gap-2.5 text-xs text-rose-700">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -92,8 +95,8 @@ export const SignupPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Role Selection Grid */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-800 mb-2">
+          <div className="space-y-2.5">
+            <label className="block text-xs font-semibold text-shade-70 uppercase tracking-wider">
               Select Your Role in Disaster Response <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -103,33 +106,27 @@ export const SignupPage: React.FC = () => {
                   <div
                     key={opt.role}
                     onClick={() => setRole(opt.role)}
-                    className={`p-3.5 rounded-xl border cursor-pointer transition flex flex-col justify-between ${
+                    className={`p-4 rounded-md border cursor-pointer transition-all duration-150 flex flex-col justify-between ${
                       selected
-                        ? 'border-blue-600 bg-blue-50/60 ring-2 ring-blue-500/20 shadow-sm'
-                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                        ? 'border-ink bg-canvas-cream ring-1 ring-ink'
+                        : 'border-hairline-light hover:border-shade-40 hover:bg-canvas-cream/50'
                     }`}
                   >
                     <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-bold text-slate-900">{opt.title}</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-bold text-ink">{opt.title}</span>
                         {selected ? (
-                          <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-ink shrink-0" />
                         ) : (
-                          <span className="w-4 h-4 rounded-full border border-slate-300"></span>
+                          <span className="w-4 h-4 rounded-pill border border-hairline-light shrink-0" />
                         )}
                       </div>
-                      <p className="text-[11px] text-slate-500 leading-relaxed">{opt.desc}</p>
+                      <p className="type-caption text-shade-50 leading-relaxed">{opt.desc}</p>
                     </div>
-                    <div className="mt-2.5">
-                      <span
-                        className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
-                          opt.autoApproved
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
-                      >
+                    <div className="mt-3">
+                      <Badge variant={opt.autoApproved ? 'mint' : 'shade'} size="sm">
                         {opt.badge}
-                      </span>
+                      </Badge>
                     </div>
                   </div>
                 );
@@ -139,92 +136,70 @@ export const SignupPage: React.FC = () => {
 
           {/* User Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Full Legal Name <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="e.g. Ramesh Chandra"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              />
-            </div>
+            <Input
+              label="Full Legal Name"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="e.g. Ramesh Chandra"
+            />
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Contact Phone Number
-              </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 98765 43210"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              />
-            </div>
+            <Input
+              label="Contact Phone Number"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+91 98765 43210"
+            />
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Email Address <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@organization.org"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              />
-            </div>
+            <Input
+              label="Email Address"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@organization.org"
+            />
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Account Password <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Minimum 6 characters"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              />
-            </div>
+            <Input
+              label="Account Password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Minimum 6 characters"
+            />
           </div>
 
           {/* Org Name if not FAMILY */}
           {role !== 'FAMILY' && (
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Organization / Camp / Hospital Name <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={orgName}
-                onChange={(e) => setOrgName(e.target.value)}
-                placeholder="e.g. NDRF Battalion 4 / District Civil Hospital"
-                className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              />
-            </div>
+            <Input
+              label="Organization / Camp / Hospital Name"
+              required
+              value={orgName}
+              onChange={(e) => setOrgName(e.target.value)}
+              placeholder="e.g. NDRF Battalion 4 / Civil Hospital"
+            />
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-sm flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50"
-          >
-            {loading ? 'Creating Account...' : <><UserPlus className="w-4 h-4" /> Complete Registration</>}
-          </button>
+          <div className="pt-2">
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              isLoading={loading}
+              leftIcon={<UserPlus className="w-4 h-4" />}
+              className="w-full"
+            >
+              Complete Registration
+            </Button>
+          </div>
         </form>
       </div>
 
-      <div className="text-center text-xs text-slate-600">
+      <div className="text-center type-caption text-shade-50">
         Already registered?{' '}
-        <Link to="/login" className="text-blue-600 font-semibold hover:underline">
+        <Link to="/login" className="text-ink font-semibold hover:underline">
           Sign In here
         </Link>
       </div>
