@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
+import { useI18n } from '../context/I18nContext.tsx';
 import {
   Users,
   Building2,
@@ -16,6 +17,7 @@ import { Badge } from '../components/ui/Badge.tsx';
 export const DashboardPage: React.FC = () => {
   const { profile } = useAuth();
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const roleLabels: Record<string, string> = {
     FAMILY: 'Family Member / Relative',
@@ -61,7 +63,7 @@ export const DashboardPage: React.FC = () => {
               leftIcon={<PlusCircle className="w-4 h-4" />}
               className="w-full md:w-auto"
             >
-              Submit Missing Report
+              {t('nav_report_missing')}
             </Button>
           )}
 
@@ -73,7 +75,7 @@ export const DashboardPage: React.FC = () => {
               leftIcon={<PlusCircle className="w-4 h-4" />}
               className="w-full md:w-auto"
             >
-              Register Rescued Person
+              {t('nav_report_found')}
             </Button>
           )}
 
@@ -85,7 +87,7 @@ export const DashboardPage: React.FC = () => {
               leftIcon={<PlusCircle className="w-4 h-4" />}
               className="w-full md:w-auto"
             >
-              Hospital Medical Intake
+              {t('nav_report_hospital')}
             </Button>
           )}
 
@@ -97,7 +99,7 @@ export const DashboardPage: React.FC = () => {
               leftIcon={<ShieldCheck className="w-4 h-4" />}
               className="w-full md:w-auto"
             >
-              Open Verification Queue
+              {t('nav_review')}
             </Button>
           )}
         </div>
@@ -191,7 +193,7 @@ export const DashboardPage: React.FC = () => {
       <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="type-heading-lg text-ink">Active Case Directory</h3>
+            <h3 className="type-heading-lg text-ink">{t('nav_cases')}</h3>
             <p className="type-caption text-shade-50 mt-1">Live reconciliation status across emergency shelter nodes</p>
           </div>
           <Link

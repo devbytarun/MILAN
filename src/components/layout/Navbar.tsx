@@ -195,7 +195,7 @@ export const Navbar: React.FC = () => {
               }`}
             >
               <Radio className="w-3.5 h-3.5 text-[#181d26]" />
-              <span>Voice AI</span>
+              <span>{t('nav_voice_ai')}</span>
             </Link>
 
             <Link
@@ -207,7 +207,7 @@ export const Navbar: React.FC = () => {
               }`}
             >
               <FileText className="w-3.5 h-3.5 text-[#181d26]" />
-              <span>Forensic Dossiers</span>
+              <span>{t('nav_forensic_dossiers')}</span>
             </Link>
           </nav>
 
@@ -227,7 +227,7 @@ export const Navbar: React.FC = () => {
               >
                 <span className="text-[#9297a0]">{roleLabelText}:</span>
                 <span className="font-semibold text-[#181d26]">
-                  {profile ? profile.role.replace('_', ' ') : 'Guest'}
+                  {profile ? profile.role.replace('_', ' ') : t('nav_guest')}
                 </span>
                 <ChevronDown className="w-3 h-3 opacity-60" />
               </button>
@@ -235,7 +235,7 @@ export const Navbar: React.FC = () => {
               {roleSwitcherOpen && (
                 <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-elevation-3 py-2 z-50 border border-[#dddddd] bg-white text-[#181d26]">
                   <div className="px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#9297a0] border-b border-[#dddddd] mb-1">
-                    Select Evaluation Persona
+                    {t('nav_select_persona')}
                   </div>
                   {(Object.keys(DEMO_USERS) as UserRole[]).map((r) => (
                     <button
@@ -294,7 +294,7 @@ export const Navbar: React.FC = () => {
                   size="sm"
                   onClick={() => navigate('/signup')}
                 >
-                  Sign up for free
+                  {t('nav_sign_up')}
                 </Button>
               </div>
             )}
@@ -364,13 +364,13 @@ export const Navbar: React.FC = () => {
               to="/report/voice"
               className="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#f8fafc]"
             >
-              Voice AI Intake
+              {t('nav_voice_ai')}
             </Link>
             <Link
               to="/dossier"
               className="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#f8fafc]"
             >
-              Forensic Dossiers
+              {t('nav_forensic_dossiers')}
             </Link>
           </div>
 
@@ -422,7 +422,7 @@ export const Navbar: React.FC = () => {
                 onClick={() => navigate('/signup')}
                 className="flex-1"
               >
-                Sign up for free
+                {t('nav_sign_up')}
               </Button>
             </div>
           )}

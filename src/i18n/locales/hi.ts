@@ -21,6 +21,11 @@ export const hi: TranslationDictionary = {
   nav_role_coordinator: 'राहत समन्वयक',
   nav_sign_in: 'लॉग इन करें',
   nav_sign_out: 'लॉग आउट',
+  nav_voice_ai: 'वॉइस AI',
+  nav_forensic_dossiers: 'फॉरेंसिक डोसियर',
+  nav_sign_up: 'निःशुल्क पंजीकरण करें',
+  nav_select_persona: 'मूल्यांकन भूमिका चुनें',
+  nav_guest: 'अतिथि',
 
   // Emergency Notice Banner
   notice_banner_title: 'तत्काल खतरा और प्राथमिक आपातकालीन सूचना:',

@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useI18n } from '../context/I18nContext.tsx';
 import { VoiceInputPanel } from '../components/voice/VoiceInputPanel.tsx';
 import { submitCaseReport } from '../services/caseService.ts';
 import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
@@ -61,6 +62,7 @@ function toFullInput(attrs: Partial<CreateCaseWithReportInput>, rawTranscript: s
 }
 
 export const VoiceIntakePage: React.FC = () => {
+  const { t } = useI18n();
   const [mode, setMode] = useState<PageMode>('input');
   const [parseResult, setParseResult] = useState<ParsedVoiceReport | null>(null);
   const [editableData, setEditableData] = useState<CreateCaseWithReportInput | null>(null);
@@ -750,7 +752,7 @@ export const VoiceIntakePage: React.FC = () => {
                   leftIcon={<CheckCircle2 className="w-4 h-4" />}
                   rightIcon={<ArrowRight className="w-4 h-4" />}
                 >
-                  Confirm & Register Case
+                  {submitting ? t('btn_submitting') : t('btn_submit')}
                 </Button>
               </div>
             </div>

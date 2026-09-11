@@ -21,6 +21,11 @@ export const en: TranslationDictionary = {
   nav_role_coordinator: 'Relief Coordinator',
   nav_sign_in: 'Sign In',
   nav_sign_out: 'Sign Out',
+  nav_voice_ai: 'Voice AI',
+  nav_forensic_dossiers: 'Forensic Dossiers',
+  nav_sign_up: 'Sign up for free',
+  nav_select_persona: 'Select Evaluation Persona',
+  nav_guest: 'Guest',
 
   // Emergency Notice Banner
   notice_banner_title: 'IMMEDIATE DANGER & FIRST RESPONDERS NOTICE:',

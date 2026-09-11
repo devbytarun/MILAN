@@ -20,6 +20,11 @@ export const bn: TranslationDictionary = {
   nav_role_coordinator: 'ত্রাণ সমন্বয়কারী',
   nav_sign_in: 'লগ ইন করুন',
   nav_sign_out: 'লগ আউট',
+  nav_voice_ai: 'ভয়েস AI',
+  nav_forensic_dossiers: 'ফরেনসিক ডসিয়ে',
+  nav_sign_up: 'বিনামূল্যে নিবন্ধন করুন',
+  nav_select_persona: 'মূল্যায়ন ভূমিকা নির্বাচন করুন',
+  nav_guest: 'অতিথি',
 
   notice_banner_title: 'তাৎক্ষণিক বিপদ ও প্রাথমিক জরুরি নোটিশ:',
   notice_banner_desc: 'মিলন দুর্যোগ সমন্বয়ে সহায়তা করে, কিন্তু উদ্ধারকারী নৌকা পাঠায় না। জীবননাশের ঝুঁকিতে জাতীয় জরুরি হেল্পলাইনে যোগাযোগ করুন।',

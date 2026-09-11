@@ -52,6 +52,11 @@ export interface TranslationDictionary {
   nav_role_coordinator: string;
   nav_sign_in: string;
   nav_sign_out: string;
+  nav_voice_ai: string;
+  nav_forensic_dossiers: string;
+  nav_sign_up: string;
+  nav_select_persona: string;
+  nav_guest: string;
 
   // Emergency Notice Banner
   notice_banner_title: string;

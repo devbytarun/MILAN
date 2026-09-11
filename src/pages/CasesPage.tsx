@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getLocalCases, FullCaseData } from '../services/caseService.ts';
+import { useI18n } from '../context/I18nContext.tsx';
 import {
   Search,
   Filter,
@@ -15,6 +16,7 @@ import { Badge } from '../components/ui/Badge.tsx';
 
 export const CasesPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [cases] = useState<FullCaseData[]>(() => getLocalCases());
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<'ALL' | 'MISSING' | 'FOUND'>('ALL');
@@ -49,10 +51,10 @@ export const CasesPage: React.FC = () => {
             Central Directory
           </Badge>
           <h1 className="font-display text-2xl sm:text-3xl font-normal text-[#181d26] mt-1.5">
-            Cases Registry
+            {t('cases_title')}
           </h1>
           <p className="text-sm text-[#41454d]">
-            Live cross-referenced database across emergency triage centers, camps, and family intakes.
+            {t('cases_subtitle')}
           </p>
         </div>
 
@@ -82,7 +84,7 @@ export const CasesPage: React.FC = () => {
           <Search className="w-4 h-4 text-[#9297a0] absolute left-3.5 top-3.5" />
           <input
             type="text"
-            placeholder="Search name, UID, location, clue..."
+            placeholder={t('cases_search_placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-3.5 py-2 text-xs border border-[#dddddd] rounded-md outline-none bg-white text-[#181d26] focus:border-[#181d26] transition-colors placeholder:text-[#9297a0]"
@@ -94,17 +96,17 @@ export const CasesPage: React.FC = () => {
             <span className="text-xs font-semibold text-[#41454d] flex items-center gap-1 mr-1">
               <Filter className="w-3.5 h-3.5 text-[#9297a0]" /> Type:
             </span>
-            {(['ALL', 'MISSING', 'FOUND'] as const).map((t) => (
+            {(['ALL', 'MISSING', 'FOUND'] as const).map((type) => (
               <button
-                key={t}
-                onClick={() => setTypeFilter(t)}
+                key={type}
+                onClick={() => setTypeFilter(type)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  typeFilter === t
+                  typeFilter === type
                     ? 'bg-[#181d26] text-white font-semibold'
                     : 'bg-white text-[#41454d] hover:bg-[#f8fafc] border border-[#dddddd]'
                 }`}
               >
-                {t}
+                {type === 'ALL' ? t('cases_filter_all') : type === 'MISSING' ? t('cases_filter_missing') : t('cases_filter_found')}
               </button>
             ))}
           </div>
@@ -132,9 +134,9 @@ export const CasesPage: React.FC = () => {
             <div className="w-12 h-12 rounded-full bg-[#f8fafc] flex items-center justify-center mx-auto text-[#9297a0] border border-[#dddddd]">
               <Inbox className="w-6 h-6" />
             </div>
-            <h3 className="font-display text-lg font-normal text-[#181d26]">No matching cases found</h3>
+            <h3 className="font-display text-lg font-normal text-[#181d26]">{t('cases_empty_title')}</h3>
             <p className="text-xs text-[#41454d] max-w-sm mx-auto">
-              No registry entries match your query "{searchTerm}". Try refining filters or search criteria.
+              {t('cases_empty_desc')}
             </p>
             <Button
               variant="secondary"
@@ -154,12 +156,12 @@ export const CasesPage: React.FC = () => {
               <thead className="bg-[#f8fafc] text-[#333840] font-semibold border-b border-[#dddddd]">
                 <tr>
                   <th className="p-4">Case UID</th>
-                  <th className="p-4">Type</th>
-                  <th className="p-4">Reported Subject</th>
-                  <th className="p-4">Location / Shelter</th>
+                  <th className="p-4">{t('cases_col_type')}</th>
+                  <th className="p-4">{t('cases_col_person')}</th>
+                  <th className="p-4">{t('cases_col_location')}</th>
                   <th className="p-4">Key Clue / Marks</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4 text-right">Actions</th>
+                  <th className="p-4">{t('cases_col_status')}</th>
+                  <th className="p-4 text-right">{t('cases_col_actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#dddddd]">
@@ -220,7 +222,7 @@ export const CasesPage: React.FC = () => {
                           to={`/cases/${c.id}`}
                           className="text-[#181d26] hover:underline font-semibold inline-flex items-center gap-1"
                         >
-                          View <ArrowRight className="w-3 h-3" />
+                          {t('cases_view_details')} <ArrowRight className="w-3 h-3" />
                         </Link>
                       </td>
                     </tr>
