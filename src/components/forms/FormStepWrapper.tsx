@@ -36,6 +36,14 @@ export const FormStepWrapper: React.FC<FormStepWrapperProps> = ({
   const isFirst = currentStep === 0;
   const isLast = currentStep === steps.length - 1;
 
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isLast) {
+      onSubmit?.();
+    } else if (canNext) {
+      onNext();
+    }
+  };
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header & Step Tracker Card */}
@@ -99,7 +107,7 @@ export const FormStepWrapper: React.FC<FormStepWrapperProps> = ({
       </div>
 
       {/* Form Step Body Card */}
-      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3">
+      <form onSubmit={handleFormSubmit} className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3">
         {children}
 
         {/* Navigation Buttons using canonical Pill Buttons */}
@@ -117,10 +125,9 @@ export const FormStepWrapper: React.FC<FormStepWrapperProps> = ({
 
           {!isLast ? (
             <Button
-              type="button"
+              type="submit"
               variant="primary"
               size="md"
-              onClick={onNext}
               disabled={!canNext}
               rightIcon={<ArrowRight className="w-4 h-4" />}
             >
@@ -128,10 +135,9 @@ export const FormStepWrapper: React.FC<FormStepWrapperProps> = ({
             </Button>
           ) : (
             <Button
-              type="button"
-              variant="aloe"
+              type="submit"
+              variant="primary"
               size="md"
-              onClick={onSubmit}
               isLoading={isSubmitting}
               leftIcon={<ShieldCheck className="w-4 h-4" />}
             >
@@ -139,7 +145,7 @@ export const FormStepWrapper: React.FC<FormStepWrapperProps> = ({
             </Button>
           )}
         </div>
-      </div>
+      </form>
     </div>
   );
 };

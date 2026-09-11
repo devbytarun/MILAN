@@ -8,9 +8,12 @@ import {
   Stethoscope,
   Search,
   ArrowRight,
-  Database,
   ShieldCheck,
   FileSpreadsheet,
+  Radio,
+  FileText,
+  WifiOff,
+  Zap,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button.tsx';
 import { Badge } from '../components/ui/Badge.tsx';

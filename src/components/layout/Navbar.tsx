@@ -13,6 +13,8 @@ import {
   ChevronDown,
   Building2,
   Search,
+  Radio,
+  FileText,
 } from 'lucide-react';
 import { Button } from '../ui/Button.tsx';
 import { Badge } from '../ui/Badge.tsx';
@@ -180,6 +182,29 @@ export const Navbar: React.FC = () => {
                 {t('nav_review')}
               </Link>
             )}
+            <Link
+              to="/report/voice"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive('/report/voice')
+                  ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
+                  : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
+              }`}
+            >
+              <Radio className="w-3.5 h-3.5 text-[#181d26]" />
+              <span>Voice / Radio AI</span>
+            </Link>
+
+            <Link
+              to="/dossier"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                isActive('/dossier')
+                  ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
+                  : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5 text-[#181d26]" />
+              <span>Forensic Dossiers</span>
+            </Link>
           </nav>
 
           {/* Right Action / Language / Persona Switcher / Profile */}

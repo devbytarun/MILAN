@@ -1,5 +1,4 @@
-import React from 'react';
-import { Navigate, Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 import type { UserRole } from '../types/index.ts';
 import { ShieldAlert, Clock, ArrowRight, LogOut } from 'lucide-react';

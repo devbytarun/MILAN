@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import type { MatchResult } from '../../types/index.ts';
 import type { FullCaseData } from '../../services/caseService.ts';
 import {
@@ -8,6 +9,7 @@ import {
   ArrowRight,
   User,
   MapPin,
+  FileText,
 } from 'lucide-react';
 import { Button } from '../ui/Button.tsx';
 import { Badge } from '../ui/Badge.tsx';
@@ -180,7 +182,17 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
           Compare Side-by-Side
         </Button>
 
-        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          <Link to={`/dossier/${sourceCase.case.id}/${candidateCase.case.id}`}>
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<FileText className="w-3.5 h-3.5" />}
+              className="w-full sm:w-auto"
+            >
+              Forensic Dossier
+            </Button>
+          </Link>
           {onReject && (
             <Button
               type="button"

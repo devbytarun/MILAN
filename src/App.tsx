@@ -16,6 +16,8 @@ import { FamilyReportPage } from './pages/FamilyReportPage.tsx';
 import { FoundReportPage } from './pages/FoundReportPage.tsx';
 import { HospitalReportPage } from './pages/HospitalReportPage.tsx';
 import { ReviewPage } from './pages/ReviewPage.tsx';
+import { VoiceIntakePage } from './pages/VoiceIntakePage.tsx';
+import { DossierPage } from './pages/DossierPage.tsx';
 
 export const App: React.FC = () => {
   return (
@@ -72,6 +74,9 @@ export const App: React.FC = () => {
               }
             />
 
+            {/* Voice/Radio AI Transcript Parser (Open for demo & field responders) */}
+            <Route path="/report/voice" element={<VoiceIntakePage />} />
+
             {/* Match Candidate Review (REVIEWER, ADMIN) */}
             <Route
               path="/review"
@@ -81,6 +86,10 @@ export const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
+
+            {/* Forensic Verification Dossier (Open for demo & forensic auditors) */}
+            <Route path="/dossier" element={<DossierPage />} />
+            <Route path="/dossier/:sourceId/:candidateId" element={<DossierPage />} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
