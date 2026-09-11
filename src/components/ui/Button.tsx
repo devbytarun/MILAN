@@ -1,7 +1,16 @@
 import React, { forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
 
-export type ButtonVariant = 'primary' | 'outline-dark' | 'outline-light' | 'aloe' | 'ghost' | 'ghost-dark';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'outline-dark'
+  | 'outline-light'
+  | 'aloe'
+  | 'rescue'
+  | 'critical'
+  | 'ghost'
+  | 'ghost-dark';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -23,15 +32,18 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   disabled,
   ...props
 }, ref) => {
-  const baseStyles = 'inline-flex items-center justify-center font-body rounded-pill transition-all duration-200 select-none whitespace-nowrap active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100';
+  const baseStyles = 'inline-flex items-center justify-center font-body rounded-pill transition-all duration-150 select-none whitespace-nowrap active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
 
   const variantStyles: Record<ButtonVariant, string> = {
-    'primary': 'bg-primary text-on-primary hover:bg-shade-70 active:bg-shade-70 shadow-sm',
-    'outline-dark': 'bg-transparent text-on-dark border-2 border-on-dark hover:bg-white/10 active:bg-white/15',
-    'outline-light': 'bg-canvas-light text-ink border border-ink hover:bg-canvas-cream active:bg-shade-30',
-    'aloe': 'bg-aloe text-ink hover:bg-[#adf5c4] active:bg-[#97f0b2] shadow-sm font-medium',
-    'ghost': 'bg-transparent text-ink hover:bg-black/5 active:bg-black/10',
-    'ghost-dark': 'bg-transparent text-on-dark hover:bg-white/10 active:bg-white/15',
+    'primary': 'bg-humanitarian-blue text-white hover:bg-blue-700 active:bg-blue-800 shadow-sm font-semibold',
+    'secondary': 'bg-slate-900 text-white hover:bg-slate-800 active:bg-slate-950 shadow-sm font-semibold',
+    'outline-dark': 'bg-transparent text-white border border-slate-600 hover:bg-white/10 active:bg-white/15 font-medium',
+    'outline-light': 'bg-white text-slate-900 border border-slate-300 hover:bg-slate-50 active:bg-slate-100 font-medium shadow-sm',
+    'aloe': 'bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 shadow-sm font-semibold',
+    'rescue': 'bg-teal-700 text-white hover:bg-teal-800 active:bg-teal-900 shadow-sm font-semibold',
+    'critical': 'bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 shadow-sm font-semibold',
+    'ghost': 'bg-transparent text-slate-800 hover:bg-slate-100 active:bg-slate-200 font-medium',
+    'ghost-dark': 'bg-transparent text-white hover:bg-white/10 active:bg-white/15 font-medium',
   };
 
   const sizeStyles: Record<ButtonSize, string> = {

@@ -1,6 +1,17 @@
 import React from 'react';
 
-export type BadgeVariant = 'mint' | 'shade' | 'dark' | 'outline' | 'verified' | 'pending';
+export type BadgeVariant =
+  | 'mint'
+  | 'shade'
+  | 'dark'
+  | 'outline'
+  | 'verified'
+  | 'pending'
+  | 'critical'
+  | 'info'
+  | 'offline'
+  | 'rescue'
+  | 'hospital';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
@@ -19,12 +30,17 @@ export const Badge: React.FC<BadgeProps> = ({
   const baseStyles = 'inline-flex items-center gap-1.5 font-body font-medium uppercase tracking-wider rounded-pill select-none';
 
   const variantStyles: Record<BadgeVariant, string> = {
-    'mint': 'bg-aloe text-ink border border-aloe/40',
-    'shade': 'bg-shade-30 text-ink border border-shade-40/30',
-    'dark': 'bg-shade-70 text-on-dark border border-shade-60',
-    'outline': 'bg-transparent text-ink border border-hairline-light',
-    'verified': 'bg-aloe text-ink border border-aloe/60 font-semibold',
-    'pending': 'bg-[#fef3c7] text-[#92400e] border border-[#fde68a] font-semibold',
+    'mint': 'bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold',
+    'shade': 'bg-slate-100 text-slate-800 border border-slate-200',
+    'dark': 'bg-slate-900 text-white border border-slate-700',
+    'outline': 'bg-transparent text-slate-800 border border-slate-200',
+    'verified': 'bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold',
+    'pending': 'bg-amber-50 text-amber-800 border border-amber-200 font-semibold',
+    'critical': 'bg-rose-50 text-rose-800 border border-rose-200 font-semibold',
+    'info': 'bg-blue-50 text-blue-800 border border-blue-200 font-semibold',
+    'offline': 'bg-slate-100 text-slate-700 border border-slate-300 font-semibold',
+    'rescue': 'bg-teal-50 text-teal-800 border border-teal-200 font-semibold',
+    'hospital': 'bg-indigo-50 text-indigo-800 border border-indigo-200 font-semibold',
   };
 
   const sizeStyles = {

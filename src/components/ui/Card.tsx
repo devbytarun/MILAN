@@ -1,6 +1,15 @@
 import React from 'react';
 
-export type CardVariant = 'default' | 'elevated' | 'featured-aloe' | 'pistachio' | 'cinematic' | 'flat';
+export type CardVariant =
+  | 'default'
+  | 'elevated'
+  | 'featured-aloe'
+  | 'pistachio'
+  | 'cinematic'
+  | 'flat'
+  | 'emergency'
+  | 'informational'
+  | 'sunlight';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: CardVariant;
@@ -14,15 +23,18 @@ export const Card: React.FC<CardProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'rounded-lg transition-all duration-200';
+  const baseStyles = 'rounded-lg transition-all duration-150';
 
   const variantStyles: Record<CardVariant, string> = {
-    'default': 'bg-canvas-light text-ink border border-hairline-light shadow-elevation-3 p-6 sm:p-8',
-    'elevated': 'bg-canvas-light text-ink border border-hairline-light shadow-elevation-3 p-6 sm:p-8',
-    'featured-aloe': 'bg-aloe text-ink border border-aloe/20 shadow-elevation-3 p-6 sm:p-8',
-    'pistachio': 'bg-pistachio text-ink border border-pistachio/20 p-6 sm:p-8',
-    'cinematic': 'bg-canvas-night-elevated text-on-dark border border-hairline-dark shadow-elevation-1 p-6 sm:p-8',
-    'flat': 'bg-canvas-light text-ink border border-hairline-light p-6 sm:p-8',
+    'default': 'bg-white text-slate-900 border border-slate-200 shadow-elevation-1 p-6 sm:p-8',
+    'elevated': 'bg-white text-slate-900 border border-slate-200 shadow-elevation-3 p-6 sm:p-8',
+    'featured-aloe': 'bg-emerald-50 text-slate-900 border border-emerald-200 shadow-elevation-2 p-6 sm:p-8',
+    'pistachio': 'bg-teal-50 text-slate-900 border border-teal-200 p-6 sm:p-8',
+    'cinematic': 'bg-slate-900 text-white border border-slate-800 shadow-elevation-2 p-6 sm:p-8',
+    'flat': 'bg-white text-slate-900 border border-slate-200 p-6 sm:p-8',
+    'emergency': 'bg-rose-50 border border-rose-200 text-slate-900 p-6 sm:p-8',
+    'informational': 'bg-blue-50 border border-blue-200 text-slate-900 p-6 sm:p-8',
+    'sunlight': 'bg-white border-2 border-slate-900 text-slate-950 shadow-elevation-2 p-6 sm:p-8',
   };
 
   const interactiveStyles = interactive ? 'hover:-translate-y-0.5 hover:shadow-lg cursor-pointer' : '';

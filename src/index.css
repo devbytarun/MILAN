@@ -10,39 +10,57 @@
 @layer base {
 
   :root {
-    /* ── Colors: Brand & Accent ── */
-    --color-primary: #000000;
-    --color-ink: #000000;
+    /* ── Colors: Humanitarian Brand & Authority ── */
+    --color-primary: #1e40af;
+    --color-primary-hover: #1d4ed8;
+    --color-ink: #0f172a;
+    --color-ink-muted: #475569;
     --color-on-primary: #ffffff;
     --color-on-dark: #ffffff;
 
     /* ── Colors: Canvas ── */
-    --canvas-night: #000000;
-    --canvas-night-elevated: #0a0a0a;
-    --canvas-light: #ffffff;
-    --canvas-cream: #fbfbf5;
-    --surface-elevated-dark: #1e2c31;
+    --canvas-light: #f8fafc;
+    --canvas-card: #ffffff;
+    --canvas-cream: #f1f5f9;
+    --canvas-night: #0f172a;
+    --canvas-night-elevated: #1e293b;
+    --surface-elevated-dark: #1e293b;
 
-    /* ── Colors: Accent Greens ── */
-    --aloe: #c1fbd4;
-    --pistachio: #d4f9e0;
+    /* ── Colors: Semantic Humanitarian Spectrum ── */
+    --humanitarian-blue: #1e40af;
+    --humanitarian-blue-soft: #eff6ff;
+    --humanitarian-sage: #059669;
+    --humanitarian-sage-soft: #ecfdf5;
+    --humanitarian-amber: #d97706;
+    --humanitarian-amber-soft: #fffbeb;
+    --humanitarian-rose: #dc2626;
+    --humanitarian-rose-soft: #fef2f2;
+    --humanitarian-teal: #0d9488;
+    --humanitarian-teal-soft: #f0fdfa;
+    --humanitarian-indigo: #4f46e5;
+    --humanitarian-indigo-soft: #eef2ff;
+
+    /* ── Colors: Accent & Compatibility ── */
+    --aloe: #059669;
+    --aloe-soft: #ecfdf5;
+    --pistachio: #10b981;
 
     /* ── Colors: Shade Ladder ── */
-    --shade-30: #d4d4d8;
-    --shade-40: #a1a1aa;
-    --shade-50: #71717a;
-    --shade-60: #52525b;
-    --shade-70: #3f3f46;
+    --shade-30: #e2e8f0;
+    --shade-40: #cbd5e1;
+    --shade-50: #64748b;
+    --shade-60: #475569;
+    --shade-70: #334155;
 
     /* ── Colors: Hairlines ── */
-    --hairline-light: #e4e4e7;
-    --hairline-dark: #1e2c31;
+    --hairline-light: #e2e8f0;
+    --hairline-dark: #334155;
 
-    /* ── Colors: Cool Links (dark surfaces) ── */
-    --link-cool-1: #9dabad;
-    --link-cool-2: #9797a2;
-    --link-cool-3: #bdbdca;
-    --link-mint: #99b3ad;
+    /* ── Colors: Links ── */
+    --link-cool-1: #94a3b8;
+    --link-cool-2: #cbd5e1;
+    --link-cool-3: #e2e8f0;
+    --link-mint: #5eead4;
 
     /* ── Spacing (8px base) ── */
     --space-xxs: 2px;
@@ -69,9 +87,9 @@
     --elevation-3: 0 8px 8px rgba(0,0,0,0.1), 0 4px 4px rgba(0,0,0,0.1), 0 2px 2px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.1);
     --elevation-4: 0 25px 50px -12px rgba(0,0,0,0.25);
 
-    /* ── Typography: Font Families ── */
-    --font-display: 'Inter Variable', 'Inter', Helvetica, Arial, sans-serif;
-    --font-body: 'Inter Variable', 'Inter', Helvetica, Arial, sans-serif;
+    /* ── Typography: Multi-Script Indian Font Families ── */
+    --font-display: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Devanagari', 'Noto Sans Bengali', 'Noto Sans Tamil', 'Noto Sans Telugu', 'Noto Sans Gujarati', 'Noto Sans Gurmukhi', 'Noto Sans Kannada', 'Noto Sans Malayalam', 'Noto Sans Oriya', 'Noto Nastaliq Urdu', sans-serif;
+    --font-body: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Devanagari', 'Noto Sans Bengali', 'Noto Sans Tamil', 'Noto Sans Telugu', 'Noto Sans Gujarati', 'Noto Sans Gurmukhi', 'Noto Sans Kannada', 'Noto Sans Malayalam', 'Noto Sans Oriya', 'Noto Nastaliq Urdu', sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
     /* ── Motion ── */
@@ -114,6 +132,21 @@
     color: var(--color-ink);
     background-color: var(--canvas-light);
     min-height: 100vh;
+  }
+
+  /* ── Directional RTL Utilities ── */
+  [dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+  }
+
+  [dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+  }
+
+  [dir="rtl"] .rtl-swap-start {
+    margin-right: unset;
+    margin-left: auto;
   }
 
   #root {
