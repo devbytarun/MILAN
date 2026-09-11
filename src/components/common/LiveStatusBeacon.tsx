@@ -59,7 +59,7 @@ export const LiveStatusBeacon: React.FC<LiveStatusBeaconProps> = ({
     OFFLINE: {
       color: 'bg-amber-500',
       pingColor: 'bg-amber-400',
-      text: 'Offline Blackout Active',
+      text: 'Offline Mode',
       badgeBg: 'bg-amber-50 border-amber-200 text-amber-800',
       icon: <WifiOff className="w-3.5 h-3.5 text-amber-600" />,
     },

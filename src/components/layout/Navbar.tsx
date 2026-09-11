@@ -74,19 +74,22 @@ export const Navbar: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  // Format role label cleanly without double colons
+  const roleLabelText = t('nav_role_label').replace(/:$/, '');
+
   return (
     <header
       className={`sticky top-0 z-40 h-16 bg-white border-b border-[#dddddd] transition-shadow duration-150 ${
         scrolled ? 'shadow-elevation-1' : ''
       }`}
     >
-      <div className="w-full px-4 sm:px-6 lg:px-10 h-full">
-        <div className="flex items-center justify-between h-full">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-full">
+        <div className="flex items-center justify-between h-full gap-4">
           {/* Brand Logo & Live Status */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <Link
               to="/"
-              className="flex items-center gap-2.5 group select-none"
+              className="flex items-center gap-2 group select-none whitespace-nowrap"
               aria-label="MILAN Home"
             >
               <span className="font-display text-xl font-black tracking-wider uppercase text-[#181d26]">
@@ -96,16 +99,16 @@ export const Navbar: React.FC = () => {
                 DISASTER GRID
               </Badge>
             </Link>
-            <div className="hidden lg:block border-l border-[#dddddd] pl-3">
+            <div className="hidden xl:block border-l border-[#dddddd] pl-3 shrink-0">
               <LiveStatusBeacon />
             </div>
           </div>
 
-          {/* Desktop Nav Links (Haas / Inter 14px modest weight) */}
-          <nav className="hidden md:flex items-center gap-1" aria-label="Main Navigation">
+          {/* Desktop Nav Links (Single line, whitespace-nowrap, Airtable neutral styles) */}
+          <nav className="hidden lg:flex items-center gap-1 shrink-0" aria-label="Main Navigation">
             <Link
               to="/dashboard"
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive('/dashboard')
                   ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
                   : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
@@ -116,87 +119,88 @@ export const Navbar: React.FC = () => {
 
             <Link
               to="/cases"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive('/cases')
                   ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
                   : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
               }`}
             >
               <Search className="w-3.5 h-3.5" />
-              {t('nav_cases')}
+              <span>{t('nav_cases')}</span>
             </Link>
 
-            {/* Role-Specific Action Links with Airtable Sub-colors */}
+            {/* Role-Specific Action Links */}
             {profile?.role === 'FAMILY' && (
               <Link
                 to="/report/missing"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive('/report/missing')
-                    ? 'bg-[#aa2d00] text-white font-semibold'
-                    : 'text-[#aa2d00] hover:bg-[#aa2d00]/10'
+                    ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
+                    : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
                 }`}
               >
                 <FilePlus className="w-3.5 h-3.5" />
-                {t('nav_report_missing')}
+                <span>{t('nav_report_missing')}</span>
               </Link>
             )}
 
             {(profile?.role === 'NGO' || profile?.role === 'ARMY_RESCUE' || profile?.role === 'ADMIN') && (
               <Link
                 to="/report/found"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive('/report/found')
-                    ? 'bg-[#0a2e0e] text-white font-semibold'
-                    : 'text-[#0a2e0e] hover:bg-[#0a2e0e]/10'
+                    ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
+                    : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
                 }`}
               >
                 <FilePlus className="w-3.5 h-3.5" />
-                {t('nav_report_found')}
+                <span>{t('nav_report_found')}</span>
               </Link>
             )}
 
             {(profile?.role === 'HOSPITAL' || profile?.role === 'ADMIN') && (
               <Link
                 to="/report/hospital"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive('/report/hospital')
-                    ? 'bg-[#254fad] text-white font-semibold'
-                    : 'text-[#254fad] hover:bg-[#254fad]/10'
+                    ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
+                    : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
                 }`}
               >
                 <Building2 className="w-3.5 h-3.5" />
-                {t('nav_report_hospital')}
+                <span>{t('nav_report_hospital')}</span>
               </Link>
             )}
 
             {(profile?.role === 'REVIEWER' || profile?.role === 'ADMIN') && (
               <Link
                 to="/review"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive('/review')
-                    ? 'bg-[#181d26] text-white font-semibold'
-                    : 'text-[#181d26] hover:bg-[#f8fafc]'
+                    ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
+                    : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
                 }`}
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                {t('nav_review')}
+                <span>{t('nav_review')}</span>
               </Link>
             )}
+
             <Link
               to="/report/voice"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive('/report/voice')
                   ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
                   : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
               }`}
             >
               <Radio className="w-3.5 h-3.5 text-[#181d26]" />
-              <span>Voice / Radio AI</span>
+              <span>Voice AI</span>
             </Link>
 
             <Link
               to="/dossier"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive('/dossier')
                   ? 'bg-[#f8fafc] text-[#181d26] font-semibold'
                   : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
@@ -207,21 +211,24 @@ export const Navbar: React.FC = () => {
             </Link>
           </nav>
 
-          {/* Right Action / Language / Persona Switcher / Profile */}
-          <div className="hidden md:flex items-center gap-2.5">
+          {/* Right Controls (Language / Role Switcher / Profile) */}
+          <div className="hidden lg:flex items-center gap-2.5 shrink-0">
             {/* Language Switcher */}
             <LanguageSwitcher variant="pill" />
 
             {/* Quick Persona Switcher */}
             <div className="relative" ref={dropdownRef}>
               <button
+                type="button"
                 onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
-                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-[#dddddd] bg-white text-[#333840] hover:bg-[#f8fafc] font-medium transition-colors"
+                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-[#dddddd] bg-white text-[#333840] hover:bg-[#f8fafc] font-medium transition-colors whitespace-nowrap"
                 title="Switch demo evaluation persona"
                 aria-expanded={roleSwitcherOpen}
               >
-                <span className="text-[#9297a0]">{t('nav_role_label')}:</span>
-                <span className="font-semibold text-[#181d26]">{profile ? profile.role.replace('_', ' ') : 'Guest'}</span>
+                <span className="text-[#9297a0]">{roleLabelText}:</span>
+                <span className="font-semibold text-[#181d26]">
+                  {profile ? profile.role.replace('_', ' ') : 'Guest'}
+                </span>
                 <ChevronDown className="w-3 h-3 opacity-60" />
               </button>
 
@@ -233,6 +240,7 @@ export const Navbar: React.FC = () => {
                   {(Object.keys(DEMO_USERS) as UserRole[]).map((r) => (
                     <button
                       key={r}
+                      type="button"
                       onClick={() => handleRoleChange(r)}
                       className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition-colors ${
                         profile?.role === r
@@ -250,16 +258,19 @@ export const Navbar: React.FC = () => {
               )}
             </div>
 
-            {/* Profile or Auth CTAs (Airtable primary near-black button) */}
+            {/* Profile or Auth CTAs */}
             {profile ? (
-              <div className="flex items-center gap-2 pl-2 border-l border-[#dddddd]">
-                <div className="text-right">
-                  <div className="text-xs font-semibold text-[#181d26] leading-tight">{profile.full_name || 'Coordinator'}</div>
+              <div className="flex items-center gap-2 pl-2 border-l border-[#dddddd] shrink-0">
+                <div className="text-right whitespace-nowrap">
+                  <div className="text-xs font-semibold text-[#181d26] leading-tight">
+                    {profile.full_name || 'Coordinator'}
+                  </div>
                   <div className="text-[10px] text-[#9297a0] truncate max-w-[110px]">
                     {profile.organization_name || profile.role}
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => signOut()}
                   className="p-1.5 rounded-lg text-[#41454d] hover:text-[#aa2d00] hover:bg-[#f8fafc] transition-colors"
                   title={t('nav_sign_out')}
@@ -269,7 +280,7 @@ export const Navbar: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 whitespace-nowrap">
                 <Button
                   variant="secondary"
                   size="sm"
@@ -289,10 +300,11 @@ export const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* Mobile menu trigger */}
-          <div className="md:hidden flex items-center gap-2">
+          {/* Mobile Menu Trigger (lg:hidden) */}
+          <div className="lg:hidden flex items-center gap-2 shrink-0">
             <LanguageSwitcher variant="compact" />
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc] transition-colors"
               aria-label={mobileMenuOpen ? 'Close Menu' : 'Open Menu'}
@@ -306,7 +318,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-[#dddddd] bg-white text-[#181d26] px-4 pt-3 pb-6 space-y-4 shadow-elevation-3">
+        <div className="lg:hidden border-b border-[#dddddd] bg-white text-[#181d26] px-4 pt-3 pb-6 space-y-4 shadow-elevation-3">
           <div className="pb-2 border-b border-[#dddddd]">
             <LiveStatusBeacon />
           </div>
@@ -326,19 +338,19 @@ export const Navbar: React.FC = () => {
             </Link>
             <Link
               to="/report/missing"
-              className="block px-3 py-2 rounded-lg text-sm font-semibold text-[#aa2d00] hover:bg-[#aa2d00]/10"
+              className="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#f8fafc]"
             >
               {t('nav_report_missing')}
             </Link>
             <Link
               to="/report/found"
-              className="block px-3 py-2 rounded-lg text-sm font-semibold text-[#0a2e0e] hover:bg-[#0a2e0e]/10"
+              className="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#f8fafc]"
             >
               {t('nav_report_found')}
             </Link>
             <Link
               to="/report/hospital"
-              className="block px-3 py-2 rounded-lg text-sm font-semibold text-[#254fad] hover:bg-[#254fad]/10"
+              className="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#f8fafc]"
             >
               {t('nav_report_hospital')}
             </Link>
@@ -348,14 +360,27 @@ export const Navbar: React.FC = () => {
             >
               {t('nav_review')}
             </Link>
+            <Link
+              to="/report/voice"
+              className="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#f8fafc]"
+            >
+              Voice AI Intake
+            </Link>
+            <Link
+              to="/dossier"
+              className="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#f8fafc]"
+            >
+              Forensic Dossiers
+            </Link>
           </div>
 
           <div className="pt-3 border-t border-[#dddddd]">
-            <div className="text-xs text-[#9297a0] mb-2 font-medium">{t('nav_role_label')}:</div>
+            <div className="text-xs text-[#9297a0] mb-2 font-medium">{roleLabelText}:</div>
             <div className="grid grid-cols-2 gap-2">
               {(Object.keys(DEMO_USERS) as UserRole[]).map((r) => (
                 <button
                   key={r}
+                  type="button"
                   onClick={() => handleRoleChange(r)}
                   className={`text-left px-2.5 py-1.5 text-xs rounded-lg border transition-colors ${
                     profile?.role === r
