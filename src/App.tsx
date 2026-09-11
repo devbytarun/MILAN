@@ -15,6 +15,8 @@ import { FamilyReportPage } from './pages/FamilyReportPage.tsx';
 import { FoundReportPage } from './pages/FoundReportPage.tsx';
 import { HospitalReportPage } from './pages/HospitalReportPage.tsx';
 import { ReviewPage } from './pages/ReviewPage.tsx';
+import { VoiceIntakePage } from './pages/VoiceIntakePage.tsx';
+import { DossierPage } from './pages/DossierPage.tsx';
 
 export const App: React.FC = () => {
   return (
@@ -70,12 +72,40 @@ export const App: React.FC = () => {
               }
             />
 
+            {/* Voice/Radio AI Transcript Parser (NGO, ARMY_RESCUE, HOSPITAL, ADMIN) */}
+            <Route
+              path="/report/voice"
+              element={
+                <ProtectedRoute allowedRoles={['NGO', 'ARMY_RESCUE', 'HOSPITAL', 'ADMIN']}>
+                  <VoiceIntakePage />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Match Candidate Review (REVIEWER, ADMIN) */}
             <Route
               path="/review"
               element={
                 <ProtectedRoute allowedRoles={['REVIEWER', 'ADMIN']}>
                   <ReviewPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Forensic Verification Dossier (REVIEWER, ADMIN) */}
+            <Route
+              path="/dossier"
+              element={
+                <ProtectedRoute allowedRoles={['REVIEWER', 'ADMIN']}>
+                  <DossierPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dossier/:sourceId/:candidateId"
+              element={
+                <ProtectedRoute allowedRoles={['REVIEWER', 'ADMIN']}>
+                  <DossierPage />
                 </ProtectedRoute>
               }
             />

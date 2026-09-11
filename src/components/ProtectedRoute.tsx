@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 import type { UserRole } from '../types/index.ts';
 import { ShieldAlert, Clock, ArrowRight } from 'lucide-react';
@@ -35,12 +35,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
         <p className="text-slate-600 mb-6">
           Your current role (<span className="font-semibold text-rose-600">{profile.role}</span>) is not permitted to access this module.
         </p>
-        <a
-          href="/dashboard"
+        <Link
+          to="/dashboard"
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
         >
           Return to Dashboard <ArrowRight className="w-4 h-4" />
-        </a>
+        </Link>
       </div>
     );
   }

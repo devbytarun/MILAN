@@ -11,6 +11,8 @@ import {
   Menu,
   X,
   ChevronDown,
+  Radio,
+  FileText,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -111,6 +113,28 @@ export const Navbar: React.FC = () => {
                 }`}
               >
                 <CheckCircle2 className="w-4 h-4" /> Match Reviewer
+              </Link>
+            )}
+
+            {(profile?.role === 'NGO' || profile?.role === 'ARMY_RESCUE' || profile?.role === 'HOSPITAL' || profile?.role === 'ADMIN') && (
+              <Link
+                to="/report/voice"
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition ${
+                  isActive('/report/voice') ? 'bg-cyan-950 text-cyan-300 border border-cyan-700' : 'text-cyan-400 hover:bg-slate-800'
+                }`}
+              >
+                <Radio className="w-4 h-4" /> Voice Parser
+              </Link>
+            )}
+
+            {(profile?.role === 'REVIEWER' || profile?.role === 'ADMIN') && (
+              <Link
+                to="/dossier"
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition ${
+                  isActive('/dossier') ? 'bg-violet-950 text-violet-300 border border-violet-700' : 'text-violet-400 hover:bg-slate-800'
+                }`}
+              >
+                <FileText className="w-4 h-4" /> Dossier
               </Link>
             )}
 
@@ -225,34 +249,51 @@ export const Navbar: React.FC = () => {
           >
             Cases Registry
           </Link>
-          <Link
-            to="/report/missing"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-md text-sm text-emerald-400 hover:bg-slate-800"
-          >
-            Report Missing Person
-          </Link>
-          <Link
-            to="/report/found"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-md text-sm text-blue-400 hover:bg-slate-800"
-          >
-            Report Found Person
-          </Link>
-          <Link
-            to="/report/hospital"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-md text-sm text-purple-400 hover:bg-slate-800"
-          >
-            Hospital Intake
-          </Link>
-          <Link
-            to="/review"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block px-3 py-2 rounded-md text-sm text-indigo-400 hover:bg-slate-800"
-          >
-            Match Reviewer Dashboard
-          </Link>
+          {profile?.role === 'FAMILY' && (
+            <Link
+              to="/report/missing"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-md text-sm text-emerald-400 hover:bg-slate-800"
+            >
+              Report Missing Person
+            </Link>
+          )}
+          {(profile?.role === 'NGO' || profile?.role === 'ARMY_RESCUE' || profile?.role === 'ADMIN') && (
+            <Link
+              to="/report/found"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-md text-sm text-blue-400 hover:bg-slate-800"
+            >
+              Report Found Person
+            </Link>
+          )}
+          {(profile?.role === 'HOSPITAL' || profile?.role === 'ADMIN') && (
+            <Link
+              to="/report/hospital"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-md text-sm text-purple-400 hover:bg-slate-800"
+            >
+              Hospital Intake
+            </Link>
+          )}
+          {(profile?.role === 'REVIEWER' || profile?.role === 'ADMIN') && (
+            <Link
+              to="/review"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-md text-sm text-indigo-400 hover:bg-slate-800"
+            >
+              Match Reviewer Dashboard
+            </Link>
+          )}
+          {(profile?.role === 'NGO' || profile?.role === 'ARMY_RESCUE' || profile?.role === 'HOSPITAL' || profile?.role === 'ADMIN') && (
+            <Link
+              to="/report/voice"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-md text-sm text-cyan-400 hover:bg-slate-800"
+            >
+              Voice / Radio Parser
+            </Link>
+          )}
 
           <div className="pt-3 border-t border-slate-800">
             <div className="text-xs text-slate-400 mb-2">Switch Demo Role:</div>
