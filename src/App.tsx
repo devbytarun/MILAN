@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.tsx';
+import { I18nProvider } from './context/I18nContext.tsx';
 import { AppLayout } from './components/layout/AppLayout.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 
@@ -18,8 +19,9 @@ import { ReviewPage } from './pages/ReviewPage.tsx';
 
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <I18nProvider>
+      <AuthProvider>
+        <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
             {/* Public Routes */}
@@ -86,6 +88,7 @@ export const App: React.FC = () => {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </I18nProvider>
   );
 };
 
