@@ -19,6 +19,8 @@ import {
   Calendar,
   Ruler,
   Tag,
+  MapPin,
+  Sparkles,
 } from 'lucide-react';
 import { parseDisasterVoiceTranscript } from '../../lib/voice-parser.ts';
 import type { ParsedVoiceReport } from '../../lib/voice-parser.ts';
@@ -131,6 +133,7 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   const recognitionRef = useRef<any>(null);
+  const isListeningRef = useRef<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const animFrameRef = useRef<number | null>(null);
   const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -206,9 +209,9 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
         }
 
         setTimeout(() => {
-          setListeningState((current) => (current === 'committed' ? 'listening' : current));
-        }, 700);
-      }, 150);
+          setListeningState((current) => (current === 'committed' && isListeningRef.current ? 'listening' : current));
+        }, 550);
+      }, 100);
     },
     [soundEnabled]
   );
@@ -219,8 +222,19 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
 
     if (recognitionRef.current) {
       try {
-        recognitionRef.current.stop();
+        recognitionRef.current.abort();
       } catch {}
+    }
+
+    // Instant synchronous UI state activation
+    isListeningRef.current = true;
+    setIsListening(true);
+    setListeningState('listening');
+    uncommittedBufferRef.current = '';
+    setLiveInterim('');
+
+    if (soundEnabled) {
+      playAssistantChime('start');
     }
 
     const recognition = new SpeechRecognition();
@@ -228,14 +242,6 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
     recognition.interimResults = true;
     recognition.lang = 'en-IN';
     recognition.maxAlternatives = 1;
-
-    uncommittedBufferRef.current = '';
-    setLiveInterim('');
-    setListeningState('listening');
-
-    if (soundEnabled) {
-      playAssistantChime('start');
-    }
 
     recognition.onresult = (event: any) => {
       let currentResultText = '';
@@ -265,19 +271,20 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
         return;
       }
 
-      // 800ms silence detection debounce
+      // Snappy 480ms silence commit
       pauseTimerRef.current = setTimeout(() => {
         if (uncommittedBufferRef.current) {
           commitSpeechBuffer(uncommittedBufferRef.current);
         }
-      }, 800);
+      }, 480);
     };
 
     recognition.onerror = (event: any) => {
       if (event.error !== 'no-speech' && event.error !== 'aborted') {
-        console.warn('Speech recognition warning:', event.error);
+        console.warn('Speech recognition status:', event.error);
       }
       if (event.error === 'not-allowed') {
+        isListeningRef.current = false;
         setIsListening(false);
         setListeningState('idle');
       }
@@ -287,20 +294,33 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
       if (uncommittedBufferRef.current) {
         commitSpeechBuffer(uncommittedBufferRef.current);
       }
-      setIsListening(false);
-      setListeningState('idle');
+      // If user still intends to listen, seamlessly maintain session
+      if (isListeningRef.current) {
+        try {
+          recognition.start();
+        } catch {
+          isListeningRef.current = false;
+          setIsListening(false);
+          setListeningState('idle');
+        }
+      } else {
+        setIsListening(false);
+        setListeningState('idle');
+      }
     };
 
     recognitionRef.current = recognition;
     try {
       recognition.start();
-      setIsListening(true);
     } catch (err) {
-      console.warn('Failed to start speech recognition:', err);
+      console.warn('Speech recognition immediate activation note:', err);
     }
   }, [commitSpeechBuffer, soundEnabled]);
 
   const stopListening = useCallback(() => {
+    isListeningRef.current = false;
+    setIsListening(false);
+    setListeningState('idle');
     if (pauseTimerRef.current) {
       clearTimeout(pauseTimerRef.current);
     }
@@ -309,12 +329,10 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
     }
     if (recognitionRef.current) {
       try {
-        recognitionRef.current.stop();
+        recognitionRef.current.abort();
       } catch {}
       recognitionRef.current = null;
     }
-    setIsListening(false);
-    setListeningState('idle');
     setLiveInterim('');
   }, [commitSpeechBuffer]);
 
@@ -560,6 +578,31 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
               {liveParsed.attributes.p_build && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">
                   Build: {liveParsed.attributes.p_build}
+                </span>
+              )}
+              {liveParsed.attributes.p_found_location && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-400/40">
+                  <MapPin className="w-3 h-3" /> {liveParsed.attributes.p_found_location}
+                </span>
+              )}
+              {liveParsed.attributes.p_scars && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-400/40">
+                  🩹 Scar: {liveParsed.attributes.p_scars}
+                </span>
+              )}
+              {liveParsed.attributes.p_birthmarks && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-pink-500/20 text-pink-300 border border-pink-400/40">
+                  <Sparkles className="w-3 h-3" /> Mark: {liveParsed.attributes.p_birthmarks}
+                </span>
+              )}
+              {liveParsed.attributes.p_hair_description && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-400/40">
+                  Hair: {liveParsed.attributes.p_hair_description}
+                </span>
+              )}
+              {liveParsed.attributes.p_condition_status && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-red-500/20 text-red-300 border border-red-400/40">
+                  Status: {liveParsed.attributes.p_condition_status}
                 </span>
               )}
               {liveParsed.attributes.p_clothing && (
