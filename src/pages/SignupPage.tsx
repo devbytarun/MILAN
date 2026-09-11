@@ -79,17 +79,17 @@ export const SignupPage: React.FC = () => {
         <Badge variant="shade" size="sm">
           Operational Role Enrollment
         </Badge>
-        <h1 className="font-display text-2xl sm:text-3xl font-normal text-[#181d26] tracking-tight mt-2">
+        <h1 className="font-display text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight mt-2">
           Register for MILAN
         </h1>
-        <p className="text-xs text-[#41454d]">
+        <p className="text-xs text-slate-600">
           Select your operational role to establish proper data access and reporting authorization.
         </p>
       </div>
 
-      <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-6">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-card space-y-6">
         {error && (
-          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-2.5 text-xs text-rose-700">
+          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-xs text-rose-700">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -98,7 +98,7 @@ export const SignupPage: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Role Selection Grid */}
           <div className="space-y-2.5">
-            <label className="block text-xs font-medium text-[#41454d]">
+            <label className="block text-xs font-semibold text-slate-700">
               Select Your Role in Disaster Response <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -110,23 +110,23 @@ export const SignupPage: React.FC = () => {
                     onClick={() => setRole(opt.role)}
                     className={`p-4 rounded-xl border cursor-pointer transition-all duration-150 flex flex-col justify-between ${
                       selected
-                        ? 'border-[#181d26] bg-[#f8fafc] ring-1 ring-[#181d26]'
-                        : 'border-[#dddddd] hover:border-[#181d26] hover:bg-[#f8fafc]/50'
+                        ? 'border-orange-500 bg-orange-50/40 ring-2 ring-orange-500/20 shadow-sm'
+                        : 'border-slate-200/90 hover:border-slate-300 hover:bg-slate-50/60 bg-white'
                     }`}
                   >
                     <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-bold text-[#181d26]">{opt.title}</span>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-bold text-slate-900">{opt.title}</span>
                         {selected ? (
-                          <CheckCircle2 className="w-4 h-4 text-[#181d26] shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-orange-600 shrink-0" />
                         ) : (
-                          <span className="w-4 h-4 rounded-full border border-[#dddddd] shrink-0" />
+                          <span className="w-4 h-4 rounded-full border border-slate-300 shrink-0" />
                         )}
                       </div>
-                      <p className="text-xs text-[#41454d] leading-relaxed">{opt.desc}</p>
+                      <p className="text-xs text-slate-600 leading-relaxed">{opt.desc}</p>
                     </div>
                     <div className="mt-3">
-                      <Badge variant={opt.autoApproved ? 'forest' : 'shade'} size="sm">
+                      <Badge variant={opt.autoApproved ? 'verified' : 'shade'} size="sm">
                         {opt.badge}
                       </Badge>
                     </div>
@@ -187,7 +187,7 @@ export const SignupPage: React.FC = () => {
           <div className="pt-2">
             <Button
               type="submit"
-              variant="primary"
+              variant="brand"
               size="lg"
               isLoading={loading}
               leftIcon={<UserPlus className="w-4 h-4" />}
@@ -199,9 +199,9 @@ export const SignupPage: React.FC = () => {
         </form>
       </div>
 
-      <div className="text-center text-xs text-[#41454d]">
+      <div className="text-center text-xs text-slate-600">
         Already registered?{' '}
-        <Link to="/login" className="text-[#181d26] font-semibold hover:underline">
+        <Link to="/login" className="text-orange-600 font-semibold hover:text-orange-700 hover:underline">
           Sign In here
         </Link>
       </div>

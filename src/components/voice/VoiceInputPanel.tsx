@@ -324,12 +324,12 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
   }, []);
 
   return (
-    <div className="space-y-6 text-[#333840] font-body">
+    <div className="space-y-6 text-slate-700 font-body">
       {/* Top Controls Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#dddddd] gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200/90 gap-3">
         <div className="flex items-center gap-2">
-          <Radio className="w-4 h-4 text-[#181d26]" />
-          <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#181d26]">
+          <Radio className="w-4 h-4 text-orange-600" />
+          <span className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-900">
             VOICE & AUDIO DISPATCH PARSER
           </span>
         </div>
@@ -338,25 +338,25 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg border border-[#dddddd] bg-[#f8fafc] hover:bg-white text-[#41454d] font-medium transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium transition-colors shadow-sm"
             title="Toggle Audio Feedback Chimes"
           >
-            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-[#006400]" /> : <VolumeX className="w-3.5 h-3.5 text-[#9297a0]" />}
+            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-emerald-600" /> : <VolumeX className="w-3.5 h-3.5 text-slate-400" />}
             <span>{soundEnabled ? 'Chimes: ON' : 'Chimes: OFF'}</span>
           </button>
         </div>
       </div>
 
       {/* Center Dictation Visualizer */}
-      <div className="p-6 sm:p-8 bg-[#f8fafc] border border-[#dddddd] rounded-xl flex flex-col items-center justify-center text-center space-y-4">
+      <div className="p-6 sm:p-8 bg-slate-50/70 border border-slate-200/90 rounded-2xl flex flex-col items-center justify-center text-center space-y-4">
         <button
           type="button"
           onClick={isListening ? stopListening : startListening}
           disabled={!micSupported}
-          className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200 select-none shadow-elevation-2 active:scale-95 ${
+          className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-200 select-none shadow-md active:scale-95 ${
             isListening
-              ? 'bg-[#aa2d00] text-white animate-pulse'
-              : 'bg-[#181d26] text-white hover:bg-[#2c333f]'
+              ? 'bg-orange-600 text-white animate-pulse ring-4 ring-orange-500/20'
+              : 'bg-slate-900 text-white hover:bg-slate-800'
           }`}
           title={isListening ? 'Click to Stop Listening' : micSupported ? 'Click to Start Voice Recording' : 'Microphone Not Supported'}
         >
@@ -368,7 +368,7 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
         </button>
 
         <div className="space-y-1 max-w-md">
-          <div className="text-sm font-semibold text-[#181d26]">
+          <div className="text-sm font-semibold text-slate-900">
             {isListening
               ? listeningState === 'recognizing'
                 ? 'Processing Spoken Input...'
@@ -377,7 +377,7 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
                 : 'Listening... Speak Details Naturally'
               : 'Click to Start Speech-to-Text Dictation'}
           </div>
-          <p className="text-xs text-[#41454d]">
+          <p className="text-xs text-slate-600">
             {isListening
               ? 'Speak continuous details: name, age, clothes, scars, location, blood group, condition.'
               : 'Or paste raw VHF radio logs or field dispatch text directly in the box below.'}
@@ -386,15 +386,15 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
 
         {/* Live Interim Feedback */}
         {liveInterim && (
-          <div className="px-3 py-1.5 bg-white border border-[#dddddd] rounded-lg text-xs font-medium text-[#181d26] shadow-sm max-w-md truncate">
-            <span className="text-[#9297a0] font-mono text-[10px] uppercase mr-1.5">Hearing:</span>
+          <div className="px-3 py-1.5 bg-white border border-slate-200/90 rounded-lg text-xs font-medium text-slate-900 shadow-sm max-w-md truncate">
+            <span className="text-slate-400 font-mono text-[10px] uppercase mr-1.5">Hearing:</span>
             "{liveInterim}"
           </div>
         )}
 
         {listeningState === 'committed' && lastCommittedPhrase && (
-          <div className="px-3 py-1 bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg text-xs font-semibold text-[#0a2e0e] flex items-center gap-1.5 shadow-sm">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#006400]" />
+          <div className="px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-800 flex items-center gap-1.5 shadow-sm">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
             <span className="truncate">Captured: "{lastCommittedPhrase}"</span>
           </div>
         )}
@@ -402,54 +402,54 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
 
       {/* Live Entity Radar: Attributes detected in real time */}
       {liveParsed && liveParsed.extractedEntities.length > 0 && (
-        <div className="p-4 bg-white border border-[#dddddd] rounded-xl space-y-3">
+        <div className="p-4 bg-white border border-slate-200/90 rounded-2xl space-y-3 shadow-sm">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-mono text-[11px] uppercase tracking-wider font-semibold text-[#181d26] flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 text-[#181d26]" /> Real-Time Extracted Evidence ({liveParsed.extractedEntities.length} fields detected)
+            <span className="font-mono text-[11px] uppercase tracking-wider font-semibold text-slate-900 flex items-center gap-1.5">
+              <Activity className="w-3.5 h-3.5 text-orange-600" /> Real-Time Extracted Evidence ({liveParsed.extractedEntities.length} fields detected)
             </span>
-            <span className="font-mono text-xs font-bold text-[#006400]">
+            <span className="font-mono text-xs font-bold text-emerald-600">
               {liveParsed.confidence}% confidence
             </span>
           </div>
 
           <div className="flex flex-wrap gap-2">
             {liveParsed.attributes.p_full_name && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#f8fafc] text-[#181d26] border border-[#dddddd]">
-                <User className="w-3 h-3 text-[#9297a0]" /> Name: <strong>{liveParsed.attributes.p_full_name}</strong>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-50 text-slate-800 border border-slate-200/90">
+                <User className="w-3 h-3 text-slate-400" /> Name: <strong>{liveParsed.attributes.p_full_name}</strong>
               </span>
             )}
             {liveParsed.attributes.p_age && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#f8fafc] text-[#181d26] border border-[#dddddd]">
-                <Calendar className="w-3 h-3 text-[#9297a0]" /> Age: <strong>{liveParsed.attributes.p_age}</strong>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-50 text-slate-800 border border-slate-200/90">
+                <Calendar className="w-3 h-3 text-slate-400" /> Age: <strong>{liveParsed.attributes.p_age}</strong>
               </span>
             )}
             {liveParsed.attributes.p_gender && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#f8fafc] text-[#181d26] border border-[#dddddd]">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-50 text-slate-800 border border-slate-200/90">
                 Gender: <strong>{liveParsed.attributes.p_gender}</strong>
               </span>
             )}
             {liveParsed.attributes.p_blood_group && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#f8fafc] text-[#181d26] border border-[#dddddd]">
-                <Heart className="w-3 h-3 text-[#aa2d00]" /> Blood: <strong>{liveParsed.attributes.p_blood_group}</strong>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-50 text-slate-800 border border-slate-200/90">
+                <Heart className="w-3 h-3 text-rose-500" /> Blood: <strong>{liveParsed.attributes.p_blood_group}</strong>
               </span>
             )}
             {liveParsed.attributes.p_comm_status && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#f8fafc] text-[#181d26] border border-[#dddddd]">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-50 text-slate-800 border border-slate-200/90">
                 Comm: <strong>{liveParsed.attributes.p_comm_status === 'CAN_COMMUNICATE' ? 'Verbal' : 'Non-Verbal'}</strong>
               </span>
             )}
             {liveParsed.attributes.p_found_location && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#f8fafc] text-[#181d26] border border-[#dddddd]">
-                <MapPin className="w-3 h-3 text-[#9297a0]" /> Location: <strong>{liveParsed.attributes.p_found_location}</strong>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-50 text-slate-800 border border-slate-200/90">
+                <MapPin className="w-3 h-3 text-slate-400" /> Location: <strong>{liveParsed.attributes.p_found_location}</strong>
               </span>
             )}
             {liveParsed.attributes.p_clothing && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#f8fafc] text-[#181d26] border border-[#dddddd] truncate max-w-xs">
-                <Tag className="w-3 h-3 text-[#9297a0]" /> Clothes: <strong>{liveParsed.attributes.p_clothing}</strong>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-50 text-slate-800 border border-slate-200/90 truncate max-w-xs">
+                <Tag className="w-3 h-3 text-slate-400" /> Clothes: <strong>{liveParsed.attributes.p_clothing}</strong>
               </span>
             )}
             {liveParsed.attributes.p_scars && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-[#f8fafc] text-[#181d26] border border-[#dddddd]">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-50 text-slate-800 border border-slate-200/90">
                 Scar: <strong>{liveParsed.attributes.p_scars}</strong>
               </span>
             )}
@@ -458,16 +458,16 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
       )}
 
       {/* Transcript Textarea Card */}
-      <div className="bg-white border border-[#dddddd] rounded-xl p-5 shadow-elevation-1 space-y-3">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-card space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-[#181d26]" />
-            <label htmlFor="transcript-area" className="text-xs font-mono font-bold uppercase tracking-wider text-[#181d26]">
+            <FileText className="w-4 h-4 text-slate-900" />
+            <label htmlFor="transcript-area" className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900">
               Dispatch Transcript Buffer
             </label>
           </div>
           {transcript && (
-            <span className="text-xs font-mono text-[#9297a0]">
+            <span className="text-xs font-mono text-slate-400">
               {transcript.trim().split(/\s+/).filter(Boolean).length} words
             </span>
           )}
@@ -480,11 +480,11 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
           onChange={(e) => setTranscript(e.target.value)}
           placeholder="Spoken statements will stream here automatically...&#10;&#10;Or paste dispatch notes, e.g.:&#10;&quot;Control, this is NDRF boat team. Rescued Veer Kumar, male, approximately 28 years old, near bridge. Wearing blue denim jacket. Has scar on left eyebrow. Blood group B+...&quot;"
           rows={5}
-          className="w-full px-3.5 py-3 text-sm rounded-lg border border-[#dddddd] bg-[#f8fafc] focus:bg-white text-[#181d26] placeholder-[#9297a0] outline-none focus:border-[#181d26] focus:ring-1 focus:ring-[#181d26] transition leading-relaxed resize-none"
+          className="w-full px-3.5 py-3 text-sm rounded-xl border border-slate-200/90 bg-slate-50/50 focus:bg-white text-slate-900 placeholder:text-slate-400 outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition leading-relaxed resize-none"
         />
 
         {/* Action Controls Row */}
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-2 border-t border-[#dddddd] gap-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-2 border-t border-slate-200/80 gap-3">
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <Button
               variant="secondary"
@@ -509,7 +509,7 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
                   setTranscript('');
                   lastCommittedTextRef.current = '';
                 }}
-                className="text-xs text-[#9297a0] hover:text-[#aa2d00] font-medium ml-1 transition-colors"
+                className="text-xs text-slate-400 hover:text-rose-600 font-medium ml-1 transition-colors"
               >
                 Clear
               </button>
@@ -517,7 +517,7 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
           </div>
 
           <Button
-            variant="primary"
+            variant="brand"
             size="md"
             onClick={handleParse}
             disabled={!transcript.trim() || isParsing}
@@ -531,12 +531,12 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
 
       {/* Demo Transcripts Expandable Grid */}
       {showSamples && (
-        <div className="bg-[#f8fafc] border border-[#dddddd] rounded-xl p-5 space-y-3 animate-fade-in">
-          <div className="flex items-center justify-between pb-2 border-b border-[#dddddd]">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#181d26]">
+        <div className="bg-slate-50/70 border border-slate-200/90 rounded-2xl p-5 space-y-3 animate-fade-in">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-900">
               Select Preloaded Crisis Dispatches:
             </span>
-            <span className="text-[11px] text-[#9297a0] font-mono">
+            <span className="text-[11px] text-slate-400 font-mono">
               Click any card to load transcript
             </span>
           </div>
@@ -547,18 +547,18 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
                 key={idx}
                 type="button"
                 onClick={() => loadSample(item.text)}
-                className="p-3.5 bg-white border border-[#dddddd] hover:border-[#181d26] rounded-lg text-left transition-colors space-y-1.5 group"
+                className="p-3.5 bg-white border border-slate-200/90 hover:border-orange-500/80 hover:bg-orange-50/20 rounded-xl text-left transition-all duration-150 space-y-1.5 group shadow-sm hover:shadow-card"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#f8fafc] border border-[#dddddd] text-[#181d26]">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-50 border border-slate-200 text-slate-700">
                     {item.badge}
                   </span>
-                  <span className="text-[11px] font-medium text-[#1b61c9] group-hover:underline">
+                  <span className="text-[11px] font-medium text-orange-600 group-hover:text-orange-700 group-hover:underline">
                     Load →
                   </span>
                 </div>
-                <div className="text-xs font-semibold text-[#181d26]">{item.label}</div>
-                <p className="text-[11px] text-[#41454d] line-clamp-2 leading-relaxed">
+                <div className="text-xs font-semibold text-slate-900">{item.label}</div>
+                <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed">
                   {item.text}
                 </p>
               </button>

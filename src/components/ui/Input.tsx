@@ -26,7 +26,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-xs font-medium text-[#41454d]"
+          className="block text-xs font-semibold text-slate-700"
         >
           {label}
         </label>
@@ -34,7 +34,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
 
       <div className="relative flex items-center">
         {leftIcon && (
-          <div className="absolute left-3.5 text-[#9297a0] pointer-events-none flex items-center justify-center">
+          <div className="absolute left-3.5 text-slate-400 pointer-events-none flex items-center justify-center">
             {leftIcon}
           </div>
         )}
@@ -43,20 +43,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
           ref={ref}
           id={inputId}
           disabled={disabled}
-          className={`w-full min-h-[44px] px-3.5 py-2.5 text-sm font-normal text-[#181d26] bg-white border rounded-md transition-colors duration-150 outline-none placeholder:text-[#9297a0] disabled:bg-[#f8fafc] disabled:text-[#9297a0] disabled:cursor-not-allowed ${
+          className={`w-full min-h-[42px] px-3.5 py-2 text-sm font-normal text-slate-900 bg-white border rounded-lg transition-all duration-150 outline-none placeholder:text-slate-400 shadow-sm disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed ${
             leftIcon ? '!pl-10' : ''
           } ${
             rightIcon ? '!pr-10' : ''
           } ${
             error
-              ? 'border-rose-500 focus:border-rose-600 focus:ring-2 focus:ring-rose-500/20'
-              : 'border-[#dddddd] hover:border-[#9297a0] focus:border-[#458fff] focus:ring-2 focus:ring-[#458fff]/20'
+              ? 'border-rose-400 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
+              : 'border-slate-200 hover:border-slate-300 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10'
           } ${className}`}
           {...props}
         />
 
         {rightIcon && (
-          <div className="absolute right-3.5 text-[#9297a0] flex items-center justify-center">
+          <div className="absolute right-3.5 text-slate-400 flex items-center justify-center">
             {rightIcon}
           </div>
         )}
@@ -65,7 +65,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
       {error ? (
         <p className="text-xs text-rose-600 font-medium">{error}</p>
       ) : helperText ? (
-        <p className="text-xs text-[#9297a0]">{helperText}</p>
+        <p className="text-xs text-slate-500">{helperText}</p>
       ) : null}
     </div>
   );

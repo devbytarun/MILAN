@@ -94,23 +94,23 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-modal bg-[#181d26]/80 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white border border-[#dddddd] rounded-xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-elevation-4 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-modal bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white border border-slate-200/90 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
         {/* Header (Airtable dark surface) */}
-        <div className="p-6 bg-[#181d26] text-white flex items-center justify-between border-b border-[#333840]">
+        <div className="p-6 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#a8d8c4]">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-orange-400">
               <span>{sourceCase.case.case_uid} (Missing)</span>
               <span>↔</span>
               <span>{candidateCase.case.case_uid} (Found)</span>
             </div>
-            <h2 className="font-display text-xl sm:text-2xl font-normal text-white mt-1">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white mt-1">
               Side-by-Side Verification Audit
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-[#9297a0] hover:text-white rounded-full hover:bg-white/10 transition-colors"
+            className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -119,47 +119,47 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
         {/* Content Scrollable Area */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {/* Match Score Banner */}
-          <div className="p-5 bg-[#f8fafc] border border-[#dddddd] rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="p-5 bg-slate-50/80 border border-slate-200/80 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <div className="text-xs font-bold text-[#181d26] uppercase tracking-wide">
+              <div className="text-xs font-bold text-slate-900 uppercase tracking-wide">
                 Algorithmic Confidence Assessment
               </div>
-              <p className="type-caption text-[#41454d] mt-1">
+              <p className="text-xs text-slate-600 mt-1">
                 {matchResult.explanation}
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
               <Badge
-                variant={matchResult.confidenceTier === 'HIGH' ? 'mint' : matchResult.confidenceTier === 'MEDIUM' ? 'pending' : 'shade'}
+                variant={matchResult.confidenceTier === 'HIGH' ? 'verified' : matchResult.confidenceTier === 'MEDIUM' ? 'pending' : 'shade'}
                 size="sm"
               >
                 {matchResult.confidenceTier} CONFIDENCE
               </Badge>
               <div className="text-right">
-                <div className="font-display text-2xl font-bold text-[#181d26]">
+                <div className="text-2xl font-bold text-slate-900 font-mono">
                   {matchResult.score}%
                 </div>
-                <div className="text-[10px] uppercase font-semibold text-[#9297a0]">Confidence Score</div>
+                <div className="text-[10px] uppercase font-semibold text-slate-400">Confidence Score</div>
               </div>
             </div>
           </div>
 
           {/* Child Safeguard Banner (if minor detected) */}
           {isMinor && (
-            <div className="p-4 rounded-lg bg-[#fcab79]/15 border border-[#fcab79] text-xs text-[#aa2d00] space-y-2">
-              <div className="flex items-center gap-2 font-bold">
-                <AlertTriangle className="w-4 h-4 text-[#aa2d00] shrink-0" />
+            <div className="p-4 rounded-xl bg-rose-50/80 border border-rose-200 text-xs text-rose-900 space-y-2">
+              <div className="flex items-center gap-2 font-bold text-rose-800">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
                 <span>ANTI-TRAFFICKING CHILD SAFEGUARD ENGAGED (MINOR UNDER 18)</span>
               </div>
-              <p className="leading-relaxed">
+              <p className="leading-relaxed text-rose-700">
                 National SOP mandates that unaccompanied minors cannot be discharged without verified government identification of the claimant guardian and anti-trafficking clearance.
               </p>
-              <label className="flex items-center gap-2 font-semibold pt-1 cursor-pointer select-none">
+              <label className="flex items-center gap-2 font-semibold pt-1 cursor-pointer select-none text-rose-900">
                 <input
                   type="checkbox"
                   checked={guardianProofVerified}
                   onChange={(e) => setGuardianProofVerified(e.target.checked)}
-                  className="rounded border-[#dddddd] text-[#aa2d00] focus:ring-[#aa2d00]"
+                  className="rounded border-rose-300 text-rose-600 focus:ring-rose-500"
                 />
                 <span>I confirm that valid guardian identity proof and biometric/photo alignment have been audited.</span>
               </label>
@@ -167,37 +167,37 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
           )}
 
           {/* Comparison Table */}
-          <div className="border border-[#dddddd] rounded-lg overflow-hidden">
+          <div className="border border-slate-200/90 rounded-xl overflow-hidden shadow-xs">
             <table className="w-full text-xs text-left">
-              <thead className="bg-[#f8fafc] text-[#333840] font-semibold border-b border-[#dddddd]">
+              <thead className="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-200">
                 <tr>
                   <th className="p-3.5 w-1/4">Attribute</th>
-                  <th className="p-3.5 w-[37.5%] border-l border-r border-[#dddddd] bg-[#a8d8c4]/15 text-[#181d26] font-bold">
+                  <th className="p-3.5 w-[37.5%] border-l border-r border-slate-200 bg-orange-50/40 text-slate-900 font-bold">
                     Family Missing Report ({sourceCase.case.case_uid})
                   </th>
-                  <th className="p-3.5 w-[37.5%] bg-[#f8fafc] text-[#181d26] font-bold">
+                  <th className="p-3.5 w-[37.5%] bg-slate-50 text-slate-900 font-bold">
                     Rescue Intake Report ({candidateCase.case.case_uid})
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#dddddd]">
+              <tbody className="divide-y divide-slate-100">
                 {rows.map((r) => (
                   <tr
                     key={r.label}
-                    className={r.highlight ? 'bg-[#a8d8c4]/10 font-medium' : 'hover:bg-[#f8fafc] transition-colors'}
+                    className={r.highlight ? 'bg-orange-50/30 font-medium' : 'hover:bg-slate-50/60 transition-colors'}
                   >
-                    <td className="p-3.5 font-bold text-[#181d26]">
+                    <td className="p-3.5 font-bold text-slate-900">
                       {r.label}
                       {r.highlight && (
-                        <span className="block text-[10px] text-[#aa2d00] font-semibold">
+                        <span className="block text-[10px] text-orange-600 font-semibold">
                           ★ High Weight Feature
                         </span>
                       )}
                     </td>
-                    <td className="p-3.5 text-[#181d26] border-l border-r border-[#dddddd]">
+                    <td className="p-3.5 text-slate-800 border-l border-r border-slate-200">
                       {r.source}
                     </td>
-                    <td className="p-3.5 text-[#181d26]">
+                    <td className="p-3.5 text-slate-800">
                       {r.candidate}
                     </td>
                   </tr>
@@ -207,9 +207,9 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
           </div>
 
           {/* Reviewer Action Box */}
-          <div className="bg-[#f8fafc] border border-[#dddddd] rounded-lg p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-[#181d26] flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-[#181d26]" />
+          <div className="bg-slate-50/80 border border-slate-200/80 rounded-xl p-5 space-y-4">
+            <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+              <FileCheck className="w-4 h-4 text-orange-600" />
               Coordinator Verification Decision
             </h3>
 
@@ -218,15 +218,15 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedAction('VERIFIED')}
-                className={`p-3.5 rounded-lg border text-left transition-colors flex items-center justify-between ${
+                className={`p-3.5 rounded-xl border text-left transition-colors flex items-center justify-between ${
                   selectedAction === 'VERIFIED'
-                    ? 'bg-[#181d26] text-white border-[#181d26] font-semibold shadow-sm'
-                    : 'bg-white hover:bg-[#f8fafc] border-[#dddddd] text-[#333840]'
+                    ? 'bg-slate-900 text-white border-slate-900 font-semibold shadow-sm'
+                    : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
                 }`}
               >
                 <div>
                   <div className="text-xs font-bold">VERIFY MATCH</div>
-                  <div className={`text-[10px] ${selectedAction === 'VERIFIED' ? 'text-white/70' : 'text-[#9297a0]'}`}>
+                  <div className={`text-[10px] ${selectedAction === 'VERIFIED' ? 'text-white/70' : 'text-slate-400'}`}>
                     Confirmed positive reunion
                   </div>
                 </div>
@@ -236,15 +236,15 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedAction('REJECTED')}
-                className={`p-3.5 rounded-lg border text-left transition-colors flex items-center justify-between ${
+                className={`p-3.5 rounded-xl border text-left transition-colors flex items-center justify-between ${
                   selectedAction === 'REJECTED'
-                    ? 'bg-[#aa2d00] text-white border-[#aa2d00] font-semibold shadow-sm'
-                    : 'bg-white hover:bg-[#f8fafc] border-[#dddddd] text-[#333840]'
+                    ? 'bg-rose-700 text-white border-rose-700 font-semibold shadow-sm'
+                    : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
                 }`}
               >
                 <div>
                   <div className="text-xs font-bold">REJECT MATCH</div>
-                  <div className={`text-[10px] ${selectedAction === 'REJECTED' ? 'text-white/70' : 'text-[#9297a0]'}`}>
+                  <div className={`text-[10px] ${selectedAction === 'REJECTED' ? 'text-white/70' : 'text-slate-400'}`}>
                     False positive candidate
                   </div>
                 </div>
@@ -254,26 +254,26 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedAction('MORE_INFO_NEEDED')}
-                className={`p-3.5 rounded-lg border text-left transition-colors flex items-center justify-between ${
+                className={`p-3.5 rounded-xl border text-left transition-colors flex items-center justify-between ${
                   selectedAction === 'MORE_INFO_NEEDED'
-                    ? 'bg-[#f5e9d4] text-[#181d26] border-[#e0d0b5] font-semibold shadow-sm'
-                    : 'bg-white hover:bg-[#f8fafc] border-[#dddddd] text-[#333840]'
+                    ? 'bg-amber-600 text-white border-amber-600 font-semibold shadow-sm'
+                    : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
                 }`}
               >
                 <div>
                   <div className="text-xs font-bold">REQUEST MORE INFO</div>
-                  <div className="text-[10px] text-[#9297a0]">
+                  <div className={`text-[10px] ${selectedAction === 'MORE_INFO_NEEDED' ? 'text-white/80' : 'text-slate-400'}`}>
                     Require shelter photo/call
                   </div>
                 </div>
-                <HelpCircle className="w-4 h-4 text-[#d9a441] shrink-0" />
+                <HelpCircle className="w-4 h-4 shrink-0" />
               </button>
             </div>
 
             {/* Audit Notes */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-[#333840] uppercase tracking-wider">
-                Evidentiary Audit Justification <span className="text-[#aa2d00]">*</span>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Evidentiary Audit Justification <span className="text-orange-600">*</span>
               </label>
               <textarea
                 rows={2}
@@ -281,14 +281,14 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Explain the evidentiary justification for this verification decision..."
-                className="w-full px-3.5 py-2.5 text-xs text-[#181d26] border border-[#dddddd] rounded-md outline-none focus:border-[#181d26] bg-white"
+                className="w-full px-3.5 py-2.5 text-xs text-slate-900 border border-slate-200 rounded-xl outline-none focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 bg-white transition-all"
               />
             </div>
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-white border-t border-[#dddddd] flex items-center justify-end gap-3">
+        <div className="p-4 bg-white border-t border-slate-200/90 flex items-center justify-end gap-3">
           <Button
             type="button"
             variant="secondary"
@@ -299,11 +299,12 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
           </Button>
           <Button
             type="button"
-            variant="primary"
+            variant="brand"
             size="sm"
             disabled={isMinor && selectedAction === 'VERIFIED' && !guardianProofVerified}
             onClick={() => onConfirmAction(selectedAction, reason)}
             leftIcon={<ShieldCheck className="w-4 h-4" />}
+            className="shadow-sm"
           >
             Confirm Decision in Audit Log
           </Button>

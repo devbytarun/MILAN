@@ -47,17 +47,17 @@ export const LoginPage: React.FC = () => {
         <Badge variant="shade" size="sm">
           Authorized Agency & Family Access
         </Badge>
-        <h1 className="font-display text-2xl sm:text-3xl font-normal text-[#181d26] tracking-tight mt-2">
+        <h1 className="font-display text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight mt-2">
           Sign In to MILAN
         </h1>
-        <p className="text-xs text-[#41454d]">
+        <p className="text-xs text-slate-600">
           Enter your authorized credentials or select an evaluation demo account below.
         </p>
       </div>
 
-      <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-6">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-card space-y-6">
         {error && (
-          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-2.5 text-xs text-rose-700">
+          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-xs text-rose-700">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -84,7 +84,7 @@ export const LoginPage: React.FC = () => {
           <div className="pt-2">
             <Button
               type="submit"
-              variant="primary"
+              variant="brand"
               size="md"
               isLoading={loading}
               leftIcon={<LogIn className="w-4 h-4" />}
@@ -97,10 +97,10 @@ export const LoginPage: React.FC = () => {
 
         <div className="relative my-4">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#dddddd]"></div>
+            <div className="w-full border-t border-slate-200"></div>
           </div>
           <div className="relative flex justify-center text-[10px] uppercase">
-            <span className="bg-white px-3 text-[#9297a0] font-semibold tracking-wider">
+            <span className="bg-white px-3 text-slate-400 font-semibold tracking-wider font-mono">
               1-Click Evaluation Personas
             </span>
           </div>
@@ -114,31 +114,31 @@ export const LoginPage: React.FC = () => {
                 key={role}
                 type="button"
                 onClick={() => handleQuickLogin(role)}
-                className="p-3 border border-[#dddddd] hover:border-[#181d26] hover:bg-[#f8fafc] rounded-lg text-left transition-colors duration-150"
+                className="p-3 bg-white border border-slate-200/90 hover:border-orange-500/80 hover:bg-orange-50/30 active:bg-orange-50/50 rounded-xl text-left transition-all duration-150 group shadow-sm hover:shadow-card"
               >
-                <div className="text-[10px] font-semibold text-[#41454d] uppercase tracking-wider">
+                <div className="text-[10px] font-mono font-semibold text-slate-500 uppercase tracking-wider group-hover:text-orange-700 transition-colors">
                   {role.replace('_', ' ')}
                 </div>
-                <div className="text-xs font-semibold text-[#181d26] truncate mt-0.5">
+                <div className="text-xs font-semibold text-slate-900 truncate mt-0.5">
                   {DEMO_USERS[role].fullName.split(' ')[0]}
                 </div>
               </button>
             ))}
           </div>
-          <div className="text-[10px] text-center text-[#9297a0] pt-1">
+          <div className="text-[10px] text-center text-slate-400 font-mono pt-1">
             [SIMULATED DRILL / DEMO DATA]
           </div>
         </div>
       </div>
 
-      <div className="text-center text-xs text-[#41454d] space-y-1">
+      <div className="text-center text-xs text-slate-600 space-y-1">
         <div>
           Don't have an account?{' '}
-          <Link to="/signup" className="text-[#181d26] font-semibold hover:underline">
+          <Link to="/signup" className="text-orange-600 font-semibold hover:text-orange-700 hover:underline">
             Register new account
           </Link>
         </div>
-        <p className="text-[10px] text-[#9297a0]">
+        <p className="text-[10px] text-slate-400 font-mono">
           MILAN Disaster Portal • Offline Sync & IndexedDB Enabled
         </p>
       </div>

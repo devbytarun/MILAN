@@ -78,7 +78,7 @@ export const LiveStatusBeacon: React.FC<LiveStatusBeaconProps> = ({
     <div className={`inline-flex flex-wrap items-center gap-2 ${className}`}>
       {/* Live Pulsing Beacon Pill */}
       <div
-        className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-pill border text-xs font-semibold select-none transition-colors ${current.badgeBg}`}
+        className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full border text-xs font-semibold select-none transition-colors ${current.badgeBg}`}
         title={`Network state: ${networkState}. Last verified: ${lastSync}`}
       >
         <span className="relative flex h-2 w-2">
@@ -98,7 +98,7 @@ export const LiveStatusBeacon: React.FC<LiveStatusBeaconProps> = ({
       {/* Evaluation / Demo Sandbox Transparency Tag */}
       {showTransparencyNotice && (
         <div
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-pill bg-slate-100 border border-slate-200 text-[10px] font-mono font-medium text-slate-600"
+          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[10px] font-mono font-medium text-slate-600"
           title="Data is simulated for disaster drill demonstration. No real victim records are published."
         >
           <ShieldAlert className="w-3 h-3 text-slate-500" />
