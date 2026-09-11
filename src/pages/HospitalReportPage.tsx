@@ -86,43 +86,43 @@ export const HospitalReportPage: React.FC = () => {
 
   if (submittedUid) {
     return (
-      <div className="max-w-2xl mx-auto my-8 bg-white border border-purple-200 rounded-2xl p-8 shadow-sm text-center space-y-6">
-        <div className="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
-          <CheckCircle2 className="w-10 h-10" />
+      <div className="max-w-2xl mx-auto my-8 bg-canvas-light border border-hairline-light rounded-lg p-8 shadow-elevation-3 text-center space-y-6">
+        <div className="w-16 h-16 bg-canvas-cream text-ink rounded-pill flex items-center justify-center mx-auto border border-hairline-light">
+          <CheckCircle2 className="w-8 h-8 text-ink" />
         </div>
 
         <div>
-          <span className="text-xs font-bold text-purple-800 bg-purple-100 px-3 py-1 rounded-full uppercase tracking-wider">
+          <span className="inline-flex items-center text-[10px] font-semibold text-ink bg-canvas-cream px-3 py-1 rounded-pill uppercase tracking-wider border border-hairline-light">
             Clinical Patient Registered
           </span>
-          <h2 className="text-2xl font-bold text-slate-900 mt-3">
+          <h2 className="type-heading-xl text-ink mt-3">
             Hospital Case Synchronized
           </h2>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="type-caption text-shade-50 mt-1">
             Patient record created with privacy protection for clinical diagnostics.
           </p>
         </div>
 
-        <div className="p-5 bg-slate-900 text-white rounded-xl shadow-md max-w-sm mx-auto space-y-1">
-          <div className="text-[11px] font-semibold text-purple-300 uppercase tracking-widest">
+        <div className="p-6 bg-canvas-night text-on-dark rounded-md shadow-elevation-1 max-w-sm mx-auto space-y-1 border border-hairline-dark">
+          <div className="text-[10px] font-semibold text-shade-40 uppercase tracking-widest">
             Case Clinical UID
           </div>
-          <div className="text-3xl font-mono font-extrabold tracking-wider text-purple-400">
+          <div className="text-3xl font-mono font-bold tracking-wider text-on-dark">
             {submittedUid}
           </div>
         </div>
 
-        <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl text-left text-xs text-purple-950 flex items-start gap-2">
-          <Lock className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
-          <div>
-            <strong>Medical Privacy Active:</strong> Sensitive clinical details (condition, surgical history) are strictly quarantined to Hospital and Admin roles.
+        <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md text-left text-xs text-ink flex items-start gap-2">
+          <Lock className="w-4 h-4 text-ink shrink-0 mt-0.5" />
+          <div className="type-caption text-shade-60">
+            <strong className="text-ink">Medical Privacy Active:</strong> Sensitive clinical details (condition, surgical history) are strictly quarantined to Hospital and Admin roles.
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             to="/cases"
-            className="w-full sm:w-auto px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition"
+            className="w-full sm:w-auto px-6 py-2.5 bg-primary text-on-primary hover:bg-shade-70 font-semibold rounded-pill text-xs flex items-center justify-center gap-2 shadow-sm transition"
           >
             <Search className="w-4 h-4" /> View in Cases Registry
           </Link>
@@ -131,7 +131,7 @@ export const HospitalReportPage: React.FC = () => {
               setSubmittedUid(null);
               setCurrentStep(0);
             }}
-            className="w-full sm:w-auto px-5 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-xs transition"
+            className="w-full sm:w-auto px-5 py-2.5 border border-ink hover:bg-canvas-cream text-ink font-semibold rounded-pill text-xs transition"
           >
             Admit Another Patient
           </button>
@@ -154,15 +154,15 @@ export const HospitalReportPage: React.FC = () => {
       {/* STEP 1: Referral & Triage */}
       {currentStep === 0 && (
         <div className="space-y-4">
-          <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl flex items-center justify-between">
-            <div className="text-xs text-purple-900 font-medium">
+          <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="type-caption text-ink font-medium">
               Did patient arrive with an existing Milan UID (from NGO or Army referral)?
             </div>
             <button
               type="button"
               onClick={() => setHasExistingUid(!hasExistingUid)}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                hasExistingUid ? 'bg-purple-600 text-white' : 'bg-white text-slate-700 border border-slate-200'
+              className={`px-4 py-1.5 rounded-pill text-xs transition-colors shrink-0 ${
+                hasExistingUid ? 'bg-ink text-on-primary font-semibold' : 'bg-canvas-light text-ink border border-hairline-light hover:bg-canvas-cream'
               }`}
             >
               {hasExistingUid ? 'Yes, Link UID' : 'No, New Case'}
