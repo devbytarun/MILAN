@@ -1,22 +1,22 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth, DEMO_USERS } from '../context/AuthContext.tsx';
 import { useI18n } from '../context/I18nContext.tsx';
 import type { UserRole } from '../types/index.ts';
 import {
+  ArrowRight,
+  Search,
   Building2,
   Stethoscope,
-  Search,
-  ArrowRight,
+  Phone,
   ShieldCheck,
-  FileSpreadsheet,
-  Radio,
+  CheckCircle2,
+  Lock,
   FileText,
-  WifiOff,
-  Zap,
+  Clock,
+  UserCheck,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button.tsx';
-import { Badge } from '../components/ui/Badge.tsx';
 
 export const LandingPage: React.FC = () => {
   const { profile, switchDemoRole } = useAuth();
@@ -29,362 +29,710 @@ export const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-white text-[#333840] min-h-screen">
-      {/* ── Emergency First Responders Alert Band (Subtle Hairline Notice) ── */}
-      <div className="border-b border-[#dddddd] bg-[#f8fafc] px-4 py-2.5">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+    <div className="bg-white text-[#333840] min-h-screen font-body selection:bg-[#181d26] selection:text-white">
+      {/* ── 00. COMPACT EMERGENCY NOTICE STRIP ── */}
+      <div className="border-b border-[#dddddd] bg-[#f8fafc] px-6 sm:px-8 lg:px-12 py-2">
+        <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2 text-[#41454d]">
-            <span className="w-2 h-2 rounded-full bg-[#aa2d00]" />
-            <strong className="text-[#181d26]">{t('emergency_notice_title')}:</strong>
-            <span className="hidden sm:inline">{t('emergency_notice_desc')}</span>
+            <span className="w-2 h-2 rounded-full bg-[#aa2d00] shrink-0" />
+            <strong className="text-[#181d26] font-semibold">
+              {t('notice_banner_title')}
+            </strong>
+            <span className="hidden md:inline text-[#41454d]">
+              {t('notice_banner_desc')}
+            </span>
           </div>
           <div className="flex items-center gap-3 font-mono text-[11px] text-[#41454d]">
-            <span>NDRF: <strong className="text-[#181d26]">1078</strong></span>
-            <span>POLICE: <strong className="text-[#181d26]">112</strong></span>
-            <span>AMBULANCE: <strong className="text-[#181d26]">108</strong></span>
+            <span>{t('notice_ndrf')}</span>
+            <span>•</span>
+            <span>{t('notice_police')}</span>
+            <span>•</span>
+            <span>{t('notice_ambulance')}</span>
+            <span>•</span>
+            <span>{t('notice_childline')}</span>
           </div>
         </div>
       </div>
 
-      {/* ── Airtable Hero Band: Pure White Canvas, 96px Spacing, Zero Gradients ── */}
-      <section className="py-20 sm:py-24 border-b border-[#dddddd]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl space-y-6">
-            {/* Editorial Eyebrow Tag */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="shade" size="md">
-                {t('hero_tag')}
-              </Badge>
-              <span className="text-[11px] font-mono text-[#9297a0] bg-[#f8fafc] px-2 py-0.5 rounded-sm border border-[#dddddd]">
-                [SIMULATED DRILL / DEMO DATA]
-              </span>
+      {/* ── 01. HERO SECTION: ASYMMETRIC EDITORIAL NARRATIVE + OPERATIONAL RECONCILIATION DOSSIER ── */}
+      <section className="py-12 sm:py-16 lg:py-20 border-b border-[#dddddd]">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+            {/* Left: Narrative & Structured Action Hierarchy */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Plain Eyebrow Metadata (No Pill) */}
+              <div className="text-[11px] font-mono tracking-widest uppercase text-[#9297a0] font-semibold flex items-center gap-2">
+                <span>{t('hero_network_tag')}</span>
+                <span>•</span>
+                <span>{t('hero_simulated_tag')}</span>
+              </div>
+
+              {/* Editorial Headline */}
+              <h1 className="font-display font-normal text-4xl sm:text-5xl lg:text-6xl text-[#181d26] tracking-tight leading-[1.08]">
+                {t('hero_title')}
+              </h1>
+
+              {/* Supporting Statement */}
+              <p className="text-base sm:text-lg text-[#333840] leading-relaxed max-w-2xl font-normal">
+                {t('hero_subtitle')}
+              </p>
+
+              {/* Strict Action Hierarchy: Primary solid, Secondary outline, Tertiary quiet */}
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                {/* Primary CTA: Solid Near-Black Ink */}
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={() => handleLaunchRole('FAMILY', '/report/missing')}
+                  rightIcon={<ArrowRight className="w-4 h-4" />}
+                >
+                  {t('hero_cta_missing')}
+                </Button>
+
+                {/* Secondary CTA: Outline White Button */}
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => handleLaunchRole('NGO', '/report/found')}
+                  leftIcon={<Building2 className="w-4 h-4" />}
+                >
+                  {t('hero_cta_found')}
+                </Button>
+
+                {/* Tertiary CTA: Quiet Text Link */}
+                <Link
+                  to="/cases"
+                  className="px-4 py-3 text-sm font-medium text-[#181d26] hover:text-[#aa2d00] hover:underline transition-colors flex items-center gap-1.5"
+                >
+                  <Search className="w-4 h-4 text-[#9297a0]" />
+                  {t('hero_cta_search')}
+                </Link>
+              </div>
+
+              {/* Operational Capabilities Footnote */}
+              <div className="pt-4 border-t border-[#dddddd] flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-[#9297a0] font-mono">
+                <span className="flex items-center gap-1.5 text-[#41454d]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#006400]" /> {t('hero_trust_offline')}
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5 text-[#41454d]">
+                  <Lock className="w-3.5 h-3.5 text-[#181d26]" /> {t('hero_trust_privacy')}
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5 text-[#41454d]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#aa2d00]" /> {t('hero_trust_safeguard')}
+                </span>
+              </div>
             </div>
 
-            {/* Headline: Haas Grotesk 40px/48px, modest weight 400 (never bold) */}
-            <h1 className="font-display text-4xl sm:text-5xl text-[#181d26] font-normal tracking-tight leading-[1.15]">
-              Reuniting Families in Crisis When Names & Faces Aren't Enough.
-            </h1>
+            {/* Right: Real Operational Software Visual (Actual Candidate Reconciliation Dossier) */}
+            <div className="lg:col-span-5">
+              <div className="border border-[#dddddd] rounded-xl bg-white shadow-elevation-1 overflow-hidden">
+                {/* Dossier Header */}
+                <div className="bg-[#f8fafc] border-b border-[#dddddd] px-4 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#006400]" />
+                    <span className="font-mono text-xs font-bold text-[#181d26] tracking-wider uppercase">
+                      {t('dossier_title')}
+                    </span>
+                  </div>
+                  <span className="font-mono text-[10px] text-[#9297a0]">{t('dossier_uid')}</span>
+                </div>
 
-            {/* Supporting Copy: 16px / 18px body in #333840 */}
-            <p className="text-base sm:text-lg text-[#333840] leading-relaxed max-w-2xl">
-              {t('hero_subheadline')}
+                {/* Compared Records Overview */}
+                <div className="p-4 border-b border-[#dddddd] space-y-3">
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="p-2.5 bg-[#f8fafc] rounded-lg border border-[#dddddd] space-y-1">
+                      <span className="text-[10px] font-mono text-[#9297a0] uppercase block">
+                        {t('dossier_source_a')}
+                      </span>
+                      <strong className="text-sm text-[#181d26] block">Bir Kumar</strong>
+                      <span className="text-[11px] text-[#41454d] block">
+                        Age ~28 • Male • Dehradun Relative Desk (09:15)
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 bg-[#f8fafc] rounded-lg border border-[#dddddd] space-y-1">
+                      <span className="text-[10px] font-mono text-[#9297a0] uppercase block">
+                        {t('dossier_source_b')}
+                      </span>
+                      <strong className="text-sm text-[#006400] block">Veer Kumar</strong>
+                      <span className="text-[11px] text-[#41454d] block">
+                        Age 27 • Male • Camp Zone 2 Boat Rescue (11:42)
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Confidence Bar */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs font-mono">
+                      <span className="text-[#41454d]">{t('dossier_confidence_label')}</span>
+                      <span className="font-bold text-[#006400]">{t('dossier_confidence_val')}</span>
+                    </div>
+                    <div className="w-full bg-[#f8fafc] border border-[#dddddd] h-2 rounded-full overflow-hidden">
+                      <div className="bg-[#006400] h-full rounded-full w-[84%]" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Evidence Comparison Matrix (Compact structured rows) */}
+                <div className="divide-y divide-[#dddddd] text-xs">
+                  <div className="px-4 py-2.5 flex items-center justify-between">
+                    <div>
+                      <span className="font-medium text-[#181d26]">{t('dossier_scars_label')}</span>{' '}
+                      <span className="text-[#41454d]">{t('dossier_scars_val')}</span>
+                    </div>
+                    <span className="font-mono text-[10px] text-[#006400] font-semibold bg-[#f0fdf4] border border-[#bbf7d0] px-1.5 py-0.5 rounded">
+                      {t('dossier_scars_badge')}
+                    </span>
+                  </div>
+
+                  <div className="px-4 py-2.5 flex items-center justify-between">
+                    <div>
+                      <span className="font-medium text-[#181d26]">{t('dossier_clothing_label')}</span>{' '}
+                      <span className="text-[#41454d]">{t('dossier_clothing_val')}</span>
+                    </div>
+                    <span className="font-mono text-[10px] text-[#006400] font-semibold bg-[#f0fdf4] border border-[#bbf7d0] px-1.5 py-0.5 rounded">
+                      {t('dossier_clothing_badge')}
+                    </span>
+                  </div>
+
+                  <div className="px-4 py-2.5 flex items-center justify-between">
+                    <div>
+                      <span className="font-medium text-[#181d26]">{t('dossier_age_label')}</span>{' '}
+                      <span className="text-[#41454d]">{t('dossier_age_val')}</span>
+                    </div>
+                    <span className="font-mono text-[10px] text-[#006400] font-semibold bg-[#f0fdf4] border border-[#bbf7d0] px-1.5 py-0.5 rounded">
+                      {t('dossier_age_badge')}
+                    </span>
+                  </div>
+
+                  <div className="px-4 py-2.5 flex items-center justify-between">
+                    <div>
+                      <span className="font-medium text-[#181d26]">{t('dossier_zone_label')}</span>{' '}
+                      <span className="text-[#41454d]">{t('dossier_zone_val')}</span>
+                    </div>
+                    <span className="font-mono text-[10px] text-[#006400] font-semibold bg-[#f0fdf4] border border-[#bbf7d0] px-1.5 py-0.5 rounded">
+                      {t('dossier_zone_badge')}
+                    </span>
+                  </div>
+
+                  <div className="px-4 py-2.5 flex items-center justify-between">
+                    <div>
+                      <span className="font-medium text-[#181d26]">{t('dossier_blood_label')}</span>{' '}
+                      <span className="text-[#9297a0]">{t('dossier_blood_val')}</span>
+                    </div>
+                    <span className="font-mono text-[10px] text-[#9297a0] font-semibold bg-[#f8fafc] border border-[#dddddd] px-1.5 py-0.5 rounded">
+                      {t('dossier_blood_badge')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Human Reviewer Gate Notice */}
+                <div className="p-3 bg-[#f5e9d4] border-t border-[#e0d0b5] text-xs flex items-start gap-2 text-[#181d26]">
+                  <Clock className="w-4 h-4 text-[#d9a441] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold block">{t('dossier_signoff_title')}</span>
+                    <span className="text-[11px] text-[#41454d]">
+                      {t('dossier_signoff_desc')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 02. COMPACT OPERATIONAL STATUS STRIP ── */}
+      <section className="border-b border-[#dddddd] bg-[#f8fafc] py-3.5 px-6 sm:px-8 lg:px-12">
+        <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-y-2 gap-x-6 text-xs font-mono text-[#41454d]">
+          <div className="flex items-center gap-2 text-[#181d26] font-semibold">
+            <span className="w-2 h-2 rounded-full bg-[#006400] animate-pulse" />
+            <span>{t('status_operational_mesh')}</span>
+          </div>
+          <div>{t('status_sync_frequency')}</div>
+          <div>{t('status_active_nodes')}</div>
+          <div>{t('status_connected_camps')}</div>
+          <div>{t('status_triage_wards')}</div>
+          <div>{t('status_verified_reunions')}</div>
+        </div>
+      </section>
+
+      {/* ── 03. THE PROBLEM: INFORMATION CHAOS IN DISASTERS (Editorial Section, NO cards) ── */}
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd]">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+            {/* Left: Problem Narrative */}
+            <div className="lg:col-span-5 space-y-4">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+                {t('problem_tag')}
+              </span>
+              <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+                {t('problem_title')}
+              </h2>
+              <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+                {t('problem_desc')}
+              </p>
+            </div>
+
+            {/* Right: Connective Diagram of Fragmented Field Signals Converging */}
+            <div className="lg:col-span-7 space-y-4">
+              <div className="border border-[#dddddd] rounded-xl p-6 sm:p-8 bg-[#f8fafc] space-y-6">
+                <div className="text-[11px] font-mono uppercase tracking-wider text-[#9297a0] font-semibold">
+                  FRAGMENTED FIELD SIGNALS GENERATED DURING EVACUATION
+                </div>
+
+                {/* 4 Fragmented Signals */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+                  <div className="p-3 bg-white border border-[#dddddd] rounded-lg space-y-1">
+                    <span className="text-[#aa2d00] font-bold block">{t('problem_family_label')}</span>
+                    <p className="text-[#181d26] font-body text-xs">
+                      {t('problem_family_desc')}
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-white border border-[#dddddd] rounded-lg space-y-1">
+                    <span className="text-[#0a2e0e] font-bold block">{t('problem_field_label')}</span>
+                    <p className="text-[#181d26] font-body text-xs">
+                      {t('problem_field_desc')}
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-white border border-[#dddddd] rounded-lg space-y-1">
+                    <span className="text-[#254fad] font-bold block">{t('problem_hospital_label')}</span>
+                    <p className="text-[#181d26] font-body text-xs">
+                      {t('problem_hospital_desc')}
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-white border border-[#dddddd] rounded-lg space-y-1">
+                    <span className="text-[#181d26] font-bold block">{t('problem_milan_core')}</span>
+                    <p className="text-[#181d26] font-body text-xs">
+                      {t('problem_milan_desc')}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Visual Convergence Indicator */}
+                <div className="pt-2 border-t border-[#dddddd] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
+                  <span className="text-[#41454d]">
+                    WEIGHTED MULTI-ATTRIBUTE RECONCILIATION ENGINE
+                  </span>
+                  <span className="text-[#006400] font-bold flex items-center gap-1 bg-[#f0fdf4] border border-[#bbf7d0] px-2.5 py-1 rounded">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> RECONCILED INTO ONE UNIFIED CANDIDATE
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 04. DATA TRANSFORMATION: CHAOS TO STRUCTURED ATTRIBUTES ── */}
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd] bg-[#f8fafc]">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-10">
+          <div className="max-w-3xl space-y-3">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+              {t('trans_tag')}
+            </span>
+            <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+              {t('trans_title')}
+            </h2>
+            <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+              {t('trans_desc')}
             </p>
+          </div>
 
-            {/* Signature Button Row: Primary near-black button + White secondary button with hairline border */}
-            <div className="pt-4 flex flex-wrap items-center gap-3">
+          {/* Transformation Split Comparison */}
+          <div className="border border-[#dddddd] rounded-xl bg-white overflow-hidden grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-[#dddddd]">
+            {/* Left: Raw Field Signals */}
+            <div className="lg:col-span-5 p-6 sm:p-8 space-y-4">
+              <div className="flex items-center justify-between text-xs font-mono text-[#9297a0]">
+                <span>{t('trans_raw_title')}</span>
+                <span>VHF CH-16 LOG</span>
+              </div>
+              <div className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg font-mono text-xs text-[#181d26] leading-relaxed space-y-2">
+                <p className="text-[#aa2d00] font-bold">// RECORDED AUDIO DISPATCH (04:12 PM)</p>
+                <p>
+                  "Sector 4 rescue boat dispatch: Found adult male survivor near Haldwani bypass, age approximately 28 years. Subject is disoriented, wearing blue denim jacket and dark trousers. Has visible laceration scar on left eyebrow. Cannot give home address."
+                </p>
+              </div>
+              <p className="text-xs text-[#41454d] leading-relaxed">
+                Natural language parser extracts physical descriptors without requiring field workers to type into complex database forms while operating in the rain.
+              </p>
+            </div>
+
+            {/* Right: Normalized Structured Attributes */}
+            <div className="lg:col-span-7 p-6 sm:p-8 space-y-4">
+              <div className="flex items-center justify-between text-xs font-mono text-[#9297a0]">
+                <span>{t('trans_table_title')}</span>
+                <span className="text-[#006400] font-bold">{t('trans_col_confidence')}</span>
+              </div>
+
+              <div className="border border-[#dddddd] rounded-lg overflow-hidden divide-y divide-[#dddddd] text-xs">
+                <div className="grid grid-cols-3 p-2.5 bg-[#f8fafc] font-mono text-[#9297a0]">
+                  <div>{t('trans_col_attr')}</div>
+                  <div className="col-span-2">{t('trans_col_extracted')}</div>
+                </div>
+                <div className="grid grid-cols-3 p-2.5">
+                  <div className="font-mono text-[#41454d]">{t('trans_attr_name')}</div>
+                  <div className="col-span-2 font-semibold text-[#181d26]">Male</div>
+                </div>
+                <div className="grid grid-cols-3 p-2.5">
+                  <div className="font-mono text-[#41454d]">{t('trans_attr_age')}</div>
+                  <div className="col-span-2 font-semibold text-[#181d26]">28 Years (Tolerance ±2 yrs)</div>
+                </div>
+                <div className="grid grid-cols-3 p-2.5">
+                  <div className="font-mono text-[#41454d]">{t('trans_attr_clothing')}</div>
+                  <div className="col-span-2 font-semibold text-[#181d26]">Blue denim jacket, dark trousers</div>
+                </div>
+                <div className="grid grid-cols-3 p-2.5">
+                  <div className="font-mono text-[#41454d]">{t('trans_attr_marks')}</div>
+                  <div className="col-span-2 font-semibold text-[#181d26]">Scar on left eyebrow</div>
+                </div>
+                <div className="grid grid-cols-3 p-2.5">
+                  <div className="font-mono text-[#41454d]">Location Found</div>
+                  <div className="col-span-2 font-semibold text-[#181d26]">Haldwani bypass, Sector 4</div>
+                </div>
+                <div className="grid grid-cols-3 p-2.5 bg-[#f5e9d4]">
+                  <div className="font-mono text-[#aa2d00] font-bold">{t('trans_attr_status')}</div>
+                  <div className="col-span-2 font-bold text-[#181d26]">CANNOT_COMMUNICATE (Disoriented)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 05. CONTINUOUS RECONCILIATION PIPELINE (Single Flow, NO card soup) ── */}
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd]">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-12">
+          <div className="max-w-3xl space-y-3">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+              {t('pipeline_tag')}
+            </span>
+            <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+              {t('pipeline_title')}
+            </h2>
+            <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+              {t('pipeline_desc')}
+            </p>
+          </div>
+
+          {/* Continuous Flow with Connecting Line */}
+          <div className="relative border-t border-[#dddddd] pt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+              {/* Stage 1 */}
+              <div className="space-y-2">
+                <div className="font-mono text-xs font-bold text-[#aa2d00]">01 / INTAKE</div>
+                <h3 className="font-semibold text-sm text-[#181d26]">{t('pipeline_s1_title')}</h3>
+                <p className="text-xs text-[#41454d] leading-relaxed">
+                  {t('pipeline_s1_desc')}
+                </p>
+              </div>
+
+              {/* Stage 2 */}
+              <div className="space-y-2">
+                <div className="font-mono text-xs font-bold text-[#aa2d00]">02 / NORMALIZE</div>
+                <h3 className="font-semibold text-sm text-[#181d26]">{t('pipeline_s2_title')}</h3>
+                <p className="text-xs text-[#41454d] leading-relaxed">
+                  {t('pipeline_s2_desc')}
+                </p>
+              </div>
+
+              {/* Stage 3 */}
+              <div className="space-y-2">
+                <div className="font-mono text-xs font-bold text-[#aa2d00]">03 / MATCH</div>
+                <h3 className="font-semibold text-sm text-[#181d26]">{t('pipeline_s3_title')}</h3>
+                <p className="text-xs text-[#41454d] leading-relaxed">
+                  {t('pipeline_s3_desc')}
+                </p>
+              </div>
+
+              {/* Stage 4 */}
+              <div className="space-y-2">
+                <div className="font-mono text-xs font-bold text-[#aa2d00]">04 / COMPARE</div>
+                <h3 className="font-semibold text-sm text-[#181d26]">{t('pipeline_s4_title')}</h3>
+                <p className="text-xs text-[#41454d] leading-relaxed">
+                  {t('pipeline_s4_desc')}
+                </p>
+              </div>
+
+              {/* Stage 5 */}
+              <div className="space-y-2">
+                <div className="font-mono text-xs font-bold text-[#006400]">05 / VERIFY</div>
+                <h3 className="font-semibold text-sm text-[#181d26]">{t('pipeline_s5_title')}</h3>
+                <p className="text-xs text-[#41454d] leading-relaxed">
+                  {t('pipeline_s5_desc')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 06. HUMAN VERIFICATION & CHILD ANTI-TRAFFICKING (Trust Differentiator) ── */}
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd] bg-[#f8fafc]">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+            {/* Left: Authority Description */}
+            <div className="lg:col-span-5 space-y-4">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+                {t('safeguards_tag')}
+              </span>
+              <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+                {t('safeguards_title')}
+              </h2>
+              <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+                {t('safeguards_desc')}
+              </p>
+              <div className="pt-2">
+                <Button
+                  variant="primary"
+                  size="md"
+                  onClick={() => handleLaunchRole('REVIEWER', '/review')}
+                  rightIcon={<ArrowRight className="w-4 h-4" />}
+                >
+                  Open Coordinator Review Queue
+                </Button>
+              </div>
+            </div>
+
+            {/* Right: Human Verification Protocol Visual */}
+            <div className="lg:col-span-7 space-y-4">
+              <div className="border border-[#dddddd] rounded-xl bg-white p-6 sm:p-8 space-y-6">
+                <div className="flex items-center justify-between border-b border-[#dddddd] pb-4">
+                  <div>
+                    <span className="text-xs font-mono text-[#9297a0] block uppercase">
+                      GOVERNANCE PROTOCOL
+                    </span>
+                    <strong className="text-base text-[#181d26]">
+                      Section 370 IPC Dual-Authorization Handover
+                    </strong>
+                  </div>
+                  <span className="font-mono text-xs text-[#006400] font-bold bg-[#f0fdf4] border border-[#bbf7d0] px-2.5 py-1 rounded">
+                    PROTECTION ACTIVE
+                  </span>
+                </div>
+
+                <div className="space-y-3 text-xs">
+                  <div className="flex items-start gap-3 p-3 bg-[#f8fafc] rounded-lg border border-[#dddddd]">
+                    <UserCheck className="w-4 h-4 text-[#006400] shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-[#181d26] block">{t('safeguards_r1_title')}</strong>
+                      <span className="text-[#41454d]">
+                        {t('safeguards_r1_desc')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 bg-[#f8fafc] rounded-lg border border-[#dddddd]">
+                    <ShieldCheck className="w-4 h-4 text-[#aa2d00] shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-[#181d26] block">{t('safeguards_r2_title')}</strong>
+                      <span className="text-[#41454d]">
+                        {t('safeguards_r2_desc')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 bg-[#f8fafc] rounded-lg border border-[#dddddd]">
+                    <FileText className="w-4 h-4 text-[#181d26] shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-[#181d26] block">{t('safeguards_r3_title')}</strong>
+                      <span className="text-[#41454d]">
+                        {t('safeguards_r3_desc')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 07. THREE OPERATIONAL WORKSPACES (Distinct Editorial Rows, NOT 3 clone cards) ── */}
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd]">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-12">
+          <div className="max-w-3xl space-y-3">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+              {t('domains_tag')}
+            </span>
+            <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+              {t('domains_title')}
+            </h2>
+            <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+              {t('domains_desc')}
+            </p>
+          </div>
+
+          {/* 3 Distinct Full-Width Rows */}
+          <div className="space-y-6">
+            {/* Domain 1: Family */}
+            <div className="p-6 sm:p-8 border border-[#dddddd] rounded-xl bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-2 max-w-2xl">
+                <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-[#aa2d00]" />
+                  <span className="font-mono text-xs font-bold uppercase text-[#aa2d00]">
+                    STAKEHOLDER 01 / FAMILY & NEXT-OF-KIN
+                  </span>
+                </div>
+                <h3 className="font-display text-xl font-normal text-[#181d26]">
+                  {t('domains_family_title')}
+                </h3>
+                <p className="text-sm text-[#41454d] leading-relaxed">
+                  {t('domains_family_desc')}
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => handleLaunchRole('FAMILY', '/report/missing')}
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="shrink-0"
+              >
+                {t('domains_family_cta')}
+              </Button>
+            </div>
+
+            {/* Domain 2: Field Rescue (NDRF / Army) */}
+            <div className="p-6 sm:p-8 border border-[#dddddd] rounded-xl bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-2 max-w-2xl">
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-[#0a2e0e]" />
+                  <span className="font-mono text-xs font-bold uppercase text-[#0a2e0e]">
+                    STAKEHOLDER 02 / FIELD RESCUE & ARMY NDRF
+                  </span>
+                </div>
+                <h3 className="font-display text-xl font-normal text-[#181d26]">
+                  {t('domains_rescue_title')}
+                </h3>
+                <p className="text-sm text-[#41454d] leading-relaxed">
+                  {t('domains_rescue_desc')}
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => handleLaunchRole('NGO', '/report/found')}
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="shrink-0"
+              >
+                {t('domains_rescue_cta')}
+              </Button>
+            </div>
+
+            {/* Domain 3: Hospital & Trauma Units */}
+            <div className="p-6 sm:p-8 border border-[#dddddd] rounded-xl bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-2 max-w-2xl">
+                <div className="flex items-center gap-2">
+                  <Stethoscope className="w-4 h-4 text-[#254fad]" />
+                  <span className="font-mono text-xs font-bold uppercase text-[#254fad]">
+                    STAKEHOLDER 03 / HOSPITAL & CLINICAL TRIAGE
+                  </span>
+                </div>
+                <h3 className="font-display text-xl font-normal text-[#181d26]">
+                  {t('domains_hospital_title')}
+                </h3>
+                <p className="text-sm text-[#41454d] leading-relaxed">
+                  {t('domains_hospital_desc')}
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => handleLaunchRole('HOSPITAL', '/report/hospital')}
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="shrink-0"
+              >
+                {t('domains_hospital_cta')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 08. 1-CLICK STAKEHOLDER PERSONA EVALUATION STRIP ── */}
+      <section className="py-12 sm:py-16 border-b border-[#dddddd] bg-[#f8fafc]">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#9297a0]">
+                {t('personas_tag')}
+              </span>
+              <h2 className="font-display font-normal text-2xl text-[#181d26]">
+                {t('personas_title')}
+              </h2>
+            </div>
+            <span className="text-xs font-mono text-[#9297a0]">
+              {t('personas_desc')}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {(Object.keys(DEMO_USERS) as UserRole[]).map((r) => {
+              const user = DEMO_USERS[r];
+              const isCurrent = profile?.role === r;
+              return (
+                <button
+                  key={r}
+                  onClick={() => handleLaunchRole(r, '/dashboard')}
+                  className={`p-3.5 rounded-lg border text-left transition-colors select-none ${
+                    isCurrent
+                      ? 'bg-[#181d26] text-white border-[#181d26] font-semibold'
+                      : 'bg-white border-[#dddddd] text-[#181d26] hover:bg-[#f8fafc]'
+                  }`}
+                >
+                  <div className={`text-[10px] font-bold uppercase tracking-wider ${isCurrent ? 'text-white/70' : 'text-[#9297a0]'}`}>
+                    {r.replace('_', ' ')}
+                  </div>
+                  <div className="text-xs font-semibold truncate mt-1">{user.fullName}</div>
+                  <div className={`text-[10px] truncate mt-0.5 ${isCurrent ? 'text-white/60' : 'text-[#41454d]'}`}>
+                    {user.orgName?.split(' ')[0] || r}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 09. CLOSING EDITORIAL CALL TO ACTION ── */}
+      <section className="py-16 sm:py-24">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="border border-[#dddddd] rounded-xl p-8 sm:p-14 bg-white space-y-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div className="space-y-3 max-w-2xl">
+              <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
+                OPEN HUMANITARIAN INFRASTRUCTURE
+              </span>
+              <h2 className="font-display font-normal text-3xl sm:text-4xl text-[#181d26] leading-tight">
+                {t('closing_title')}
+              </h2>
+              <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
+                {t('closing_desc')}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
               <Button
                 variant="primary"
                 size="lg"
                 onClick={() => handleLaunchRole('FAMILY', '/report/missing')}
                 rightIcon={<ArrowRight className="w-4 h-4" />}
               >
-                {t('hero_cta_missing')}
+                {t('closing_cta_report')}
               </Button>
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => handleLaunchRole('NGO', '/report/found')}
-                leftIcon={<Building2 className="w-4 h-4" />}
-              >
-                {t('hero_cta_found')}
-              </Button>
+
               <Button
                 variant="secondary"
                 size="lg"
                 onClick={() => navigate('/cases')}
                 leftIcon={<Search className="w-4 h-4" />}
               >
-                Browse Cases
+                {t('closing_cta_directory')}
               </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Brand Voltage 1: Signature Coral Card (#aa2d00) ── */}
-      <section className="py-16 sm:py-24 border-b border-[#dddddd]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="signature-coral-card rounded-xl p-8 sm:p-12 space-y-6">
-            <div className="max-w-2xl space-y-3">
-              <Badge variant="dark" size="sm">
-                Distressed Relatives Portal
-              </Badge>
-              <h2 className="font-display text-2xl sm:text-4xl font-normal text-white leading-tight">
-                Missing Person Intake with Multimodal Audio Clues
-              </h2>
-              <p className="text-white/90 text-sm sm:text-base leading-relaxed">
-                Families can file comprehensive 6-stage reports indexing clothing, scars, birthmarks, and jewelry. Speak or paste Hindi/English voice calls with the built-in natural language parser to extract structured case clues automatically.
-              </p>
-            </div>
-            <div className="pt-2 flex flex-wrap items-center gap-3">
-              <Button
-                variant="secondary-on-dark"
-                size="md"
-                onClick={() => handleLaunchRole('FAMILY', '/report/missing')}
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-              >
-                Open Family Report Form
-              </Button>
-              <button
-                type="button"
-                onClick={() => navigate('/cases')}
-                className="text-sm font-medium text-white underline underline-offset-4 hover:text-white/80 transition-colors"
-              >
-                Check live registry status
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Editorial Section 2: Demo-Grid Cluster on Warm Pastel Surfaces ── */}
-      <section className="py-16 sm:py-24 border-b border-[#dddddd]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="max-w-2xl space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#9297a0]">
-              Operational Telemetry
-            </span>
-            <h2 className="font-display text-2xl sm:text-3xl font-normal text-[#181d26]">
-              Real-Time Field Coordination Grid
-            </h2>
-            <p className="text-sm text-[#41454d]">
-              Live operational telemetry linking active relief camps, trauma centers, and verified reunions:
-            </p>
-          </div>
-
-          {/* Uneven Multi-Card Grid on Pastel Surfaces (Airtable Spec) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Card 1: Mint surface */}
-            <div className="p-6 rounded-md bg-[#a8d8c4]/25 border border-[#a8d8c4] space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#006400]">
-                  Shelters Active
-                </span>
-                <Building2 className="w-4 h-4 text-[#006400]" />
-              </div>
-              <div className="font-display text-3xl font-normal text-[#006400]">
-                14 Camps
-              </div>
-              <p className="text-xs text-[#333840] leading-relaxed">
-                Relief Sector Bravo active with offline sync queues and localized emergency dispatch.
-              </p>
-            </div>
-
-            {/* Card 2: Cream surface */}
-            <div className="p-6 rounded-md bg-[#f5e9d4] border border-[#e0d0b5] space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#181d26]">
-                  Trauma Wards
-                </span>
-                <Stethoscope className="w-4 h-4 text-[#181d26]" />
-              </div>
-              <div className="font-display text-3xl font-normal text-[#181d26]">
-                8 Hospitals
-              </div>
-              <p className="text-xs text-[#333840] leading-relaxed">
-                Direct clinical inpatient triage with strict role-based medical diagnostic privacy locks.
-              </p>
-            </div>
-
-            {/* Card 3: Peach surface */}
-            <div className="p-6 rounded-md bg-[#fcab79]/25 border border-[#fcab79] space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#aa2d00]">
-                  Cases Registered
-                </span>
-                <FileSpreadsheet className="w-4 h-4 text-[#aa2d00]" />
-              </div>
-              <div className="font-display text-3xl font-normal text-[#aa2d00]">
-                142 Cases
-              </div>
-              <p className="text-xs text-[#333840] leading-relaxed">
-                Unified cross-matching across family reports, rescue admissions, and trauma wards.
-              </p>
-            </div>
-
-            {/* Card 4: Yellow surface */}
-            <div className="p-6 rounded-md bg-[#f4d35e]/30 border border-[#d9a441] space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#181d26]">
-                  Reconciled
-                </span>
-                <ShieldCheck className="w-4 h-4 text-[#181d26]" />
-              </div>
-              <div className="font-display text-3xl font-normal text-[#181d26]">
-                47 Reunited
-              </div>
-              <p className="text-xs text-[#333840] leading-relaxed">
-                100% human-verified reunions with anti-trafficking guardian verification tokens.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Brand Voltage 2: Signature Forest Card (#0a2e0e) ── */}
-      <section className="py-16 sm:py-24 border-b border-[#dddddd]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="signature-forest-card rounded-xl p-8 sm:p-12 space-y-6">
-            <div className="max-w-2xl space-y-3">
-              <Badge variant="mint" size="sm">
-                NDRF & Army Field Rescue
-              </Badge>
-              <h2 className="font-display text-2xl sm:text-4xl font-normal text-white leading-tight">
-                Field Camp Admission & Rapid VHF Radio Parser
-              </h2>
-              <p className="text-white/90 text-sm sm:text-base leading-relaxed">
-                Designed for field rescue workers handling non-verbal, infant, or trauma shock survivors. Includes offline-first local queueing and rapid VHF radio transcript parsing for zero-connectivity disaster zones.
-              </p>
-            </div>
-            <div className="pt-2 flex flex-wrap items-center gap-3">
-              <Button
-                variant="secondary-on-dark"
-                size="md"
-                onClick={() => handleLaunchRole('NGO', '/report/found')}
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-              >
-                Register Rescued Person
-              </Button>
-              <Button
-                variant="outline-dark"
-                size="md"
-                onClick={() => handleLaunchRole('HOSPITAL', '/report/hospital')}
-                leftIcon={<Stethoscope className="w-4 h-4" />}
-              >
-                Hospital Emergency Intake
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Brand Voltage 3: Signature Cream Callout Band (#f5e9d4) ── */}
-      <section className="py-16 sm:py-24 border-b border-[#dddddd]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="cream-callout-card rounded-xl p-8 sm:p-12 space-y-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="space-y-2 max-w-xl">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#181d26]">
-                  Clinical Data Protection
-                </span>
-                <h3 className="font-display text-2xl sm:text-3xl font-normal text-[#181d26]">
-                  Hospital Emergency Triage & HIPAA-Grade Privacy
-                </h3>
-                <p className="text-sm text-[#333840] leading-relaxed">
-                  Trauma wards record clinical condition, surgical history, and anatomical marks behind role-based privacy locks. Sensitive medical notes are strictly quarantined to certified clinical personnel.
-                </p>
-              </div>
-              <Button
-                variant="primary"
-                size="md"
-                onClick={() => handleLaunchRole('HOSPITAL', '/report/hospital')}
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-                className="shrink-0"
-              >
-                Open Medical Intake
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Brand Voltage 4: Dark Navy Hero Card (#181d26) ── */}
-      <section className="py-16 sm:py-24 border-b border-[#dddddd]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="hero-card-dark rounded-xl p-8 sm:p-12 space-y-8">
-            <div className="max-w-2xl space-y-3">
-              <Badge variant="mint" size="sm">
-                Reconciliation Intelligence
-              </Badge>
-              <h2 className="font-display text-2xl sm:text-4xl font-normal text-white leading-tight">
-                Explainable Deterministic Matching & Human Audit
-              </h2>
-              <p className="text-white/80 text-sm sm:text-base leading-relaxed">
-                No black boxes, no false promises. Milan compares 9 distinct physical attributes using transparent weighted scoring and enforces mandatory side-by-side human audit before any family reunion is confirmed.
-              </p>
-            </div>
-
-            {/* 4 Pipeline Steps inside Dark Hero Card */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-5 rounded-lg bg-white/5 border border-white/10 space-y-2">
-                <div className="font-mono text-xs text-[#a8d8c4] font-bold">01 / INTAKE</div>
-                <div className="font-semibold text-white text-sm">{t('pipeline_step1_title')}</div>
-                <div className="text-xs text-white/70 leading-relaxed">{t('pipeline_step1_desc')}</div>
-              </div>
-              <div className="p-5 rounded-lg bg-white/5 border border-white/10 space-y-2">
-                <div className="font-mono text-xs text-[#a8d8c4] font-bold">02 / SAFETY</div>
-                <div className="font-semibold text-white text-sm">{t('pipeline_step2_title')}</div>
-                <div className="text-xs text-white/70 leading-relaxed">{t('pipeline_step2_desc')}</div>
-              </div>
-              <div className="p-5 rounded-lg bg-white/5 border border-white/10 space-y-2">
-                <div className="font-mono text-xs text-[#a8d8c4] font-bold">03 / SCORING</div>
-                <div className="font-semibold text-white text-sm">{t('pipeline_step3_title')}</div>
-                <div className="text-xs text-white/70 leading-relaxed">{t('pipeline_step3_desc')}</div>
-              </div>
-              <div className="p-5 rounded-lg bg-white/5 border border-white/10 space-y-2">
-                <div className="font-mono text-xs text-[#a8d8c4] font-bold">04 / AUDIT</div>
-                <div className="font-semibold text-white text-sm">{t('pipeline_step4_title')}</div>
-                <div className="text-xs text-white/70 leading-relaxed">{t('pipeline_step4_desc')}</div>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <Button
-                variant="secondary-on-dark"
-                size="md"
-                onClick={() => handleLaunchRole('REVIEWER', '/review')}
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-              >
-                Launch Reviewer Audit Workspace
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Brand Voltage 5: Light Gray CTA Banner (cta-band-light #e0e2e6) ── */}
-      <section className="py-16 sm:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="cta-band-light rounded-xl p-8 sm:p-12 space-y-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
-                <h3 className="font-display text-2xl sm:text-3xl font-normal text-[#181d26] flex items-center gap-2">
-                  <Database className="w-5 h-5 text-[#181d26]" />
-                  Instant Evaluation Sandbox
-                </h3>
-                <p className="text-sm text-[#41454d] mt-1">
-                  Select any persona to immediately evaluate the disaster coordination platform:
-                </p>
-              </div>
-              <Badge variant="shade" size="sm">
-                1-CLICK AUTH
-              </Badge>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              {(Object.keys(DEMO_USERS) as UserRole[]).map((r) => {
-                const user = DEMO_USERS[r];
-                const isCurrent = profile?.role === r;
-                return (
-                  <button
-                    key={r}
-                    onClick={() => handleLaunchRole(r, '/dashboard')}
-                    className={`p-3.5 rounded-lg border text-left transition-colors select-none ${
-                      isCurrent
-                        ? 'bg-[#181d26] text-white border-[#181d26] font-semibold'
-                        : 'bg-white border-[#dddddd] text-[#181d26] hover:bg-[#f8fafc]'
-                    }`}
-                  >
-                    <div className={`text-[10px] font-bold uppercase tracking-wider ${isCurrent ? 'text-white/70' : 'text-[#9297a0]'}`}>
-                      {r.replace('_', ' ')}
-                    </div>
-                    <div className="text-xs font-semibold truncate mt-1">{user.fullName}</div>
-                    <div className={`text-[10px] truncate mt-0.5 ${isCurrent ? 'text-white/60' : 'text-[#41454d]'}`}>
-                      {user.orgName?.split(' ')[0] || r}
-                    </div>
-                  </button>
-                );
-              })}
             </div>
           </div>
         </div>

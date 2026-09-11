@@ -76,11 +76,11 @@ export const Navbar: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-sticky h-16 bg-white border-b border-[#dddddd] transition-shadow duration-150 ${
+      className={`sticky top-0 z-40 h-16 bg-white border-b border-[#dddddd] transition-shadow duration-150 ${
         scrolled ? 'shadow-elevation-1' : ''
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+      <div className="w-full px-4 sm:px-6 lg:px-10 h-full">
         <div className="flex items-center justify-between h-full">
           {/* Brand Logo & Live Status */}
           <div className="flex items-center gap-3">
@@ -137,7 +137,7 @@ export const Navbar: React.FC = () => {
                 }`}
               >
                 <FilePlus className="w-3.5 h-3.5" />
-                Report Missing
+                {t('nav_report_missing')}
               </Link>
             )}
 
@@ -151,7 +151,7 @@ export const Navbar: React.FC = () => {
                 }`}
               >
                 <FilePlus className="w-3.5 h-3.5" />
-                Report Rescued
+                {t('nav_report_found')}
               </Link>
             )}
 
@@ -165,7 +165,7 @@ export const Navbar: React.FC = () => {
                 }`}
               >
                 <Building2 className="w-3.5 h-3.5" />
-                Hospital Intake
+                {t('nav_report_hospital')}
               </Link>
             )}
 
@@ -220,13 +220,13 @@ export const Navbar: React.FC = () => {
                 title="Switch demo evaluation persona"
                 aria-expanded={roleSwitcherOpen}
               >
-                <span className="text-[#9297a0]">Role:</span>
+                <span className="text-[#9297a0]">{t('nav_role_label')}:</span>
                 <span className="font-semibold text-[#181d26]">{profile ? profile.role.replace('_', ' ') : 'Guest'}</span>
                 <ChevronDown className="w-3 h-3 opacity-60" />
               </button>
 
               {roleSwitcherOpen && (
-                <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-elevation-3 py-2 z-dropdown border border-[#dddddd] bg-white text-[#181d26]">
+                <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-elevation-3 py-2 z-50 border border-[#dddddd] bg-white text-[#181d26]">
                   <div className="px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#9297a0] border-b border-[#dddddd] mb-1">
                     Select Evaluation Persona
                   </div>
@@ -262,8 +262,8 @@ export const Navbar: React.FC = () => {
                 <button
                   onClick={() => signOut()}
                   className="p-1.5 rounded-lg text-[#41454d] hover:text-[#aa2d00] hover:bg-[#f8fafc] transition-colors"
-                  title="Sign Out"
-                  aria-label="Sign Out"
+                  title={t('nav_sign_out')}
+                  aria-label={t('nav_sign_out')}
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -276,7 +276,7 @@ export const Navbar: React.FC = () => {
                   onClick={() => navigate('/login')}
                   leftIcon={<LogIn className="w-3.5 h-3.5" />}
                 >
-                  Log In
+                  {t('nav_sign_in')}
                 </Button>
                 <Button
                   variant="primary"
@@ -328,19 +328,19 @@ export const Navbar: React.FC = () => {
               to="/report/missing"
               className="block px-3 py-2 rounded-lg text-sm font-semibold text-[#aa2d00] hover:bg-[#aa2d00]/10"
             >
-              Report Missing Person
+              {t('nav_report_missing')}
             </Link>
             <Link
               to="/report/found"
               className="block px-3 py-2 rounded-lg text-sm font-semibold text-[#0a2e0e] hover:bg-[#0a2e0e]/10"
             >
-              Report Rescued Person
+              {t('nav_report_found')}
             </Link>
             <Link
               to="/report/hospital"
               className="block px-3 py-2 rounded-lg text-sm font-semibold text-[#254fad] hover:bg-[#254fad]/10"
             >
-              Hospital Intake
+              {t('nav_report_hospital')}
             </Link>
             <Link
               to="/review"
@@ -351,7 +351,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="pt-3 border-t border-[#dddddd]">
-            <div className="text-xs text-[#9297a0] mb-2 font-medium">Switch Persona:</div>
+            <div className="text-xs text-[#9297a0] mb-2 font-medium">{t('nav_role_label')}:</div>
             <div className="grid grid-cols-2 gap-2">
               {(Object.keys(DEMO_USERS) as UserRole[]).map((r) => (
                 <button
@@ -378,7 +378,7 @@ export const Navbar: React.FC = () => {
                 leftIcon={<LogOut className="w-4 h-4" />}
                 className="w-full"
               >
-                Sign Out ({profile.full_name})
+                {t('nav_sign_out')} ({profile.full_name})
               </Button>
             </div>
           ) : (
@@ -389,7 +389,7 @@ export const Navbar: React.FC = () => {
                 onClick={() => navigate('/login')}
                 className="flex-1"
               >
-                Log In
+                {t('nav_sign_in')}
               </Button>
               <Button
                 variant="primary"

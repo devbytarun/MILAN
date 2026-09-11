@@ -109,28 +109,28 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                     onClick={() => handleSelect(l.code)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left text-xs transition-colors ${
                       isSelected
-                        ? 'bg-blue-50 text-blue-900 font-semibold'
-                        : 'text-slate-700 hover:bg-slate-50'
+                        ? 'bg-[#f8fafc] text-[#181d26] font-semibold border border-[#dddddd]'
+                        : 'text-[#333840] hover:bg-[#f8fafc]'
                     }`}
                   >
                     <div>
                       <div className="text-xs font-bold leading-tight">{l.label}</div>
-                      <div className="text-[10px] text-slate-400 font-normal">{l.englishName} {l.isRTL ? '(RTL)' : ''}</div>
+                      <div className="text-[10px] text-[#9297a0] font-normal">{l.englishName} {l.isRTL ? '(RTL)' : ''}</div>
                     </div>
-                    {isSelected && <Check className="w-4 h-4 text-blue-600 shrink-0" />}
+                    {isSelected && <Check className="w-4 h-4 text-[#181d26] shrink-0" />}
                   </button>
                 );
               })
             ) : (
-              <div className="p-4 text-center text-xs text-slate-400">
+              <div className="p-4 text-center text-xs text-[#9297a0]">
                 No matching language found
               </div>
             )}
           </div>
 
-          <div className="p-2 bg-slate-50 border-t border-slate-100 text-center">
-            <span className="text-[10px] text-slate-500 font-medium">
-              13 Indian Scheduled Languages + RTL Urdu
+          <div className="p-2 bg-[#f8fafc] border-t border-[#dddddd] text-center">
+            <span className="text-[10px] text-[#41454d] font-medium">
+              22 Eighth Schedule Languages + English (23 Total)
             </span>
           </div>
         </div>

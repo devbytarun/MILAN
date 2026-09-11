@@ -8,7 +8,7 @@ export const Footer: React.FC = () => {
 
   return (
     <footer className="mt-auto bg-white text-[#333840] border-t border-[#dddddd] py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
           {/* Brand & Mission */}
           <div className="space-y-3 md:col-span-1">
@@ -83,7 +83,7 @@ export const Footer: React.FC = () => {
               Regional Language Access
             </h4>
             <p className="text-xs text-[#41454d] leading-relaxed">
-              MILAN supports 13 Official Scheduled Indian Languages with full RTL support for crisis field operations.
+              MILAN supports all 22 Eighth Schedule Indian Languages + English with full RTL support for crisis field operations.
             </p>
             <div className="pt-1">
               <LanguageSwitcher variant="footer" />
@@ -91,7 +91,7 @@ export const Footer: React.FC = () => {
             <div className="p-2.5 rounded-md border border-[#fcab79] bg-[#fcab79]/15 text-[11px] text-[#aa2d00] leading-tight flex items-start gap-1.5">
               <AlertTriangle className="w-3.5 h-3.5 text-[#aa2d00] shrink-0 mt-0.5" />
               <span>
-                {t('emergency_notice_desc')}
+                {t('notice_banner_desc')}
               </span>
             </div>
           </div>

@@ -74,20 +74,22 @@ export const SignupPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto my-12 space-y-6">
+    <div className="max-w-2xl mx-auto my-12 space-y-6 pb-16">
       <div className="text-center space-y-2">
-        <Badge variant="mint" size="sm">
-          Account Enrollment
+        <Badge variant="shade" size="sm">
+          Operational Role Enrollment
         </Badge>
-        <h1 className="type-display-md text-ink mt-2">Register for MILAN</h1>
-        <p className="type-caption text-shade-50">
+        <h1 className="font-display text-2xl sm:text-3xl font-normal text-[#181d26] tracking-tight mt-2">
+          Register for MILAN
+        </h1>
+        <p className="text-xs text-[#41454d]">
           Select your operational role to establish proper data access and reporting authorization.
         </p>
       </div>
 
-      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 space-y-6">
+      <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-6">
         {error && (
-          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-md flex items-start gap-2.5 text-xs text-rose-700">
+          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-2.5 text-xs text-rose-700">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -96,7 +98,7 @@ export const SignupPage: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Role Selection Grid */}
           <div className="space-y-2.5">
-            <label className="block text-xs font-semibold text-shade-70 uppercase tracking-wider">
+            <label className="block text-xs font-medium text-[#41454d]">
               Select Your Role in Disaster Response <span className="text-rose-500">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -106,25 +108,25 @@ export const SignupPage: React.FC = () => {
                   <div
                     key={opt.role}
                     onClick={() => setRole(opt.role)}
-                    className={`p-4 rounded-md border cursor-pointer transition-all duration-150 flex flex-col justify-between ${
+                    className={`p-4 rounded-xl border cursor-pointer transition-all duration-150 flex flex-col justify-between ${
                       selected
-                        ? 'border-ink bg-canvas-cream ring-1 ring-ink'
-                        : 'border-hairline-light hover:border-shade-40 hover:bg-canvas-cream/50'
+                        ? 'border-[#181d26] bg-[#f8fafc] ring-1 ring-[#181d26]'
+                        : 'border-[#dddddd] hover:border-[#181d26] hover:bg-[#f8fafc]/50'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-bold text-ink">{opt.title}</span>
+                        <span className="text-xs font-bold text-[#181d26]">{opt.title}</span>
                         {selected ? (
-                          <CheckCircle2 className="w-4 h-4 text-ink shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-[#181d26] shrink-0" />
                         ) : (
-                          <span className="w-4 h-4 rounded-pill border border-hairline-light shrink-0" />
+                          <span className="w-4 h-4 rounded-full border border-[#dddddd] shrink-0" />
                         )}
                       </div>
-                      <p className="type-caption text-shade-50 leading-relaxed">{opt.desc}</p>
+                      <p className="text-xs text-[#41454d] leading-relaxed">{opt.desc}</p>
                     </div>
                     <div className="mt-3">
-                      <Badge variant={opt.autoApproved ? 'mint' : 'shade'} size="sm">
+                      <Badge variant={opt.autoApproved ? 'forest' : 'shade'} size="sm">
                         {opt.badge}
                       </Badge>
                     </div>
@@ -197,9 +199,9 @@ export const SignupPage: React.FC = () => {
         </form>
       </div>
 
-      <div className="text-center type-caption text-shade-50">
+      <div className="text-center text-xs text-[#41454d]">
         Already registered?{' '}
-        <Link to="/login" className="text-ink font-semibold hover:underline">
+        <Link to="/login" className="text-[#181d26] font-semibold hover:underline">
           Sign In here
         </Link>
       </div>

@@ -202,7 +202,7 @@ export const HospitalReportPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setVoiceModalOpen(true)}
-          className="shrink-0 px-3.5 py-2 rounded-lg bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
+          className="shrink-0 px-3.5 py-2 rounded-lg bg-[#181d26] hover:bg-[#2c333f] active:bg-[#3F3F46] text-white text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
         >
           <Sparkles className="w-3.5 h-3.5" />
           <span>Clinical Voice Log</span>

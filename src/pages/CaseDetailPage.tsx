@@ -8,9 +8,14 @@ import {
   ArrowLeft,
   ShieldCheck,
   FileText,
+  AlertTriangle,
+  Lock,
+  Phone,
+  Building,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button.tsx';
 import { Badge } from '../components/ui/Badge.tsx';
+import { evaluateChildSafeguards } from '../lib/anti-trafficking.ts';
 
 export const CaseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,10 +30,10 @@ export const CaseDetailPage: React.FC = () => {
 
   if (!caseData) {
     return (
-      <div className="max-w-2xl mx-auto my-12 p-8 bg-canvas-light border border-hairline-light rounded-lg text-center space-y-4 shadow-elevation-3">
-        <h2 className="type-heading-lg text-ink">Case Record Not Found</h2>
-        <p className="type-caption text-shade-50">
-          The requested case identifier does not exist in the active shelter registry.
+      <div className="max-w-2xl mx-auto my-12 p-8 bg-white border border-[#dddddd] rounded-xl text-center space-y-4 shadow-elevation-1">
+        <h2 className="font-display text-2xl font-normal text-[#181d26]">Case Record Not Found</h2>
+        <p className="text-sm text-[#41454d]">
+          The requested case identifier does not exist in the active disaster shelter registry.
         </p>
         <Button
           variant="primary"
@@ -43,6 +48,7 @@ export const CaseDetailPage: React.FC = () => {
   }
 
   const { case: c, report: r, attributes: a } = caseData;
+  const childSafeguards = evaluateChildSafeguards(a.age, a.approximate_age);
 
   const timelineSteps = [
     {
@@ -54,33 +60,35 @@ export const CaseDetailPage: React.FC = () => {
     {
       title: 'Distributed to Relief Shelters',
       date: 'Instant Broadcast',
-      desc: 'Physical identifiers distributed across all emergency shelter nodes.',
+      desc: 'Physical identifiers synchronized across all active relief shelter nodes.',
       done: true,
     },
     {
       title: 'Multi-Attribute Algorithmic Sweep',
       date: 'Continuous Pipeline',
-      desc: c.status === 'POSSIBLE_MATCH' || c.status === 'VERIFIED_MATCH'
-        ? 'High-confidence candidate surfaced through weighted similarity scoring.'
-        : 'Algorithmic cross-referencing against rescue shelter intakes active.',
+      desc:
+        c.status === 'POSSIBLE_MATCH' || c.status === 'VERIFIED_MATCH'
+          ? 'High-confidence candidate surfaced through weighted similarity scoring.'
+          : 'Algorithmic cross-referencing against rescue shelter intakes active.',
       done: c.status === 'POSSIBLE_MATCH' || c.status === 'VERIFIED_MATCH',
     },
     {
       title: 'Coordinator Verification Decision',
       date: c.status === 'VERIFIED_MATCH' ? 'Audit Verified' : 'Pending',
-      desc: c.status === 'VERIFIED_MATCH'
-        ? 'Relief coordinator reviewed physical scar and clothing evidence.'
-        : 'Awaiting candidate discovery or reviewer verification decision.',
+      desc:
+        c.status === 'VERIFIED_MATCH'
+          ? 'Relief coordinator reviewed physical scar, clothing, and biometric evidence.'
+          : 'Awaiting candidate discovery or reviewer verification decision.',
       done: c.status === 'VERIFIED_MATCH',
     },
   ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-12">
+    <div className="max-w-4xl mx-auto space-y-6 pb-16">
       {/* Top Breadcrumb & Navigation */}
       <div className="flex items-center justify-between">
         <Button
-          variant="outline-light"
+          variant="secondary"
           size="sm"
           onClick={() => navigate(-1)}
           leftIcon={<ArrowLeft className="w-4 h-4" />}
@@ -90,7 +98,7 @@ export const CaseDetailPage: React.FC = () => {
 
         <Link to={`/cases/${c.id}/status`}>
           <Button
-            variant="aloe"
+            variant="secondary"
             size="sm"
             leftIcon={<FileText className="w-3.5 h-3.5" />}
           >
@@ -99,65 +107,90 @@ export const CaseDetailPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* Main Header Card */}
-      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-hairline-light pb-6">
+      {/* Main Header Dossier Card */}
+      <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-[#dddddd] pb-6">
           <div className="space-y-2">
-            <div className="flex items-center gap-2.5">
-              <Badge variant={c.case_type === 'MISSING' ? 'shade' : 'mint'} size="sm">
-                {c.case_type} PERSON CASE
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Badge variant={c.case_type === 'MISSING' ? 'coral' : 'forest'} size="sm">
+                {c.case_type} PERSON DOSSIER
               </Badge>
-              <span className="font-mono text-xs font-bold text-shade-50">
+              <span className="font-mono text-xs font-bold text-[#41454d] bg-[#f8fafc] px-2 py-0.5 rounded border border-[#dddddd]">
                 {c.case_uid}
               </span>
+              {childSafeguards.isMinor && (
+                <Badge variant="cream" size="sm" icon={<Lock className="w-3 h-3 text-[#aa2d00]" />}>
+                  PROTECTED MINOR
+                </Badge>
+              )}
             </div>
-            <h1 className="type-display-md text-ink">
+
+            <h1 className="font-display text-2xl sm:text-3xl font-normal text-[#181d26] tracking-tight">
               {a.full_name || (c.case_type === 'FOUND' ? 'Unidentified Survivor' : 'Name Withheld')}
             </h1>
-            <p className="type-caption text-shade-50 flex items-center gap-2">
-              <span>Reported by {r.source_type}</span>
+
+            <p className="text-xs text-[#41454d] flex flex-wrap items-center gap-2">
+              <span>Reported via {r.source_type} intake</span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-shade-40" /> {r.found_location || 'Location not recorded'}
+                <MapPin className="w-3.5 h-3.5 text-[#9297a0]" /> {r.found_location || 'Location not recorded'}
               </span>
+              <span>•</span>
+              <span className="text-[11px] text-[#9297a0]">[SIMULATED DRILL / DEMO DATA]</span>
             </p>
           </div>
 
           {/* Status Badge */}
-          <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1.5">
+          <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1.5 shrink-0">
             <Badge
               variant={
                 c.status === 'VERIFIED_MATCH'
-                  ? 'verified'
+                  ? 'forest'
                   : c.status === 'POSSIBLE_MATCH'
-                  ? 'pending'
+                  ? 'cream'
                   : 'shade'
               }
               size="md"
               icon={
                 c.status === 'VERIFIED_MATCH' ? (
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4 text-[#006400]" />
                 ) : (
-                  <Clock className="w-4 h-4" />
+                  <Clock className="w-4 h-4 text-[#d9a441]" />
                 )
               }
             >
-              {c.status}
+              {c.status.replace('_', ' ')}
             </Badge>
-            <span className="text-[10px] text-shade-40">
+            <span className="text-[11px] text-[#9297a0]">
               Updated {new Date(c.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
         </div>
 
+        {/* Child Anti-Trafficking Safeguards Alert */}
+        {childSafeguards.isMinor && (
+          <div className="p-4 bg-[#f5e9d4] border border-[#e5d4b8] rounded-xl flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-[#aa2d00] shrink-0 mt-0.5" />
+            <div className="text-xs space-y-1">
+              <div className="font-semibold text-[#181d26]">
+                Anti-Trafficking & Child Protection Protocol Active
+              </div>
+              <p className="text-[#333840] leading-relaxed">
+                The individual is identified as a minor (approximate age {a.age || a.approximate_age || 'under 18'}).
+                Under Section 370 IPC disaster emergency safeguards, dual-officer photo ID authorization and verified guardian custody verification are required before shelter release.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Navigation Tabs */}
-        <div className="flex border-b border-hairline-light gap-6 text-xs font-semibold">
+        <div className="flex border-b border-[#dddddd] gap-6 text-xs font-semibold">
           <button
             onClick={() => setActiveTab('OVERVIEW')}
             className={`pb-3 border-b-2 transition-colors duration-150 ${
               activeTab === 'OVERVIEW'
-                ? 'border-ink text-ink font-bold'
-                : 'border-transparent text-shade-50 hover:text-ink'
+                ? 'border-[#181d26] text-[#181d26] font-bold'
+                : 'border-transparent text-[#41454d] hover:text-[#181d26]'
             }`}
           >
             Case Overview
@@ -166,8 +199,8 @@ export const CaseDetailPage: React.FC = () => {
             onClick={() => setActiveTab('ATTRIBUTES')}
             className={`pb-3 border-b-2 transition-colors duration-150 ${
               activeTab === 'ATTRIBUTES'
-                ? 'border-ink text-ink font-bold'
-                : 'border-transparent text-shade-50 hover:text-ink'
+                ? 'border-[#181d26] text-[#181d26] font-bold'
+                : 'border-transparent text-[#41454d] hover:text-[#181d26]'
             }`}
           >
             Physical Attributes
@@ -176,8 +209,8 @@ export const CaseDetailPage: React.FC = () => {
             onClick={() => setActiveTab('RECONCILIATION')}
             className={`pb-3 border-b-2 transition-colors duration-150 ${
               activeTab === 'RECONCILIATION'
-                ? 'border-ink text-ink font-bold'
-                : 'border-transparent text-shade-50 hover:text-ink'
+                ? 'border-[#181d26] text-[#181d26] font-bold'
+                : 'border-transparent text-[#41454d] hover:text-[#181d26]'
             }`}
           >
             Reconciliation & Shelter Info
@@ -188,55 +221,57 @@ export const CaseDetailPage: React.FC = () => {
         {activeTab === 'OVERVIEW' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md space-y-1">
-                <div className="text-shade-50 font-medium">Age & Demographics</div>
-                <div className="font-bold text-ink text-sm">
+              <div className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg space-y-1">
+                <div className="text-[#41454d] font-medium">Age & Demographics</div>
+                <div className="font-bold text-[#181d26] text-sm">
                   {a.age || a.approximate_age || 'Unknown'} Years • {a.gender || 'Not specified'}
                 </div>
-                <div className="text-shade-60 type-caption">
-                  Blood Group: <strong className="text-ink">{a.blood_group || 'Unknown'}</strong>
+                <div className="text-[#41454d]">
+                  Blood Group: <strong className="text-[#181d26]">{a.blood_group || 'Unknown'}</strong>
                 </div>
               </div>
 
-              <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md space-y-1">
-                <div className="text-shade-50 font-medium">Reporting Channel</div>
-                <div className="font-bold text-ink text-sm">
+              <div className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg space-y-1">
+                <div className="text-[#41454d] font-medium">Reporting Channel</div>
+                <div className="font-bold text-[#181d26] text-sm">
                   {r.source_type} Intake
                 </div>
-                <div className="text-shade-60 type-caption">
-                  Communication Status: <strong className="text-ink">{r.comm_status || 'Unknown'}</strong>
+                <div className="text-[#41454d]">
+                  Communication Status: <strong className="text-[#181d26]">{r.comm_status || 'Unknown'}</strong>
                 </div>
               </div>
             </div>
 
             {/* Notes */}
             {r.report_notes && (
-              <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md text-xs space-y-1">
-                <div className="font-bold text-ink">Intake Notes:</div>
-                <p className="type-caption text-shade-60 leading-relaxed">{r.report_notes}</p>
+              <div className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg text-xs space-y-1">
+                <div className="font-bold text-[#181d26]">Intake Notes:</div>
+                <p className="text-[#333840] leading-relaxed">{r.report_notes}</p>
               </div>
             )}
 
             {/* Timeline */}
             <div className="space-y-4 pt-2">
-              <h3 className="type-heading-md text-ink">Case Reconciliation Milestones</h3>
-              <div className="space-y-4 pl-2 border-l-2 border-hairline-light">
+              <h3 className="font-display text-lg font-normal text-[#181d26]">
+                Case Reconciliation Milestones
+              </h3>
+              <div className="space-y-4 pl-2 border-l-2 border-[#dddddd]">
                 {timelineSteps.map((step, idx) => (
                   <div key={idx} className="relative pl-6">
                     <div
-                      className={`absolute -left-[9px] top-0.5 w-4 h-4 rounded-pill border-2 bg-canvas-light flex items-center justify-center ${
-                        step.done ? 'border-ink' : 'border-shade-40'
+                      className={`absolute -left-[9px] top-0.5 w-4 h-4 rounded-full border-2 bg-white flex items-center justify-center ${
+                        step.done ? 'border-[#181d26]' : 'border-[#dddddd]'
                       }`}
                     >
-                      {step.done && <span className="w-2 h-2 rounded-pill bg-ink"></span>}
+                      {step.done && <span className="w-2 h-2 rounded-full bg-[#181d26]"></span>}
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className={`font-semibold ${step.done ? 'text-ink' : 'text-shade-40'}`}>
+                      <span className={`font-semibold ${step.done ? 'text-[#181d26]' : 'text-[#9297a0]'}`}>
                         {step.title}
                       </span>
-                      <span className="text-[10px] text-shade-40 font-medium">{step.date}</span>
+                      <span className="text-[11px] text-[#9297a0] font-medium">{step.date}</span>
                     </div>
-                    <p className="type-caption text-shade-50 mt-0.5">{step.desc}</p>
+                    <p className="text-xs text-[#41454d] mt-0.5">{step.desc}</p>
                   </div>
                 ))}
               </div>
@@ -247,50 +282,50 @@ export const CaseDetailPage: React.FC = () => {
         {/* TAB 2: ATTRIBUTES */}
         {activeTab === 'ATTRIBUTES' && (
           <div className="space-y-4 text-xs">
-            <div className="border border-hairline-light rounded-md overflow-hidden divide-y divide-hairline-light">
-              <div className="grid grid-cols-3 p-3.5 bg-canvas-cream font-semibold text-shade-70">
-                <div>Feature</div>
-                <div className="col-span-2">Recorded Attributes</div>
+            <div className="border border-[#dddddd] rounded-xl overflow-hidden divide-y divide-[#dddddd]">
+              <div className="grid grid-cols-3 p-3.5 bg-[#f8fafc] font-semibold text-[#181d26]">
+                <div>Physical Feature</div>
+                <div className="col-span-2">Recorded Intake Attributes</div>
               </div>
               <div className="grid grid-cols-3 p-3.5">
-                <div className="font-medium text-shade-50">Alternative Names</div>
-                <div className="col-span-2 text-ink">{a.alternative_names || '—'}</div>
+                <div className="font-medium text-[#41454d]">Alternative Names</div>
+                <div className="col-span-2 text-[#181d26]">{a.alternative_names || '—'}</div>
               </div>
               <div className="grid grid-cols-3 p-3.5">
-                <div className="font-medium text-shade-50">Height & Weight</div>
-                <div className="col-span-2 text-ink">
+                <div className="font-medium text-[#41454d]">Height & Weight</div>
+                <div className="col-span-2 text-[#181d26]">
                   {a.height_cm ? `${a.height_cm} cm` : '—'} • {a.weight_kg ? `${a.weight_kg} kg` : '—'} (Build: {a.build || '—'})
                 </div>
               </div>
               <div className="grid grid-cols-3 p-3.5">
-                <div className="font-medium text-shade-50">Hair & Eyes</div>
-                <div className="col-span-2 text-ink">
+                <div className="font-medium text-[#41454d]">Hair & Eyes</div>
+                <div className="col-span-2 text-[#181d26]">
                   Hair: {a.hair_colour || '—'} ({a.hair_description || '—'}), Eyes: {a.eye_colour || '—'}
                 </div>
               </div>
               <div className="grid grid-cols-3 p-3.5">
-                <div className="font-medium text-shade-50">Clothing Recorded</div>
-                <div className="col-span-2 text-ink">{a.clothing || '—'}</div>
+                <div className="font-medium text-[#41454d]">Clothing Recorded</div>
+                <div className="col-span-2 text-[#181d26]">{a.clothing || '—'}</div>
               </div>
               <div className="grid grid-cols-3 p-3.5">
-                <div className="font-medium text-shade-50">Footwear</div>
-                <div className="col-span-2 text-ink">{a.footwear || '—'}</div>
+                <div className="font-medium text-[#41454d]">Footwear</div>
+                <div className="col-span-2 text-[#181d26]">{a.footwear || '—'}</div>
               </div>
               <div className="grid grid-cols-3 p-3.5">
-                <div className="font-medium text-shade-50">Accessories / Items</div>
-                <div className="col-span-2 text-ink">{a.accessories || '—'}</div>
+                <div className="font-medium text-[#41454d]">Accessories / Items</div>
+                <div className="col-span-2 text-[#181d26]">{a.accessories || '—'}</div>
               </div>
               <div className="grid grid-cols-3 p-3.5">
-                <div className="font-medium text-shade-50">Scars & Marks</div>
-                <div className="col-span-2 text-ink font-semibold">{a.scars || 'None recorded'}</div>
+                <div className="font-medium text-[#41454d]">Scars & Marks</div>
+                <div className="col-span-2 text-[#181d26] font-semibold">{a.scars || 'None recorded'}</div>
               </div>
               <div className="grid grid-cols-3 p-3.5">
-                <div className="font-medium text-shade-50">Birthmarks & Tattoos</div>
-                <div className="col-span-2 text-ink">{a.birthmarks || a.tattoos || 'None recorded'}</div>
+                <div className="font-medium text-[#41454d]">Birthmarks & Tattoos</div>
+                <div className="col-span-2 text-[#181d26]">{a.birthmarks || a.tattoos || 'None recorded'}</div>
               </div>
-              <div className="grid grid-cols-3 p-3.5 bg-aloe/15">
-                <div className="font-bold text-ink">Key Distinguishing Clue</div>
-                <div className="col-span-2 font-bold text-ink">{a.identifying_clue || 'None'}</div>
+              <div className="grid grid-cols-3 p-3.5 bg-[#f5e9d4]">
+                <div className="font-bold text-[#181d26]">Key Distinguishing Clue</div>
+                <div className="col-span-2 font-bold text-[#181d26]">{a.identifying_clue || 'None'}</div>
               </div>
             </div>
           </div>
@@ -300,30 +335,64 @@ export const CaseDetailPage: React.FC = () => {
         {activeTab === 'RECONCILIATION' && (
           <div className="space-y-6">
             {c.status === 'VERIFIED_MATCH' ? (
-              <div className="p-6 bg-aloe border border-aloe/60 rounded-md space-y-4">
-                <div className="flex items-center gap-2.5 text-ink font-bold text-base">
-                  <CheckCircle2 className="w-6 h-6 text-ink" />
+              <div className="p-6 bg-[#f5e9d4] border border-[#e5d4b8] rounded-xl space-y-4">
+                <div className="flex items-center gap-2.5 text-[#181d26] font-semibold text-base">
+                  <CheckCircle2 className="w-5 h-5 text-[#006400]" />
                   Verified Positive Match Confirmed
                 </div>
-                <p className="type-caption text-ink leading-relaxed">
+                <p className="text-xs text-[#333840] leading-relaxed">
                   Relief coordinators have audited the evidence and verified that this case matches active rescue intake records. The person is safe and accounted for in the relief shelter network.
                 </p>
 
-                <div className="p-4 bg-canvas-light border border-hairline-light rounded-md space-y-2 text-xs text-ink">
-                  <div className="font-bold text-ink text-sm">Designated Reunion Location:</div>
-                  <div><strong>Shelter Camp:</strong> Camp Relief Zone 2 (NDRF Battalion 4 Intake)</div>
-                  <div><strong>Designated Coordinator:</strong> Major Vikram Rathore</div>
-                  <div><strong>Helpline Verification PIN:</strong> <span className="font-mono font-bold bg-shade-30 px-2 py-0.5 rounded text-ink">{c.case_uid}</span></div>
-                  <div><strong>Emergency Desk Contact:</strong> +91 98765 43210 (24/7 Disaster Helpline)</div>
+                <div className="p-5 bg-white border border-[#dddddd] rounded-xl space-y-3 text-xs text-[#181d26]">
+                  <div className="font-semibold text-sm text-[#181d26] border-b border-[#dddddd] pb-2 flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Building className="w-4 h-4 text-[#41454d]" /> Designated Reunion Location
+                    </span>
+                    <span className="text-[11px] font-mono text-[#9297a0]">CONFIDENTIAL</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <span className="text-[#41454d] block">Shelter Camp:</span>
+                      <strong className="text-sm">Camp Relief Zone 2 (NDRF Battalion 4 Intake)</strong>
+                    </div>
+                    <div>
+                      <span className="text-[#41454d] block">Designated Coordinator:</span>
+                      <strong className="text-sm">Major Vikram Rathore</strong>
+                    </div>
+                    <div>
+                      <span className="text-[#41454d] block">Helpline Verification PIN:</span>
+                      <span className="font-mono font-bold bg-[#f8fafc] border border-[#dddddd] px-2 py-0.5 rounded text-[#181d26] inline-block mt-0.5">
+                        {c.case_uid}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[#41454d] block">Emergency Desk Helpline:</span>
+                      <strong className="text-sm flex items-center gap-1.5 mt-0.5">
+                        <Phone className="w-3.5 h-3.5 text-[#006400]" /> +91 98765 43210 (24/7)
+                      </strong>
+                    </div>
+                  </div>
+
+                  {childSafeguards.isMinor && (
+                    <div className="mt-3 p-3 bg-[#f8fafc] border border-[#dddddd] rounded-lg text-xs space-y-1">
+                      <span className="font-semibold text-[#aa2d00] flex items-center gap-1.5">
+                        <Lock className="w-3.5 h-3.5" /> Chain of Custody Guardian Requirement
+                      </span>
+                      <p className="text-[#41454d]">
+                        In-person custody handover requires claimant Aadhaar/Voter ID matching the registered next of kin records, co-signed by the on-site Camp Magistrate.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : c.status === 'POSSIBLE_MATCH' ? (
-              <div className="p-6 bg-canvas-cream border border-hairline-light rounded-md space-y-4">
-                <div className="flex items-center gap-2.5 text-ink font-bold text-base">
-                  <Clock className="w-6 h-6 text-amber-600" />
+              <div className="p-6 bg-[#f5e9d4] border border-[#e5d4b8] rounded-xl space-y-4">
+                <div className="flex items-center gap-2.5 text-[#181d26] font-semibold text-base">
+                  <Clock className="w-5 h-5 text-[#d9a441]" />
                   Potential Algorithmic Candidate Under Review
                 </div>
-                <p className="type-caption text-shade-60 leading-relaxed">
+                <p className="text-xs text-[#333840] leading-relaxed">
                   Our weighted matching engine has flagged a high-similarity candidate record matching key physical clues. Coordinators are currently auditing evidence side-by-side.
                 </p>
                 <Link to="/review">
@@ -337,9 +406,9 @@ export const CaseDetailPage: React.FC = () => {
                 </Link>
               </div>
             ) : (
-              <div className="p-6 bg-canvas-cream border border-hairline-light rounded-md space-y-2 text-xs text-shade-60">
-                <div className="font-bold text-ink text-sm">Active Algorithmic Sweep</div>
-                <p className="type-caption">
+              <div className="p-6 bg-[#f8fafc] border border-[#dddddd] rounded-xl space-y-2 text-xs text-[#41454d]">
+                <div className="font-semibold text-[#181d26] text-sm">Active Algorithmic Sweep</div>
+                <p className="leading-relaxed">
                   This case is continuously checked against all incoming survivor admissions from rescue boats, shelters, and medical intake desks.
                 </p>
               </div>
