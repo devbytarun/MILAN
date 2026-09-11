@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "test": "tsx test/matching.test.ts && tsx test/innovations.test.ts && tsx test/i18n.test.ts",
+    "test": "tsx test/matching.test.ts && tsx test/innovations.test.ts && tsx test/i18n.test.ts && tsx test/rbac.test.ts",
     "lint": "oxlint",
     "preview": "vite preview"
   },

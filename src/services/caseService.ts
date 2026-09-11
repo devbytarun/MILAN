@@ -5,7 +5,9 @@ import type {
   PersonAttributes,
   CaseStatus,
   CreateCaseWithReportInput,
+  Profile,
 } from '../types/index.ts';
+import { canViewCase, sanitizeCaseForUser } from '../lib/permissions.ts';
 
 export interface FullCaseData {
   case: Case;
@@ -238,6 +240,22 @@ export function getLocalCases(): FullCaseData[] {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DEMO_CASES));
     return INITIAL_DEMO_CASES;
   }
+}
+
+/**
+ * Retrieve cases filtered and sanitized for a specific user profile and role
+ */
+export function getCasesForUser(profile: Profile | null): FullCaseData[] {
+  const allCases = getLocalCases();
+  if (!profile) {
+    return allCases
+      .filter((c) => c.case.case_type === 'MISSING' || c.case.case_type === 'FOUND' || c.case.status === 'VERIFIED_MATCH')
+      .map((c) => sanitizeCaseForUser(c, null));
+  }
+
+  return allCases
+    .filter((c) => canViewCase(profile, c))
+    .map((c) => sanitizeCaseForUser(c, profile));
 }
 
 export function saveLocalCase(newCase: FullCaseData) {

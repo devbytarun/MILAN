@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getLocalCases, FullCaseData } from '../services/caseService.ts';
+import { useAuth } from '../context/AuthContext.tsx';
+import { canViewCase, sanitizeCaseForUser, hasPermission } from '../lib/permissions.ts';
+import { AccessDenied } from './AccessDenied.tsx';
 import {
   MapPin,
   CheckCircle2,
@@ -12,6 +15,7 @@ import {
   Lock,
   Phone,
   Building,
+  Heart,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button.tsx';
 import { Badge } from '../components/ui/Badge.tsx';
@@ -20,6 +24,7 @@ import { evaluateChildSafeguards } from '../lib/anti-trafficking.ts';
 export const CaseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { profile } = useAuth();
 
   const caseData: FullCaseData | null = React.useMemo(() => {
     const all = getLocalCases();
@@ -47,8 +52,26 @@ export const CaseDetailPage: React.FC = () => {
     );
   }
 
-  const { case: c, report: r, attributes: a } = caseData;
+  // Role-based case access check
+  if (!canViewCase(profile, caseData)) {
+    return (
+      <AccessDenied
+        moduleName="Case Record"
+        reason="You do not have authorization to inspect this confidential operational case record."
+      />
+    );
+  }
+
+  const safeData = sanitizeCaseForUser(caseData, profile);
+  const { case: c, report: r, attributes: a } = safeData;
   const childSafeguards = evaluateChildSafeguards(a.age, a.approximate_age);
+
+  const canReview = hasPermission(profile?.role, 'REVIEW_MATCH');
+  const canViewDossier = hasPermission(profile?.role, 'VIEW_FORENSIC_DOSSIER');
+  const isFamily = profile?.role === 'FAMILY';
+  const isOwner =
+    (c.created_by && (c.created_by === profile?.id || c.created_by === profile?.auth_user_id)) ||
+    (isFamily && (c.created_by === 'family-demo' || c.id === 'case-demo-1'));
 
   const timelineSteps = [
     {
@@ -96,15 +119,43 @@ export const CaseDetailPage: React.FC = () => {
           Back
         </Button>
 
-        <Link to={`/cases/${c.id}/status`}>
-          <Button
-            variant="secondary"
-            size="sm"
-            leftIcon={<FileText className="w-3.5 h-3.5" />}
-          >
-            Family Status View
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          {(isFamily || isOwner) && (
+            <Link to={`/cases/${c.id}/status`}>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<FileText className="w-3.5 h-3.5" />}
+              >
+                Family Status View
+              </Button>
+            </Link>
+          )}
+
+          {canViewDossier && (
+            <Link to="/dossier">
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<FileText className="w-3.5 h-3.5" />}
+              >
+                Forensic Dossier
+              </Button>
+            </Link>
+          )}
+
+          {canReview && c.status === 'POSSIBLE_MATCH' && (
+            <Link to="/review">
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<ShieldCheck className="w-3.5 h-3.5" />}
+              >
+                Review Match
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Main Header Dossier Card */}
@@ -395,15 +446,29 @@ export const CaseDetailPage: React.FC = () => {
                 <p className="text-xs text-[#333840] leading-relaxed">
                   Our weighted matching engine has flagged a high-similarity candidate record matching key physical clues. Coordinators are currently auditing evidence side-by-side.
                 </p>
-                <Link to="/review">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    leftIcon={<ShieldCheck className="w-4 h-4" />}
-                  >
-                    Open Match Reviewer Audit
-                  </Button>
-                </Link>
+                {canReview ? (
+                  <Link to="/review">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      leftIcon={<ShieldCheck className="w-4 h-4" />}
+                    >
+                      Open Match Reviewer Audit
+                    </Button>
+                  </Link>
+                ) : isFamily ? (
+                  <div className="p-4 bg-white rounded-lg border border-[#dddddd] text-xs space-y-2">
+                    <div className="font-semibold text-[#181d26]">Status of Verification:</div>
+                    <p className="text-[#41454d] leading-relaxed">
+                      A trained humanitarian reviewer is actively verifying the physical clues with shelter officers. You will be notified immediately when identity verification is complete.
+                    </p>
+                    <Link to={`/cases/${c.id}/status`}>
+                      <Button variant="primary" size="sm" leftIcon={<Heart className="w-4 h-4" />}>
+                        Open Family Status Tracker
+                      </Button>
+                    </Link>
+                  </div>
+                ) : null}
               </div>
             ) : (
               <div className="p-6 bg-[#f8fafc] border border-[#dddddd] rounded-xl space-y-2 text-xs text-[#41454d]">

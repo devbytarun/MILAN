@@ -6,6 +6,9 @@ import { submitCaseReport } from '../services/caseService.ts';
 import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
 import type { CreateCaseWithReportInput } from '../types/index.ts';
 import { Button } from '../components/ui/Button.tsx';
+import { useAuth } from '../context/AuthContext.tsx';
+import { hasPermission } from '../lib/permissions.ts';
+import { AccessDenied } from './AccessDenied.tsx';
 import {
   Radio,
   Sparkles,
@@ -62,6 +65,7 @@ function toFullInput(attrs: Partial<CreateCaseWithReportInput>, rawTranscript: s
 }
 
 export const VoiceIntakePage: React.FC = () => {
+  const { profile } = useAuth();
   const { t } = useI18n();
   const [mode, setMode] = useState<PageMode>('input');
   const [parseResult, setParseResult] = useState<ParsedVoiceReport | null>(null);
@@ -69,6 +73,15 @@ export const VoiceIntakePage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submittedUid, setSubmittedUid] = useState<string | null>(null);
   const [copiedTranscript, setCopiedTranscript] = useState(false);
+
+  if (!hasPermission(profile?.role, 'USE_VOICE_AI')) {
+    return (
+      <AccessDenied
+        moduleName="Voice AI / Radio Parser"
+        reason="Voice radio parsing and tactical intake tools are restricted to operational field rescue personnel."
+      />
+    );
+  }
 
   const handleParseComplete = useCallback((result: ParsedVoiceReport) => {
     setParseResult(result);

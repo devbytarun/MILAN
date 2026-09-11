@@ -18,6 +18,7 @@ import { HospitalReportPage } from './pages/HospitalReportPage.tsx';
 import { ReviewPage } from './pages/ReviewPage.tsx';
 import { VoiceIntakePage } from './pages/VoiceIntakePage.tsx';
 import { DossierPage } from './pages/DossierPage.tsx';
+import { AccessDenied } from './pages/AccessDenied.tsx';
 
 export const App: React.FC = () => {
   return (
@@ -34,6 +35,9 @@ export const App: React.FC = () => {
             <Route path="/cases/:id" element={<CaseDetailPage />} />
             <Route path="/cases/:id/status" element={<FamilyStatusView />} />
 
+            {/* Access Denied Route */}
+            <Route path="/access-denied" element={<AccessDenied />} />
+
             {/* Authenticated Dashboard */}
             <Route
               path="/dashboard"
@@ -48,7 +52,7 @@ export const App: React.FC = () => {
             <Route
               path="/report/missing"
               element={
-                <ProtectedRoute allowedRoles={['FAMILY', 'ADMIN']}>
+                <ProtectedRoute requiredPermission="CREATE_MISSING_REPORT" moduleName="Missing Person Report Portal">
                   <FamilyReportPage />
                 </ProtectedRoute>
               }
@@ -58,7 +62,7 @@ export const App: React.FC = () => {
             <Route
               path="/report/found"
               element={
-                <ProtectedRoute allowedRoles={['NGO', 'ARMY_RESCUE', 'ADMIN']}>
+                <ProtectedRoute requiredPermission="CREATE_FOUND_REPORT" moduleName="Rescued Person Intake">
                   <FoundReportPage />
                 </ProtectedRoute>
               }
@@ -68,28 +72,49 @@ export const App: React.FC = () => {
             <Route
               path="/report/hospital"
               element={
-                <ProtectedRoute allowedRoles={['HOSPITAL', 'ADMIN']}>
+                <ProtectedRoute requiredPermission="CREATE_HOSPITAL_REPORT" moduleName="Hospital Medical Intake">
                   <HospitalReportPage />
                 </ProtectedRoute>
               }
             />
 
-            {/* Voice/Radio AI Transcript Parser (Open for demo & field responders) */}
-            <Route path="/report/voice" element={<VoiceIntakePage />} />
+            {/* Voice/Radio AI Transcript Parser (Authorized operational & field responders) */}
+            <Route
+              path="/report/voice"
+              element={
+                <ProtectedRoute requiredPermission="USE_VOICE_AI" moduleName="Voice AI & Radio Transcript Intake">
+                  <VoiceIntakePage />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Match Candidate Review (REVIEWER, ADMIN) */}
+            {/* Match Candidate Review (REVIEWER, ADMIN strictly) */}
             <Route
               path="/review"
               element={
-                <ProtectedRoute allowedRoles={['REVIEWER', 'ADMIN']}>
+                <ProtectedRoute requiredPermission="REVIEW_MATCH" moduleName="Match Verification Queue">
                   <ReviewPage />
                 </ProtectedRoute>
               }
             />
 
-            {/* Forensic Verification Dossier (Open for demo & forensic auditors) */}
-            <Route path="/dossier" element={<DossierPage />} />
-            <Route path="/dossier/:sourceId/:candidateId" element={<DossierPage />} />
+            {/* Forensic Verification Dossier (REVIEWER, ADMIN strictly) */}
+            <Route
+              path="/dossier"
+              element={
+                <ProtectedRoute requiredPermission="VIEW_FORENSIC_DOSSIER" moduleName="Forensic Verification Dossier">
+                  <DossierPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dossier/:sourceId/:candidateId"
+              element={
+                <ProtectedRoute requiredPermission="VIEW_FORENSIC_DOSSIER" moduleName="Forensic Verification Dossier">
+                  <DossierPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />

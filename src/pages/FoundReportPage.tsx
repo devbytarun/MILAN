@@ -11,6 +11,9 @@ import {
 import { Badge } from '../components/ui/Badge.tsx';
 import { VoiceIntakeModal } from '../components/common/VoiceIntakeModal.tsx';
 import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
+import { useAuth } from '../context/AuthContext.tsx';
+import { hasPermission } from '../lib/permissions.ts';
+import { AccessDenied } from './AccessDenied.tsx';
 
 const FOUND_STEPS: FormStep[] = [
   { id: 'comm', title: 'Communication Status', subtitle: 'Determine if survivor can provide their own details' },
@@ -20,12 +23,22 @@ const FOUND_STEPS: FormStep[] = [
 ];
 
 export const FoundReportPage: React.FC = () => {
+  const { profile } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submittedUid, setSubmittedUid] = useState<string | null>(null);
   const [commStatus, setCommStatus] = useState<CommunicationStatus>('CANNOT_COMMUNICATE');
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [voiceParseNotification, setVoiceParseNotification] = useState<string | null>(null);
+
+  if (!hasPermission(profile?.role, 'CREATE_FOUND_REPORT')) {
+    return (
+      <AccessDenied
+        moduleName="Rescue Intake Registration"
+        reason="Field rescue registration is restricted to authorized NGO coordinators and Army rescue officers."
+      />
+    );
+  }
 
   const handleApplyVoice = (parsed: ParsedVoiceReport) => {
     const a = parsed.attributes;

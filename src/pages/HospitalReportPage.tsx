@@ -9,6 +9,9 @@ import {
 } from 'lucide-react';
 import { VoiceIntakeModal } from '../components/common/VoiceIntakeModal.tsx';
 import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
+import { useAuth } from '../context/AuthContext.tsx';
+import { hasPermission } from '../lib/permissions.ts';
+import { AccessDenied } from './AccessDenied.tsx';
 
 const HOSPITAL_STEPS: FormStep[] = [
   { id: 'triage', title: 'Hospital Referral & Triage', subtitle: 'Link existing Milan UID or register new clinical patient' },
@@ -17,9 +20,19 @@ const HOSPITAL_STEPS: FormStep[] = [
 ];
 
 export const HospitalReportPage: React.FC = () => {
+  const { profile } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submittedUid, setSubmittedUid] = useState<string | null>(null);
+
+  if (!hasPermission(profile?.role, 'CREATE_HOSPITAL_REPORT')) {
+    return (
+      <AccessDenied
+        moduleName="Hospital Patient Intake"
+        reason="Clinical patient intake and trauma triage logs are restricted to verified medical personnel."
+      />
+    );
+  }
 
   const [hasExistingUid, setHasExistingUid] = useState(false);
   const [existingUid, setExistingUid] = useState('');

@@ -23,6 +23,9 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/ui/Button.tsx';
 import { Badge } from '../components/ui/Badge.tsx';
+import { useAuth } from '../context/AuthContext.tsx';
+import { hasPermission } from '../lib/permissions.ts';
+import { AccessDenied } from './AccessDenied.tsx';
 
 // Clean radial score gauge for Airtable / Editorial design
 const ScoreGauge: React.FC<{ score: number; size?: number }> = ({ score, size = 140 }) => {
@@ -182,8 +185,18 @@ const AlertCard: React.FC<{ alert: DiscrepancyAlert }> = ({ alert }) => {
 
 export const DossierPage: React.FC = () => {
   const { sourceId, candidateId } = useParams<{ sourceId: string; candidateId: string }>();
+  const { profile } = useAuth();
   const [dossier, setDossier] = useState<VerificationDossier | null>(null);
   const [showRawDossier, setShowRawDossier] = useState(false);
+
+  if (!hasPermission(profile?.role, 'VIEW_FORENSIC_DOSSIER')) {
+    return (
+      <AccessDenied
+        moduleName="Forensic Verification Dossier"
+        reason="Forensic similarity dossiers and algorithmic matrices are strictly restricted to humanitarian verification reviewers and system administrators."
+      />
+    );
+  }
 
   useEffect(() => {
     if (!sourceId || !candidateId) return;
