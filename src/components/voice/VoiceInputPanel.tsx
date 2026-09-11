@@ -5,15 +5,14 @@ import {
   Radio,
   FileText,
   Loader2,
-  Sparkles,
   CheckCircle2,
-  AlertTriangle,
-  XCircle,
   ChevronDown,
   ChevronUp,
   Clipboard,
   Wand2,
   Volume2,
+  Zap,
+  Activity,
 } from 'lucide-react';
 import { parseDisasterVoiceTranscript } from '../../lib/voice-parser.ts';
 import type { ParsedVoiceReport } from '../../lib/voice-parser.ts';
@@ -21,20 +20,28 @@ import type { ParsedVoiceReport } from '../../lib/voice-parser.ts';
 // Sample transcripts for demo purposes
 const SAMPLE_TRANSCRIPTS = [
   {
-    label: 'NDRF Radio — Rescued Child',
+    badge: 'NDRF RESCUE',
+    badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    label: 'NDRF Boat Team — Rescued 9yo Child',
     text: `Control, this is NDRF Battalion 4 boat team reporting. We just pulled a young male child, approximately 9 years old, from a rooftop near Alaknanda Riverside Market. The child is in shock and unable to speak. He is wearing a soiled red collared polo shirt with dark shorts. Has a visible scar on his left forearm and a black thread on his right wrist with a metallic charm. Slim build, short black hair. Blood group B+. Currently being transported to Camp Relief Zone 2 for intake. Condition stable, non-verbal due to trauma shock. Over.`,
   },
   {
-    label: 'Hospital Radio — Unconscious Adult',
+    badge: 'TRAUMA HOSPITAL',
+    badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    label: 'ER Hospital — Unconscious Male Adult',
     text: `Emergency department, Central Trauma Hospital. We have an unknown adult male, approximately 40 years old, admitted via Army ambulance from Sector 9 bridge collapse. He is unconscious on arrival. Athletic build. Has an old appendectomy scar and an Om tattoo on his inner right wrist. He was wearing a torn grey athletic hoodie and black track pants. Silver ring on left ring finger. Found with a waterlogged Casio digital watch. Blood group A+. Currently receiving IV fluids. Moderate head concussion.`,
   },
   {
+    badge: 'FAMILY DISPATCH',
+    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
     label: 'Family Report — Missing Grandmother',
     text: `My grandmother named Meera Sen, also called Dida, has been missing since the bridge colony evacuation. She is about 64 years old, female. Fair complexion, medium build. She has gray and white curly hair usually tied in a bun. She wears bifocal spectacles with golden metal frame and a gold chain with a rudraksha bead. She was wearing a green cotton saree with maroon border. She carries a canvas shoulder bag with her blood pressure prescription inside. Blood group O+. Please help us find her.`,
   },
   {
-    label: 'NGO Field Report — Found Elderly Woman',
-    text: `Disaster Relief Alliance field team reporting from Camp near Bhimtal bypass. Found an elderly woman, about 65 years old, at the community hall. She is able to speak but confused. She said her name is Dida. Fair skinned, medium build, wearing a partially torn green saree. She has gray curly hair and wears thick glasses. There is a chain around her neck with what appears to be a rudraksha bead. Condition stable but she needs medication.`,
+    badge: 'HINGLISH RADIO',
+    badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+    label: 'Relief Camp — Hinglish Radio Intake',
+    text: `Ek ladka mila Bhimtal relief camp ke paas. Umar lagbhag 28 saal. Blue denim jacket pehni hai. Right eyebrow ke upar scar hai. Blood group B+ bataya. Name is Bir Kumar. Condition stable hai.`,
   },
 ];
 
@@ -80,7 +87,6 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
   const [lastCommittedPhrase, setLastCommittedPhrase] = useState('');
   const [isParsing, setIsParsing] = useState(false);
   const [showSamples, setShowSamples] = useState(false);
-  const [parseResult, setParseResult] = useState<ParsedVoiceReport | null>(null);
   const [micSupported, setMicSupported] = useState(true);
   const [pulseIntensity, setPulseIntensity] = useState(0);
 
@@ -99,12 +105,12 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
     }
   }, []);
 
-  // Pulse animation during recording
+  // Smooth wave animation during recording
   useEffect(() => {
     if (isListening) {
       let phase = 0;
       const animate = () => {
-        phase += 0.06;
+        phase += 0.08;
         setPulseIntensity(Math.abs(Math.sin(phase)) * 100);
         animFrameRef.current = requestAnimationFrame(animate);
       };
@@ -135,7 +141,6 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
         if (!trimmed) {
           return cleanPhrase;
         }
-        // Don't append if already contains this exact phrase at the end
         if (trimmed.endsWith(cleanPhrase)) {
           return trimmed;
         }
@@ -148,7 +153,6 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
       uncommittedBufferRef.current = '';
       setListeningState('committed');
 
-      // Return to listening status after brief indicator
       setTimeout(() => {
         setListeningState((current) => (current === 'committed' ? 'listening' : current));
       }, 700);
@@ -179,7 +183,6 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
       let currentResultText = '';
       let isFinalResult = false;
 
-      // Extract only the latest segment from the event results to prevent historical accumulation
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
         currentResultText += result[0].transcript;
@@ -195,19 +198,16 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
       setLiveInterim(currentResultText);
       setListeningState('listening');
 
-      // Clear any pending pause debounce timer
       if (pauseTimerRef.current) {
         clearTimeout(pauseTimerRef.current);
       }
 
-      // If marked as final by engine, commit promptly
       if (isFinalResult) {
         commitSpeechBuffer(currentResultText);
         return;
       }
 
-      // Google-mic style pause detection:
-      // Wait 800ms of silence after speaking before locking in the individual statement
+      // 800ms silence detection debounce
       pauseTimerRef.current = setTimeout(() => {
         if (uncommittedBufferRef.current) {
           commitSpeechBuffer(uncommittedBufferRef.current);
@@ -216,7 +216,6 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
     };
 
     recognition.onerror = (event: any) => {
-      // Ignore normal abort / no-speech silence
       if (event.error !== 'no-speech' && event.error !== 'aborted') {
         console.warn('Speech recognition warning:', event.error);
       }
@@ -227,7 +226,6 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
     };
 
     recognition.onend = () => {
-      // Flush any remaining buffered speech when stopped
       if (uncommittedBufferRef.current) {
         commitSpeechBuffer(uncommittedBufferRef.current);
       }
@@ -268,10 +266,9 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
 
     setTimeout(() => {
       const result = parseDisasterVoiceTranscript(transcript);
-      setParseResult(result);
       setIsParsing(false);
       onParseComplete(result);
-    }, 600);
+    }, 500);
   }, [transcript, onParseComplete]);
 
   const handlePaste = useCallback(async () => {
@@ -283,322 +280,249 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
 
   const loadSample = useCallback((text: string) => {
     setTranscript(text);
-    setParseResult(null);
     setShowSamples(false);
   }, []);
 
-  const confidenceTier = parseResult
-    ? parseResult.confidence >= 80
-      ? 'HIGH'
-      : parseResult.confidence >= 40
-      ? 'MEDIUM'
-      : 'LOW'
-    : null;
-
-  const confidenceColor = confidenceTier
-    ? confidenceTier === 'HIGH'
-      ? 'text-emerald-400'
-      : confidenceTier === 'MEDIUM'
-      ? 'text-amber-400'
-      : 'text-rose-400'
-    : '';
-
-  const confidenceBg = confidenceTier
-    ? confidenceTier === 'HIGH'
-      ? 'bg-emerald-500/10 border-emerald-500/30'
-      : confidenceTier === 'MEDIUM'
-      ? 'bg-amber-500/10 border-amber-500/30'
-      : 'bg-rose-500/10 border-rose-500/30'
-    : '';
-
-  const ConfIcon = confidenceTier
-    ? confidenceTier === 'HIGH'
-      ? CheckCircle2
-    : confidenceTier === 'MEDIUM'
-    ? AlertTriangle
-    : XCircle
-    : null;
-
   return (
-    <div className="space-y-6">
-      {/* Microphone Section with Google-Style Visual Listener */}
-      <div className="relative">
-        <div className="flex flex-col items-center justify-center mb-4">
+    <div className="space-y-8">
+      {/* Interactive Glowing Mic Visualizer */}
+      <div className="relative py-4 flex flex-col items-center justify-center">
+        {/* Ambient Gradient Backdrop Glow */}
+        <div
+          className={`absolute w-72 h-72 rounded-full blur-3xl pointer-events-none transition-all duration-700 ${
+            isListening ? 'bg-rose-500/25 scale-125' : 'bg-cyan-500/15'
+          }`}
+        />
+
+        {/* The Microphone Interactive Orb */}
+        <div className="relative mb-6">
           <button
             onClick={isListening ? stopListening : startListening}
             disabled={!micSupported}
-            className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl ${
+            className={`relative w-28 h-28 rounded-full flex items-center justify-center transition-all duration-300 z-10 ${
               isListening
-                ? 'bg-gradient-to-tr from-rose-600 to-red-500 shadow-rose-500/50 scale-110'
+                ? 'bg-gradient-to-tr from-rose-600 via-rose-500 to-amber-500 shadow-2xl shadow-rose-500/60 scale-105 ring-4 ring-rose-400/40'
                 : micSupported
-                ? 'bg-slate-800 hover:bg-slate-700 shadow-blue-500/10 hover:shadow-cyan-500/20 hover:scale-105 border border-slate-700'
+                ? 'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 hover:from-slate-700 hover:to-slate-900 shadow-xl shadow-cyan-500/10 hover:shadow-cyan-500/30 hover:scale-105 border-2 border-slate-700 hover:border-cyan-400'
                 : 'bg-slate-800/50 cursor-not-allowed opacity-50'
             }`}
-            title={isListening ? 'Tap to Stop Listening' : micSupported ? 'Tap to Start Speaking' : 'Microphone not supported'}
+            title={isListening ? 'Tap to Stop Listening' : micSupported ? 'Tap to Start Dictating' : 'Microphone Not Supported'}
           >
-            {/* Pulsing Ripple Wave for Active Speech */}
+            {/* Concentric Audio Aura Rings when listening */}
             {isListening && (
               <>
                 <span
-                  className="absolute inset-0 rounded-full bg-rose-500/30 animate-ping"
-                  style={{ animationDuration: '1.4s' }}
+                  className="absolute inset-0 rounded-full bg-rose-500/40 animate-ping pointer-events-none"
+                  style={{ animationDuration: '1.6s' }}
                 />
                 <span
-                  className="absolute rounded-full bg-rose-500/15"
+                  className="absolute rounded-full border border-rose-400/30 pointer-events-none"
                   style={{
-                    inset: `-${pulseIntensity * 0.18}px`,
+                    inset: `-${pulseIntensity * 0.25}px`,
                     transition: 'inset 80ms ease-out',
+                  }}
+                />
+                <span
+                  className="absolute rounded-full border border-amber-400/20 pointer-events-none"
+                  style={{
+                    inset: `-${pulseIntensity * 0.45}px`,
+                    transition: 'inset 120ms ease-out',
                   }}
                 />
               </>
             )}
+
             {isListening ? (
-              <MicOff className="w-10 h-10 text-white relative z-10 animate-pulse" />
+              <MicOff className="w-12 h-12 text-white drop-shadow-md animate-pulse" />
             ) : (
-              <Mic className="w-10 h-10 text-cyan-400 relative z-10" />
+              <Mic className="w-12 h-12 text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.4)]" />
             )}
           </button>
 
-          {/* Real-Time Google-Mic Status Indicator */}
-          <div className="mt-4 text-center">
-            {isListening ? (
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold">
-                  <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
-                  {listeningState === 'recognizing'
-                    ? 'Processing Speech Statement...'
-                    : listeningState === 'committed'
-                    ? 'Statement Recognized!'
-                    : 'Listening... Speak naturally, then pause'}
+          {/* Equalizer Frequency Bars when Listening */}
+          {isListening && (
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 px-3 py-1 bg-slate-950/90 border border-rose-500/40 rounded-full shadow-lg">
+              <span className="w-1 h-3 bg-rose-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-1 h-5 bg-rose-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-1 h-2 bg-rose-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <span className="w-1 h-6 bg-rose-400 rounded-full animate-bounce" style={{ animationDelay: '100ms' }} />
+              <span className="w-1 h-4 bg-rose-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }} />
+            </div>
+          )}
+        </div>
+
+        {/* State Status & Google Mic Live Preview */}
+        <div className="text-center space-y-3 max-w-lg z-10">
+          {isListening ? (
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs font-bold uppercase tracking-wider">
+                <Activity className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+                {listeningState === 'recognizing'
+                  ? 'Debouncing & Locking Phrase...'
+                  : listeningState === 'committed'
+                  ? 'Statement Recognized!'
+                  : 'Mic Active — Speak naturally and pause'}
+              </div>
+
+              {/* Floating Real-Time Speech Chip */}
+              {liveInterim && (
+                <div className="p-3 bg-slate-950/90 border border-cyan-500/50 rounded-2xl shadow-xl backdrop-blur-md animate-fade-in">
+                  <div className="flex items-center gap-2 text-cyan-300 text-xs justify-center">
+                    <Volume2 className="w-4 h-4 text-cyan-400 animate-pulse shrink-0" />
+                    <span className="font-mono text-slate-400">Hearing:</span>
+                    <span className="font-semibold text-white truncate max-w-xs">"{liveInterim}"</span>
+                  </div>
                 </div>
+              )}
 
-                {/* Live Real-Time Speech Chip (Google Mic Floating Text Preview) */}
-                {liveInterim && (
-                  <div className="max-w-md mx-auto px-4 py-2 bg-slate-900/90 border border-cyan-500/40 rounded-xl shadow-lg backdrop-blur-sm animate-fade-in">
-                    <div className="flex items-center gap-2 text-cyan-300 text-xs">
-                      <Volume2 className="w-3.5 h-3.5 animate-pulse shrink-0 text-cyan-400" />
-                      <span className="font-mono text-[11px] text-slate-400 shrink-0">Hearing:</span>
-                      <span className="font-medium truncate italic text-white">"{liveInterim}"</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Just Committed Confirmation */}
-                {listeningState === 'committed' && lastCommittedPhrase && (
-                  <div className="max-w-md mx-auto px-3 py-1.5 bg-emerald-950/60 border border-emerald-500/40 rounded-lg text-emerald-300 text-[11px] font-medium flex items-center justify-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Added: "{lastCommittedPhrase}"</span>
-                  </div>
-                )}
+              {/* Just-Committed Feedback */}
+              {listeningState === 'committed' && lastCommittedPhrase && (
+                <div className="px-3 py-1.5 bg-emerald-950/80 border border-emerald-500/50 rounded-xl text-emerald-300 text-xs font-semibold flex items-center justify-center gap-2 shadow-lg">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span className="truncate">Captured: "{lastCommittedPhrase}"</span>
+                </div>
+              )}
+            </div>
+          ) : !micSupported ? (
+            <p className="text-xs text-rose-400 font-medium">
+              Microphone not supported in this browser. Use keyboard or paste below.
+            </p>
+          ) : (
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold">
+                <Zap className="w-3.5 h-3.5 text-cyan-400" />
+                Institutional Speech-to-Entity Engine
               </div>
-            ) : !micSupported ? (
-              <p className="text-xs text-slate-500">
-                Browser microphone not supported. Use text input or paste a transcript below.
+              <p className="text-xs text-slate-400 pt-1">
+                Tap microphone to dictate field rescue logs in English or Hindi. Pause ~800ms to lock each clean statement.
               </p>
-            ) : (
-              <div className="space-y-1">
-                <p className="text-xs font-medium text-slate-300">
-                  Tap microphone to dictate in English or Hindi / Hinglish.
-                </p>
-                <p className="text-[11px] text-slate-500">
-                  Speaks $\rightarrow$ Pauses a few milliseconds $\rightarrow$ Automatically locks in clear individual statements without repeats.
-                </p>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Text Input Area */}
-      <div className="relative">
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-            <FileText className="w-3.5 h-3.5 text-blue-400" />
-            Field Transcript Buffer
-          </label>
+      {/* Transcript Textarea Card */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+              <FileText className="w-4 h-4 text-cyan-400" />
+              Radio / Dictation Buffer
+            </span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono border border-slate-700">
+              Live Buffer
+            </span>
+          </div>
           {transcript && (
-            <span className="text-[10px] text-slate-500 font-mono">
+            <span className="text-xs text-slate-400 font-mono">
               {transcript.trim().split(/\s+/).filter(Boolean).length} words
             </span>
           )}
         </div>
 
-        <textarea
-          ref={textareaRef}
-          value={transcript}
-          onChange={(e) => {
-            setTranscript(e.target.value);
-            setParseResult(null);
-          }}
-          placeholder="Clean field transcript will automatically appear here as you speak...&#10;&#10;Or paste radio notes, e.g.:&#10;&quot;NDRF team reporting. Rescued Veer Kumar, male, approximately 28 years old, near bridge collapse. Wearing blue denim jacket. Has scar on left eyebrow. Blood group B+...&quot;"
-          rows={6}
-          className="w-full px-4 py-3 text-sm bg-slate-900 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-500 outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 resize-none transition font-sans leading-relaxed"
-        />
+        <div className="relative rounded-2xl p-1 bg-gradient-to-b from-slate-800 via-slate-850 to-slate-900 border border-slate-700/80 shadow-2xl focus-within:border-cyan-400/80 focus-within:ring-4 focus-within:ring-cyan-500/20 transition-all">
+          <textarea
+            ref={textareaRef}
+            value={transcript}
+            onChange={(e) => {
+              setTranscript(e.target.value);
+            }}
+            placeholder="Clean dictated statement will appear here as you speak...&#10;&#10;Or paste dispatch notes, e.g.:&#10;&quot;Control, this is NDRF boat team. Rescued Veer Kumar, male, approximately 28 years old, near bridge. Wearing blue denim jacket. Has scar on left eyebrow. Blood group B+...&quot;"
+            rows={6}
+            className="w-full px-4 py-3.5 text-sm bg-slate-950/80 rounded-xl text-slate-100 placeholder-slate-500 outline-none resize-none transition font-sans leading-relaxed border-none"
+          />
 
-        {/* Action buttons below textarea */}
-        <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handlePaste}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:border-slate-600 rounded-lg transition"
-            >
-              <Clipboard className="w-3.5 h-3.5 text-slate-400" /> Paste
-            </button>
-
-            <button
-              onClick={() => setShowSamples(!showSamples)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:border-slate-600 rounded-lg transition"
-            >
-              <Radio className="w-3.5 h-3.5 text-cyan-400" /> Demo Transcripts
-              {showSamples ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {transcript && (
+          {/* Action Row Inside Card */}
+          <div className="flex items-center justify-between p-2 pt-1 border-t border-slate-800/80 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => {
-                  setTranscript('');
-                  setParseResult(null);
-                  lastCommittedTextRef.current = '';
-                }}
-                className="px-3 py-1.5 text-xs text-slate-500 hover:text-rose-400 transition"
+                onClick={handlePaste}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white rounded-lg transition shadow-sm"
               >
-                Clear
+                <Clipboard className="w-3.5 h-3.5 text-slate-400" /> Paste Notes
               </button>
-            )}
-            <button
-              onClick={handleParse}
-              disabled={!transcript.trim() || isParsing}
-              className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-xl transition shadow-sm ${
-                transcript.trim() && !isParsing
-                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-blue-500/20'
-                  : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
-              }`}
-            >
-              {isParsing ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-white" /> Parsing Entities...
-                </>
-              ) : (
-                <>
-                  <Wand2 className="w-4 h-4 text-cyan-200" /> Extract Disaster Fields
-                </>
+
+              <button
+                onClick={() => setShowSamples(!showSamples)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-cyan-300 hover:text-white rounded-lg transition shadow-sm"
+              >
+                <Radio className="w-3.5 h-3.5 text-cyan-400" /> Demo Transcripts
+                {showSamples ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {transcript && (
+                <button
+                  onClick={() => {
+                    setTranscript('');
+                    lastCommittedTextRef.current = '';
+                  }}
+                  className="px-3 py-1.5 text-xs text-slate-400 hover:text-rose-400 transition"
+                >
+                  Clear Buffer
+                </button>
               )}
-            </button>
+
+              <button
+                onClick={handleParse}
+                disabled={!transcript.trim() || isParsing}
+                className={`flex items-center gap-2 px-6 py-2.5 text-sm font-bold rounded-xl transition shadow-lg ${
+                  transcript.trim() && !isParsing
+                    ? 'bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white shadow-cyan-500/25 hover:scale-[1.02]'
+                    : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
+                }`}
+              >
+                {isParsing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>Extracting Entities...</span>
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="w-4 h-4 text-cyan-200" />
+                    <span>Extract Fields & Review →</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Sample Transcripts Dropdown */}
+      {/* Demo Transcripts Cards */}
       {showSamples && (
-        <div className="bg-slate-900 rounded-2xl border border-slate-700 p-4 space-y-3">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Radio className="w-3.5 h-3.5 text-blue-400" /> Pre-Configured Emergency Radio Transcripts
+        <div className="bg-slate-900/95 rounded-2xl border border-slate-700/80 p-5 space-y-3 shadow-2xl animate-fade-in">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+              <Radio className="w-4 h-4 text-cyan-400" /> Click Any Realistic Emergency Dispatch to Test
+            </span>
+            <span className="text-[11px] text-slate-500">1-Click Evaluation</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {SAMPLE_TRANSCRIPTS.map((s, idx) => (
               <button
                 key={idx}
                 onClick={() => loadSample(s.text)}
-                className="text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 hover:border-cyan-500/40 transition group"
+                className="text-left p-3.5 rounded-xl bg-slate-800/70 hover:bg-slate-800 border border-slate-700/60 hover:border-cyan-400/50 transition-all group flex flex-col justify-between"
               >
-                <div className="text-xs font-semibold text-slate-200 group-hover:text-cyan-300 transition">
-                  {s.label}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border font-mono ${s.badgeColor}`}>
+                      {s.badge}
+                    </span>
+                    <span className="text-[10px] text-cyan-400 group-hover:translate-x-0.5 transition font-semibold">
+                      Load →
+                    </span>
+                  </div>
+                  <div className="text-xs font-bold text-slate-100 group-hover:text-cyan-300 transition">
+                    {s.label}
+                  </div>
+                  <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">{s.text}</p>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">{s.text}</p>
               </button>
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* Parse Results Preview Card */}
-      {parseResult && (
-        <div className="bg-slate-900 rounded-2xl border border-slate-700 p-5 space-y-4 animate-fade-in">
-          <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-slate-800">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-cyan-400" />
-              <h3 className="font-bold text-slate-200 text-sm">NLP Extracted Entities</h3>
-              <span className="text-[10px] text-slate-400 font-mono">({parseResult.extractedEntities.length} fields)</span>
-            </div>
-
-            {confidenceTier && (
-              <div
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${confidenceBg} ${confidenceColor}`}
-              >
-                {ConfIcon && <ConfIcon className="w-3.5 h-3.5" />}
-                <span>{parseResult.confidence}% {confidenceTier} CONFIDENCE</span>
-              </div>
-            )}
-          </div>
-
-          {/* Extracted Fields Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {parseResult.attributes.p_full_name && (
-              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                <span className="text-[10px] text-slate-400 block">Name</span>
-                <span className="text-xs font-bold text-slate-200 truncate block">
-                  {parseResult.attributes.p_full_name}
-                </span>
-              </div>
-            )}
-            {parseResult.attributes.p_gender && (
-              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                <span className="text-[10px] text-slate-400 block">Gender</span>
-                <span className="text-xs font-bold text-slate-200">{parseResult.attributes.p_gender}</span>
-              </div>
-            )}
-            {parseResult.attributes.p_approximate_age && (
-              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                <span className="text-[10px] text-slate-400 block">Approx Age</span>
-                <span className="text-xs font-bold text-slate-200">{parseResult.attributes.p_approximate_age} yrs</span>
-              </div>
-            )}
-            {parseResult.attributes.p_blood_group && (
-              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                <span className="text-[10px] text-slate-400 block">Blood Group</span>
-                <span className="text-xs font-bold text-rose-400">{parseResult.attributes.p_blood_group}</span>
-              </div>
-            )}
-            {parseResult.attributes.p_comm_status && (
-              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                <span className="text-[10px] text-slate-400 block">Communication</span>
-                <span className="text-xs font-bold text-slate-200">{parseResult.attributes.p_comm_status}</span>
-              </div>
-            )}
-            {parseResult.attributes.p_clothing && (
-              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                <span className="text-[10px] text-slate-400 block">Clothing</span>
-                <span className="text-xs font-bold text-slate-200 truncate block">
-                  {parseResult.attributes.p_clothing}
-                </span>
-              </div>
-            )}
-            {(parseResult.attributes.p_scars || parseResult.attributes.p_birthmarks) && (
-              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                <span className="text-[10px] text-slate-400 block">Marks & Scars</span>
-                <span className="text-xs font-bold text-amber-300 truncate block">
-                  {parseResult.attributes.p_scars || parseResult.attributes.p_birthmarks}
-                </span>
-              </div>
-            )}
-            {parseResult.attributes.p_found_location && (
-              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                <span className="text-[10px] text-slate-400 block">Found Location</span>
-                <span className="text-xs font-bold text-slate-200 truncate block">
-                  {parseResult.attributes.p_found_location}
-                </span>
-              </div>
-            )}
-            {(parseResult.attributes.p_condition_status || parseResult.attributes.p_report_notes) && (
-              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                <span className="text-[10px] text-slate-400 block">Condition / Notes</span>
-                <span className="text-xs font-bold text-cyan-300 truncate block">
-                  {parseResult.attributes.p_condition_status || parseResult.attributes.p_report_notes}
-                </span>
-              </div>
-            )}
           </div>
         </div>
       )}
