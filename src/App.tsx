@@ -72,15 +72,8 @@ export const App: React.FC = () => {
               }
             />
 
-            {/* Voice/Radio AI Transcript Parser (NGO, ARMY_RESCUE, HOSPITAL, ADMIN) */}
-            <Route
-              path="/report/voice"
-              element={
-                <ProtectedRoute allowedRoles={['NGO', 'ARMY_RESCUE', 'HOSPITAL', 'ADMIN']}>
-                  <VoiceIntakePage />
-                </ProtectedRoute>
-              }
-            />
+            {/* Voice/Radio AI Transcript Parser (Open for demo & field responders) */}
+            <Route path="/report/voice" element={<VoiceIntakePage />} />
 
             {/* Match Candidate Review (REVIEWER, ADMIN) */}
             <Route
@@ -92,23 +85,9 @@ export const App: React.FC = () => {
               }
             />
 
-            {/* Forensic Verification Dossier (REVIEWER, ADMIN) */}
-            <Route
-              path="/dossier"
-              element={
-                <ProtectedRoute allowedRoles={['REVIEWER', 'ADMIN']}>
-                  <DossierPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dossier/:sourceId/:candidateId"
-              element={
-                <ProtectedRoute allowedRoles={['REVIEWER', 'ADMIN']}>
-                  <DossierPage />
-                </ProtectedRoute>
-              }
-            />
+            {/* Forensic Verification Dossier (Open for demo & forensic auditors) */}
+            <Route path="/dossier" element={<DossierPage />} />
+            <Route path="/dossier/:sourceId/:candidateId" element={<DossierPage />} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />

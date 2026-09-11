@@ -13,6 +13,10 @@ import {
   Sparkles,
   ChevronRight,
   Database,
+  Radio,
+  FileText,
+  WifiOff,
+  Zap,
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
@@ -67,6 +71,121 @@ export const LandingPage: React.FC = () => {
 
         {/* Subtle Background Glow */}
         <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* HACKX 4.0 INSTITUTIONAL INNOVATIONS SHOWCASE */}
+      {/* ============================================================ */}
+      <section className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-600 text-xs font-bold uppercase tracking-wider mb-2">
+              <Zap className="w-3.5 h-3.5 text-amber-500" />
+              MUJ HackX 4.0 Institutional Innovations
+            </div>
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+              Disaster-Grade AI & Resilience Engines
+            </h2>
+            <p className="text-slate-600 text-sm mt-1">
+              Engineered for zero-connectivity blackout zones, chaotic radio dispatches, and forensic verification rigor.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Innovation 1: Blackout Engine */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white rounded-2xl p-6 border border-slate-800 shadow-xl flex flex-col justify-between group hover:border-amber-500/40 transition-all duration-300">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 flex items-center justify-center">
+                  <WifiOff className="w-6 h-6" />
+                </div>
+                <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  Innovation 1
+                </span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white group-hover:text-amber-300 transition">
+                  "The Blackout Protocol"
+                </h3>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Disaster zones suffer 100% cell tower failures. Intakes are cached locally in encrypted browser queues and batch-reconciled with conflict resolution when network returns.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+              <span className="text-[11px] text-slate-400">See top banner to toggle</span>
+              <span className="text-xs text-amber-400 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition">
+                Active in Header <ChevronRight className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
+
+          {/* Innovation 2: Voice/Radio AI Intake */}
+          <Link
+            to="/report/voice"
+            className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-cyan-950 to-slate-900 text-white rounded-2xl p-6 border border-cyan-900/50 shadow-xl flex flex-col justify-between group hover:border-cyan-400/60 transition-all duration-300 hover:scale-[1.01]"
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 flex items-center justify-center">
+                  <Radio className="w-6 h-6 animate-pulse" />
+                </div>
+                <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  Innovation 2
+                </span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white group-hover:text-cyan-300 transition">
+                  Voice & Radio-to-Case AI
+                </h3>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  First responders in boats or helicopters cannot type. Speak or paste chaotic radio logs in Hindi/English — zero-dependency NLP maps 8+ attributes straight to intake records.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-cyan-900/60 flex items-center justify-between">
+              <span className="text-[11px] text-cyan-400 font-mono">Live Mic & Sample Radios</span>
+              <span className="text-xs text-cyan-300 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition">
+                Launch Voice AI <ChevronRight className="w-4 h-4" />
+              </span>
+            </div>
+          </Link>
+
+          {/* Innovation 3: Forensic Dossier Engine */}
+          <Link
+            to="/dossier"
+            className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-violet-950 to-slate-900 text-white rounded-2xl p-6 border border-violet-900/50 shadow-xl flex flex-col justify-between group hover:border-violet-400/60 transition-all duration-300 hover:scale-[1.01]"
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-xl bg-violet-500/20 border border-violet-500/30 text-violet-400 flex items-center justify-center">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                  Innovation 3
+                </span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white group-hover:text-violet-300 transition">
+                  Forensic Verification Dossier
+                </h3>
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  Prevents false child handovers. Generates explainable evidence breakdown charts, flags severe discrepancies (e.g. blood group mismatches), and produces printable certificates.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-violet-900/60 flex items-center justify-between">
+              <span className="text-[11px] text-violet-400 font-mono">Institutional Dossier</span>
+              <span className="text-xs text-violet-300 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition">
+                Open Dossier Engine <ChevronRight className="w-4 h-4" />
+              </span>
+            </div>
+          </Link>
+        </div>
       </section>
 
       {/* 4 Intake Portals */}

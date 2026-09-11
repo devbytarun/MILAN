@@ -116,27 +116,36 @@ export const Navbar: React.FC = () => {
               </Link>
             )}
 
-            {(profile?.role === 'NGO' || profile?.role === 'ARMY_RESCUE' || profile?.role === 'HOSPITAL' || profile?.role === 'ADMIN') && (
-              <Link
-                to="/report/voice"
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition ${
-                  isActive('/report/voice') ? 'bg-cyan-950 text-cyan-300 border border-cyan-700' : 'text-cyan-400 hover:bg-slate-800'
-                }`}
-              >
-                <Radio className="w-4 h-4" /> Voice Parser
-              </Link>
-            )}
+            {/* Always visible innovation engines */}
+            <Link
+              to="/report/voice"
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition ${
+                isActive('/report/voice')
+                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-700'
+                  : 'text-cyan-400 hover:bg-slate-800 hover:text-cyan-300'
+              }`}
+            >
+              <Radio className="w-4 h-4" />
+              <span>Voice Parser</span>
+              <span className="text-[9px] font-extrabold px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
+                AI
+              </span>
+            </Link>
 
-            {(profile?.role === 'REVIEWER' || profile?.role === 'ADMIN') && (
-              <Link
-                to="/dossier"
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition ${
-                  isActive('/dossier') ? 'bg-violet-950 text-violet-300 border border-violet-700' : 'text-violet-400 hover:bg-slate-800'
-                }`}
-              >
-                <FileText className="w-4 h-4" /> Dossier
-              </Link>
-            )}
+            <Link
+              to="/dossier"
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition ${
+                isActive('/dossier')
+                  ? 'bg-violet-950 text-violet-300 border border-violet-700'
+                  : 'text-violet-400 hover:bg-slate-800 hover:text-violet-300'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              <span>Dossiers</span>
+              <span className="text-[9px] font-extrabold px-1 py-0.2 rounded bg-violet-500/20 text-violet-300 border border-violet-400/30">
+                NEW
+              </span>
+            </Link>
 
             <Link
               to="/cases"
@@ -285,15 +294,23 @@ export const Navbar: React.FC = () => {
               Match Reviewer Dashboard
             </Link>
           )}
-          {(profile?.role === 'NGO' || profile?.role === 'ARMY_RESCUE' || profile?.role === 'HOSPITAL' || profile?.role === 'ADMIN') && (
-            <Link
-              to="/report/voice"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-md text-sm text-cyan-400 hover:bg-slate-800"
-            >
-              Voice / Radio Parser
-            </Link>
-          )}
+          {/* Innovation Engines always available */}
+          <Link
+            to="/report/voice"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between px-3 py-2 rounded-md text-sm text-cyan-400 hover:bg-slate-800"
+          >
+            <span>Voice / Radio AI Parser</span>
+            <span className="text-[10px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded font-mono">AI</span>
+          </Link>
+          <Link
+            to="/dossier"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-between px-3 py-2 rounded-md text-sm text-violet-400 hover:bg-slate-800"
+          >
+            <span>Forensic Dossiers</span>
+            <span className="text-[10px] bg-violet-500/20 text-violet-300 px-1.5 py-0.5 rounded font-mono">NEW</span>
+          </Link>
 
           <div className="pt-3 border-t border-slate-800">
             <div className="text-xs text-slate-400 mb-2">Switch Demo Role:</div>
