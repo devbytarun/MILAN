@@ -134,6 +134,39 @@
     outline-offset: 2px;
   }
 
+  /* ── Form Inputs Base Spec ── */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="datetime-local"],
+  input[type="date"],
+  select,
+  textarea {
+    border-color: var(--hairline-light) !important;
+    border-radius: var(--radius-md) !important;
+    background-color: var(--canvas-light);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-feature-settings: "ss03";
+    transition: border-color var(--duration-normal) var(--ease-out);
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="tel"]:focus,
+  input[type="number"]:focus,
+  input[type="datetime-local"]:focus,
+  input[type="date"]:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--color-ink) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 1px var(--color-ink);
+  }
+
   /* ── Reduced Motion ── */
   @media (prefers-reduced-motion: reduce) {
     html {

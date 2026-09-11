@@ -1,62 +1,102 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { ShieldCheck, HeartHandshake, AlertTriangle } from 'lucide-react';
 
 export const Footer: React.FC = () => {
+  const location = useLocation();
+  const isCinematic = location.pathname === '/';
+
   return (
-    <footer className="bg-slate-900 border-t border-slate-800 text-slate-400 py-10 mt-auto text-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          <div>
-            <div className="flex items-center gap-2 text-white font-bold text-lg mb-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-              MILAN COORDINATION SYSTEM
+    <footer
+      className={`mt-auto transition-colors duration-200 ${
+        isCinematic
+          ? 'bg-canvas-night text-shade-40 border-t border-hairline-dark'
+          : 'bg-canvas-light text-shade-60 border-t border-hairline-light'
+      } py-12 sm:py-16`}
+    >
+      <div className={isCinematic ? 'container-cinematic' : 'container-transactional'}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 mb-10">
+          {/* Brand & Mission */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className={`font-display text-lg font-light tracking-[0.2em] uppercase ${
+                isCinematic ? 'text-on-dark' : 'text-ink'
+              }`}>
+                MILAN
+              </span>
+              <span className="text-[10px] uppercase font-semibold tracking-widest text-shade-40">
+                Disaster Coordination
+              </span>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed mb-4">
-              Disaster-time information reconciliation platform connecting family missing reports with field rescue and hospital intakes via multi-attribute deterministic matching.
+            <p className="type-caption leading-relaxed max-w-sm">
+              Critical disaster reconciliation connecting missing person reports with field rescue camps and hospital triage records through multi-attribute explainable matching.
             </p>
-            <div className="flex items-center gap-2 text-[11px] text-slate-400">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>All candidate matches require human review verification.</span>
+            <div className="flex items-center gap-2 text-xs pt-1">
+              <ShieldCheck className={`w-4 h-4 ${isCinematic ? 'text-aloe' : 'text-ink'}`} />
+              <span className={isCinematic ? 'text-shade-30' : 'text-ink font-medium'}>
+                Human review verification required for all candidate matches.
+              </span>
             </div>
           </div>
 
-          <div>
-            <h4 className="text-xs font-semibold text-slate-200 uppercase tracking-wider mb-3">
-              Operational Roles
+          {/* Operational Roles */}
+          <div className="space-y-3">
+            <h4 className={`text-xs font-semibold uppercase tracking-wider ${
+              isCinematic ? 'text-shade-30' : 'text-ink'
+            }`}>
+              Operational Protocols
             </h4>
-            <ul className="space-y-1.5 text-xs text-slate-400">
-              <li>• <strong className="text-slate-300">Family:</strong> Submit missing person details & track case timeline.</li>
-              <li>• <strong className="text-slate-300">NGO & Army:</strong> Field intake for rescued persons (communicative & non-communicative).</li>
-              <li>• <strong className="text-slate-300">Hospitals:</strong> Medical intake and condition tracking with privacy locks.</li>
-              <li>• <strong className="text-slate-300">Reviewers:</strong> Verify and audit algorithmic candidate matches.</li>
+            <ul className="space-y-2 type-caption">
+              <li>
+                <strong className={isCinematic ? 'text-on-dark' : 'text-ink'}>Family:</strong> Comprehensive intake & case timeline tracking.
+              </li>
+              <li>
+                <strong className={isCinematic ? 'text-on-dark' : 'text-ink'}>Rescue Units:</strong> Field intake for communicative & shock survivors.
+              </li>
+              <li>
+                <strong className={isCinematic ? 'text-on-dark' : 'text-ink'}>Medical Centers:</strong> Triage conditions & medical status updates.
+              </li>
+              <li>
+                <strong className={isCinematic ? 'text-on-dark' : 'text-ink'}>Reviewers:</strong> Side-by-side verification and family notification.
+              </li>
             </ul>
           </div>
 
-          <div>
-            <h4 className="text-xs font-semibold text-slate-200 uppercase tracking-wider mb-3">
-              Important Disclaimer
+          {/* Emergency Notice */}
+          <div className="space-y-3">
+            <h4 className={`text-xs font-semibold uppercase tracking-wider ${
+              isCinematic ? 'text-shade-30' : 'text-ink'
+            }`}>
+              Emergency Notice
             </h4>
-            <div className="p-3 bg-slate-800/80 border border-slate-700/60 rounded-lg text-xs leading-relaxed text-slate-300 space-y-1">
-              <div className="flex items-center gap-1.5 text-amber-400 font-medium">
-                <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-                Emergency Notice
+            <div className={`p-4 rounded-lg text-xs leading-relaxed space-y-1.5 border ${
+              isCinematic
+                ? 'bg-canvas-night-elevated border-hairline-dark text-shade-30'
+                : 'bg-canvas-cream border-hairline-light text-shade-70'
+            }`}>
+              <div className="flex items-center gap-1.5 font-semibold text-amber-500">
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                <span>Immediate Danger Notice</span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                MILAN does not replace national emergency distress response services. In imminent life-safety emergencies, immediately contact local first responders and designated relief numbers.
+              <p className="type-caption">
+                MILAN complements relief coordination and does not replace emergency response (112 / 108 / NDRF). In immediate life-threatening situations, notify emergency dispatch directly.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+        {/* Bottom Bar */}
+        <div className={`pt-6 border-t flex flex-col sm:flex-row items-center justify-between text-xs gap-3 ${
+          isCinematic ? 'border-hairline-dark text-shade-50' : 'border-hairline-light text-shade-50'
+        }`}>
           <div>
             © {new Date().getFullYear()} MILAN Disaster Information Network. Built for disaster resilience.
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
+          <div className="flex items-center gap-4">
             <span>Version 0.1.0-alpha</span>
             <span>•</span>
-            <span className="flex items-center gap-1">
-              <HeartHandshake className="w-3.5 h-3.5 text-rose-400" /> Community Supported
+            <span className="flex items-center gap-1.5">
+              <HeartHandshake className="w-3.5 h-3.5 text-rose-500" /> Open Disaster Protocol
             </span>
           </div>
         </div>
