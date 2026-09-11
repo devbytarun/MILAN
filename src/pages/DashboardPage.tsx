@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 import {
   Users,
@@ -10,9 +10,12 @@ import {
   ArrowRight,
   CheckCircle2,
 } from 'lucide-react';
+import { Button } from '../components/ui/Button.tsx';
+import { Badge } from '../components/ui/Badge.tsx';
 
 export const DashboardPage: React.FC = () => {
   const { profile } = useAuth();
+  const navigate = useNavigate();
 
   const roleLabels: Record<string, string> = {
     FAMILY: 'Family Member / Relative',
@@ -25,141 +28,159 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-12">
       {/* Profile Header Banner */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2.5">
+            <Badge variant="shade" size="sm">
               {profile ? roleLabels[profile.role] || profile.role : 'Guest'}
-            </span>
+            </Badge>
             {profile?.verification_status === 'APPROVED' && (
-              <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                <CheckCircle2 className="w-3 h-3" /> Verified Account
-              </span>
+              <Badge variant="verified" size="sm" icon={<CheckCircle2 className="w-3 h-3" />}>
+                Verified Operational Account
+              </Badge>
             )}
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 mt-2">
+          <h1 className="type-display-md text-ink">
             Welcome, {profile?.full_name || 'Coordinator'}
           </h1>
-          <p className="text-xs text-slate-500">
+          <p className="type-caption text-shade-50">
             {profile?.organization_name ? `${profile.organization_name} • ` : ''}
             Disaster Coordination Portal Active
           </p>
         </div>
 
-        {/* Quick Action Button Based on Role */}
-        <div className="flex items-center gap-2 w-full md:w-auto">
+        {/* Quick Action Pill Button Based on Role */}
+        <div className="flex items-center gap-3 w-full md:w-auto">
           {profile?.role === 'FAMILY' && (
-            <Link
-              to="/report/missing"
-              className="w-full md:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition"
+            <Button
+              variant="aloe"
+              size="md"
+              onClick={() => navigate('/report/missing')}
+              leftIcon={<PlusCircle className="w-4 h-4" />}
+              className="w-full md:w-auto"
             >
-              <PlusCircle className="w-4 h-4" /> Submit Missing Report
-            </Link>
+              Submit Missing Report
+            </Button>
           )}
 
           {(profile?.role === 'NGO' || profile?.role === 'ARMY_RESCUE' || profile?.role === 'ADMIN') && (
-            <Link
-              to="/report/found"
-              className="w-full md:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition"
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => navigate('/report/found')}
+              leftIcon={<PlusCircle className="w-4 h-4" />}
+              className="w-full md:w-auto"
             >
-              <PlusCircle className="w-4 h-4" /> Register Found Person
-            </Link>
+              Register Rescued Person
+            </Button>
           )}
 
           {(profile?.role === 'HOSPITAL' || profile?.role === 'ADMIN') && (
-            <Link
-              to="/report/hospital"
-              className="w-full md:w-auto px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition"
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => navigate('/report/hospital')}
+              leftIcon={<PlusCircle className="w-4 h-4" />}
+              className="w-full md:w-auto"
             >
-              <PlusCircle className="w-4 h-4" /> Hospital Medical Intake
-            </Link>
+              Hospital Medical Intake
+            </Button>
           )}
 
           {(profile?.role === 'REVIEWER' || profile?.role === 'ADMIN') && (
-            <Link
-              to="/review"
-              className="w-full md:w-auto px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition"
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => navigate('/review')}
+              leftIcon={<ShieldCheck className="w-4 h-4" />}
+              className="w-full md:w-auto"
             >
-              <ShieldCheck className="w-4 h-4" /> Open Verification Queue
-            </Link>
+              Open Verification Queue
+            </Button>
           )}
         </div>
       </div>
 
       {/* System Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Missing Cases</div>
-          <div className="text-2xl font-extrabold text-slate-900 mt-1">128</div>
-          <div className="text-[11px] text-emerald-600 font-medium mt-1">Active reports filed</div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 shadow-elevation-3">
+          <div className="text-[10px] font-semibold text-shade-50 uppercase tracking-wider">Missing Cases</div>
+          <div className="type-display-md font-light text-ink mt-2">128</div>
+          <div className="type-caption text-shade-50 mt-1">Active reports filed</div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Found / Rescued</div>
-          <div className="text-2xl font-extrabold text-slate-900 mt-1">94</div>
-          <div className="text-[11px] text-blue-600 font-medium mt-1">Camp & shelter intakes</div>
+        <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 shadow-elevation-3">
+          <div className="text-[10px] font-semibold text-shade-50 uppercase tracking-wider">Found / Rescued</div>
+          <div className="type-display-md font-light text-ink mt-2">94</div>
+          <div className="type-caption text-shade-50 mt-1">Camp & shelter intakes</div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Potential Matches</div>
-          <div className="text-2xl font-extrabold text-amber-600 mt-1">17</div>
-          <div className="text-[11px] text-slate-500 font-medium mt-1">Algorithmic candidates</div>
+        <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 shadow-elevation-3">
+          <div className="text-[10px] font-semibold text-shade-50 uppercase tracking-wider">Potential Matches</div>
+          <div className="type-display-md font-light text-amber-700 mt-2">17</div>
+          <div className="type-caption text-shade-50 mt-1">Algorithmic candidates</div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Verified Matches</div>
-          <div className="text-2xl font-extrabold text-emerald-600 mt-1">32</div>
-          <div className="text-[11px] text-emerald-700 font-medium mt-1">Reunited by reviewers</div>
+        <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 shadow-elevation-3">
+          <div className="text-[10px] font-semibold text-shade-50 uppercase tracking-wider">Verified Matches</div>
+          <div className="type-display-md font-light text-ink mt-2">32</div>
+          <div className="type-caption text-shade-50 mt-1">Reunited by reviewers</div>
         </div>
       </div>
 
       {/* Module Shortcuts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-3">
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-            <Users className="w-4 h-4 text-emerald-600" />
-            Family Reporting
+        <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 space-y-3 flex flex-col justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-ink font-semibold text-sm">
+              <Users className="w-4 h-4 text-ink" />
+              Family Reporting
+            </div>
+            <p className="type-caption text-shade-50 leading-relaxed">
+              Record comprehensive physical details: height, hair colour, birthmarks, footwear, and personal clothing.
+            </p>
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Record comprehensive physical details: height, hair colour, birthmarks, footwear, and personal clothing.
-          </p>
           <Link
             to="/report/missing"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink hover:underline pt-3"
           >
             Launch 6-Step Form <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-3">
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-            <Building2 className="w-4 h-4 text-blue-600" />
-            Rescue Camp Intake
+        <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 space-y-3 flex flex-col justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-ink font-semibold text-sm">
+              <Building2 className="w-4 h-4 text-ink" />
+              Rescue Camp Intake
+            </div>
+            <p className="type-caption text-shade-50 leading-relaxed">
+              Field reports for shelter intake. Automatically supports non-communicative and unidentified persons.
+            </p>
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Field reports for shelter intake. Automatically supports non-communicative and unidentified persons.
-          </p>
           <Link
             to="/report/found"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 hover:text-blue-800"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink hover:underline pt-3"
           >
             Launch Rescue Intake <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-3">
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
-            <ShieldCheck className="w-4 h-4 text-indigo-600" />
-            Review & Verification
+        <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 space-y-3 flex flex-col justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-ink font-semibold text-sm">
+              <ShieldCheck className="w-4 h-4 text-ink" />
+              Review & Verification
+            </div>
+            <p className="type-caption text-shade-50 leading-relaxed">
+              Side-by-side evidence inspection: view field comparisons, matched attributes, and conflict indicators.
+            </p>
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Side-by-side evidence inspection: view field comparisons, matched attributes, and conflict indicators.
-          </p>
           <Link
             to="/review"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 hover:text-indigo-800"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink hover:underline pt-3"
           >
             Review Candidates <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -167,15 +188,15 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Case Registry Snapshot */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4">
+      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-slate-900 text-sm">Active Case Directory</h3>
-            <p className="text-xs text-slate-500">Live reconciliation status across emergency shelter nodes</p>
+            <h3 className="type-heading-lg text-ink">Active Case Directory</h3>
+            <p className="type-caption text-shade-50 mt-1">Live reconciliation status across emergency shelter nodes</p>
           </div>
           <Link
             to="/cases"
-            className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            className="text-xs font-semibold text-ink hover:underline flex items-center gap-1"
           >
             View All Cases <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -183,73 +204,67 @@ export const DashboardPage: React.FC = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+            <thead className="bg-canvas-cream text-shade-60 font-semibold border-b border-hairline-light">
               <tr>
-                <th className="p-3">Case UID</th>
-                <th className="p-3">Type</th>
-                <th className="p-3">Reported Subject</th>
-                <th className="p-3">Last Known Location</th>
-                <th className="p-3">Status</th>
-                <th className="p-3 text-right">Actions</th>
+                <th className="p-3.5">Case UID</th>
+                <th className="p-3.5">Type</th>
+                <th className="p-3.5">Reported Subject</th>
+                <th className="p-3.5">Last Known Location</th>
+                <th className="p-3.5">Status</th>
+                <th className="p-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
-              <tr className="hover:bg-slate-50/70 transition">
-                <td className="p-3 font-mono font-bold text-blue-700">MILAN-2026-081</td>
-                <td className="p-3">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                    MISSING
-                  </span>
+            <tbody className="divide-y divide-hairline-light">
+              <tr className="hover:bg-canvas-cream/60 transition-colors">
+                <td className="p-3.5 font-mono font-bold text-ink">MILAN-2026-081</td>
+                <td className="p-3.5">
+                  <Badge variant="shade" size="sm">MISSING</Badge>
                 </td>
-                <td className="p-3 font-semibold text-slate-800">Aarav Sharma (Age 9)</td>
-                <td className="p-3 text-slate-600">Alaknanda Riverside Market, Sector 4</td>
-                <td className="p-3">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1 w-fit">
-                    <Clock className="w-3 h-3" /> POSSIBLE_MATCH
-                  </span>
+                <td className="p-3.5 font-semibold text-ink">Aarav Sharma (Age 9)</td>
+                <td className="p-3.5 text-shade-60">Alaknanda Riverside Market, Sector 4</td>
+                <td className="p-3.5">
+                  <Badge variant="pending" size="sm" icon={<Clock className="w-3 h-3" />}>
+                    POSSIBLE_MATCH
+                  </Badge>
                 </td>
-                <td className="p-3 text-right">
-                  <Link to="/cases" className="text-blue-600 hover:underline font-medium">
+                <td className="p-3.5 text-right">
+                  <Link to="/cases" className="text-ink hover:underline font-semibold">
                     Inspect Timeline
                   </Link>
                 </td>
               </tr>
-              <tr className="hover:bg-slate-50/70 transition">
-                <td className="p-3 font-mono font-bold text-blue-700">MILAN-2026-094</td>
-                <td className="p-3">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">
-                    FOUND
-                  </span>
+              <tr className="hover:bg-canvas-cream/60 transition-colors">
+                <td className="p-3.5 font-mono font-bold text-ink">MILAN-2026-094</td>
+                <td className="p-3.5">
+                  <Badge variant="mint" size="sm">FOUND</Badge>
                 </td>
-                <td className="p-3 font-semibold text-slate-800">Unidentified Minor (Boy, ~8-10)</td>
-                <td className="p-3 text-slate-600">Camp Relief Zone 2 (NDRF Intake)</td>
-                <td className="p-3">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1 w-fit">
-                    <Clock className="w-3 h-3" /> POSSIBLE_MATCH
-                  </span>
+                <td className="p-3.5 font-semibold text-ink">Unidentified Minor (Boy, ~8-10)</td>
+                <td className="p-3.5 text-shade-60">Camp Relief Zone 2 (NDRF Intake)</td>
+                <td className="p-3.5">
+                  <Badge variant="pending" size="sm" icon={<Clock className="w-3 h-3" />}>
+                    POSSIBLE_MATCH
+                  </Badge>
                 </td>
-                <td className="p-3 text-right">
-                  <Link to="/review" className="text-indigo-600 hover:underline font-medium">
+                <td className="p-3.5 text-right">
+                  <Link to="/review" className="text-ink hover:underline font-semibold">
                     Review Match
                   </Link>
                 </td>
               </tr>
-              <tr className="hover:bg-slate-50/70 transition">
-                <td className="p-3 font-mono font-bold text-blue-700">MILAN-2026-065</td>
-                <td className="p-3">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                    MISSING
-                  </span>
+              <tr className="hover:bg-canvas-cream/60 transition-colors">
+                <td className="p-3.5 font-mono font-bold text-ink">MILAN-2026-065</td>
+                <td className="p-3.5">
+                  <Badge variant="shade" size="sm">MISSING</Badge>
                 </td>
-                <td className="p-3 font-semibold text-slate-800">Meera Sen (Age 64)</td>
-                <td className="p-3 text-slate-600">Bridge Colony, Block C</td>
-                <td className="p-3">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1 w-fit">
-                    <CheckCircle2 className="w-3 h-3" /> VERIFIED_MATCH
-                  </span>
+                <td className="p-3.5 font-semibold text-ink">Meera Sen (Age 64)</td>
+                <td className="p-3.5 text-shade-60">Bridge Colony, Block C</td>
+                <td className="p-3.5">
+                  <Badge variant="verified" size="sm" icon={<CheckCircle2 className="w-3 h-3" />}>
+                    VERIFIED_MATCH
+                  </Badge>
                 </td>
-                <td className="p-3 text-right">
-                  <Link to="/cases" className="text-emerald-700 hover:underline font-medium">
+                <td className="p-3.5 text-right">
+                  <Link to="/cases" className="text-ink hover:underline font-semibold">
                     Reunited
                   </Link>
                 </td>

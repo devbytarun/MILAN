@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getLocalCases, FullCaseData } from '../services/caseService.ts';
 import {
   Search,
@@ -8,9 +8,13 @@ import {
   CheckCircle2,
   ArrowRight,
   FilePlus,
+  Inbox,
 } from 'lucide-react';
+import { Button } from '../components/ui/Button.tsx';
+import { Badge } from '../components/ui/Badge.tsx';
 
 export const CasesPage: React.FC = () => {
+  const navigate = useNavigate();
   const [cases] = useState<FullCaseData[]>(() => getLocalCases());
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<'ALL' | 'MISSING' | 'FOUND'>('ALL');
@@ -37,58 +41,65 @@ export const CasesPage: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-12">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Cases Registry</h1>
-          <p className="text-xs text-slate-500">
+          <Badge variant="shade" size="sm">
+            Central Directory
+          </Badge>
+          <h1 className="type-display-md text-ink mt-1.5">Cases Registry</h1>
+          <p className="type-caption text-shade-50">
             Live cross-referenced database across emergency triage centers, camps, and family intakes.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Link
-            to="/report/missing"
-            className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition"
+        <div className="flex items-center gap-3">
+          <Button
+            variant="aloe"
+            size="sm"
+            onClick={() => navigate('/report/missing')}
+            leftIcon={<FilePlus className="w-3.5 h-3.5" />}
           >
-            <FilePlus className="w-3.5 h-3.5" /> File Missing
-          </Link>
-          <Link
-            to="/report/found"
-            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition"
+            File Missing
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => navigate('/report/found')}
+            leftIcon={<FilePlus className="w-3.5 h-3.5" />}
           >
-            <FilePlus className="w-3.5 h-3.5" /> Register Found
-          </Link>
+            Register Found
+          </Button>
         </div>
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="bg-canvas-light border border-hairline-light rounded-lg p-4 sm:p-5 shadow-elevation-3 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+          <Search className="w-4 h-4 text-shade-40 absolute left-3.5 top-3" />
           <input
             type="text"
-            placeholder="Search by name, Milan UID, location, clue..."
+            placeholder="Search name, UID, location, clue..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-3.5 py-2 text-xs border border-hairline-light rounded-md outline-none bg-canvas-light focus:border-ink transition-colors placeholder:text-shade-40"
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <div className="flex items-center gap-1">
-            <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-semibold text-shade-50 flex items-center gap-1 mr-1">
               <Filter className="w-3.5 h-3.5" /> Type:
             </span>
             {(['ALL', 'MISSING', 'FOUND'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTypeFilter(t)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                className={`px-3 py-1.5 rounded-pill text-xs font-medium transition-colors ${
                   typeFilter === t
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                    ? 'bg-ink text-on-primary font-semibold'
+                    : 'bg-canvas-cream text-shade-70 hover:bg-shade-30/50 border border-hairline-light'
                 }`}
               >
                 {t}
@@ -96,12 +107,12 @@ export const CasesPage: React.FC = () => {
             ))}
           </div>
 
-          <div className="flex items-center gap-1 ml-0 sm:ml-2">
-            <span className="text-xs font-semibold text-slate-500">Status:</span>
+          <div className="flex items-center gap-1.5 ml-0 sm:ml-2">
+            <span className="text-xs font-semibold text-shade-50">Status:</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg outline-none bg-white text-slate-700 font-medium"
+              className="px-3 py-1.5 text-xs border border-hairline-light rounded-md outline-none bg-canvas-light text-ink font-medium focus:border-ink transition-colors cursor-pointer"
             >
               <option value="ALL">All Statuses</option>
               <option value="POSSIBLE_MATCH">Possible Matches</option>
@@ -113,87 +124,110 @@ export const CasesPage: React.FC = () => {
       </div>
 
       {/* Cases Table */}
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
-              <tr>
-                <th className="p-3.5">Case UID</th>
-                <th className="p-3.5">Type</th>
-                <th className="p-3.5">Reported Subject</th>
-                <th className="p-3.5">Location / Shelter</th>
-                <th className="p-3.5">Key Clue / Marks</th>
-                <th className="p-3.5">Status</th>
-                <th className="p-3.5 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filtered.map((item) => {
-                const { case: c, attributes: a, report: r } = item;
-                return (
-                  <tr key={c.id} className="hover:bg-slate-50/80 transition">
-                    <td className="p-3.5 font-mono font-bold text-blue-700">
-                      <Link to={`/cases/${c.id}`} className="hover:underline">
-                        {c.case_uid}
-                      </Link>
-                    </td>
-                    <td className="p-3.5">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          c.case_type === 'MISSING'
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-blue-100 text-blue-800'
-                        }`}
-                      >
-                        {c.case_type}
-                      </span>
-                    </td>
-                    <td className="p-3.5">
-                      <div className="font-bold text-slate-900">
-                        {a.full_name || (c.case_type === 'FOUND' ? 'Unidentified Survivor' : 'Name Withheld')}
-                      </div>
-                      <div className="text-[11px] text-slate-500">
-                        {a.age || a.approximate_age ? `Age ${a.age || a.approximate_age}` : 'Age Unknown'} • {a.gender || 'Unknown'} • {a.blood_group || 'Blood ?'}
-                      </div>
-                    </td>
-                    <td className="p-3.5 text-slate-600 max-w-[200px] truncate">
-                      {r.found_location || 'Not recorded'}
-                    </td>
-                    <td className="p-3.5 text-slate-600 max-w-[180px] truncate">
-                      {a.identifying_clue || a.scars || '—'}
-                    </td>
-                    <td className="p-3.5">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border flex items-center gap-1 w-fit ${
-                          c.status === 'VERIFIED_MATCH'
-                            ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                            : c.status === 'POSSIBLE_MATCH'
-                            ? 'bg-amber-100 text-amber-800 border-amber-200'
-                            : 'bg-slate-100 text-slate-700 border-slate-200'
-                        }`}
-                      >
-                        {c.status === 'VERIFIED_MATCH' ? (
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        ) : (
-                          <Clock className="w-3 h-3 text-amber-600" />
-                        )}
-                        {c.status}
-                      </span>
-                    </td>
-                    <td className="p-3.5 text-right space-x-2">
-                      <Link
-                        to={`/cases/${c.id}`}
-                        className="text-blue-600 hover:text-blue-800 font-bold inline-flex items-center gap-1"
-                      >
-                        View <ArrowRight className="w-3 h-3" />
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+      <div className="bg-canvas-light border border-hairline-light rounded-lg shadow-elevation-3 overflow-hidden">
+        {filtered.length === 0 ? (
+          <div className="p-12 text-center space-y-3">
+            <div className="w-12 h-12 rounded-pill bg-canvas-cream flex items-center justify-center mx-auto text-shade-40 border border-hairline-light">
+              <Inbox className="w-6 h-6" />
+            </div>
+            <h3 className="type-heading-md text-ink">No matching cases found</h3>
+            <p className="type-caption text-shade-50 max-w-sm mx-auto">
+              No registry entries match your query "{searchTerm}". Try refining filters or search criteria.
+            </p>
+            <Button
+              variant="outline-light"
+              size="sm"
+              onClick={() => {
+                setSearchTerm('');
+                setTypeFilter('ALL');
+                setStatusFilter('ALL');
+              }}
+            >
+              Reset Filters
+            </Button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-canvas-cream text-shade-60 font-semibold border-b border-hairline-light">
+                <tr>
+                  <th className="p-4">Case UID</th>
+                  <th className="p-4">Type</th>
+                  <th className="p-4">Reported Subject</th>
+                  <th className="p-4">Location / Shelter</th>
+                  <th className="p-4">Key Clue / Marks</th>
+                  <th className="p-4">Status</th>
+                  <th className="p-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-hairline-light">
+                {filtered.map((item) => {
+                  const { case: c, attributes: a, report: r } = item;
+                  return (
+                    <tr key={c.id} className="hover:bg-canvas-cream/60 transition-colors">
+                      <td className="p-4 font-mono font-bold text-ink">
+                        <Link to={`/cases/${c.id}`} className="hover:underline">
+                          {c.case_uid}
+                        </Link>
+                      </td>
+                      <td className="p-4">
+                        <Badge
+                          variant={c.case_type === 'MISSING' ? 'shade' : 'mint'}
+                          size="sm"
+                        >
+                          {c.case_type}
+                        </Badge>
+                      </td>
+                      <td className="p-4">
+                        <div className="font-semibold text-ink">
+                          {a.full_name || (c.case_type === 'FOUND' ? 'Unidentified Survivor' : 'Name Withheld')}
+                        </div>
+                        <div className="type-caption text-shade-50">
+                          {a.age || a.approximate_age ? `Age ${a.age || a.approximate_age}` : 'Age Unknown'} • {a.gender || 'Unknown'} • {a.blood_group || 'Blood ?'}
+                        </div>
+                      </td>
+                      <td className="p-4 text-shade-60 max-w-[200px] truncate">
+                        {r.found_location || 'Not recorded'}
+                      </td>
+                      <td className="p-4 text-shade-60 max-w-[180px] truncate">
+                        {a.identifying_clue || a.scars || '—'}
+                      </td>
+                      <td className="p-4">
+                        <Badge
+                          variant={
+                            c.status === 'VERIFIED_MATCH'
+                              ? 'verified'
+                              : c.status === 'POSSIBLE_MATCH'
+                              ? 'pending'
+                              : 'shade'
+                          }
+                          size="sm"
+                          icon={
+                            c.status === 'VERIFIED_MATCH' ? (
+                              <CheckCircle2 className="w-3 h-3" />
+                            ) : (
+                              <Clock className="w-3 h-3" />
+                            )
+                          }
+                        >
+                          {c.status}
+                        </Badge>
+                      </td>
+                      <td className="p-4 text-right">
+                        <Link
+                          to={`/cases/${c.id}`}
+                          className="text-ink hover:underline font-semibold inline-flex items-center gap-1"
+                        >
+                          View <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
