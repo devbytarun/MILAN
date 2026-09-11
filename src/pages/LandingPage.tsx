@@ -31,105 +31,76 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="bg-white text-slate-700 min-h-screen font-sans selection:bg-slate-900 selection:text-white">
-      {/* ── 00. COMPACT EMERGENCY NOTICE STRIP ── */}
-      <div className="border-b border-slate-200/80 bg-slate-50/70 px-6 sm:px-8 lg:px-12 py-2.5">
-        <div className="w-full max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-slate-600">
-            <span className="w-2 h-2 rounded-full bg-orange-600 shrink-0" />
-            <strong className="text-slate-900 font-semibold">
-              {t('notice_banner_title')}
-            </strong>
-            <span className="hidden md:inline text-slate-500">
-              {t('notice_banner_desc')}
+      {/* ── 01. HERO SECTION: CENTERED EDITORIAL NARRATIVE + OPERATIONAL RECONCILIATION DOSSIER ── */}
+      <section className="py-16 sm:py-20 lg:py-24 border-b border-slate-200/80">
+        <div className="w-full max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 text-center space-y-8">
+          {/* Plain Eyebrow Metadata */}
+          <div className="text-[11px] font-mono tracking-wider uppercase text-slate-400 font-semibold flex items-center justify-center gap-2">
+            <span>{t('hero_network_tag')}</span>
+            <span>•</span>
+            <span>{t('hero_simulated_tag')}</span>
+          </div>
+
+          {/* Editorial Headline */}
+          <h1 className="font-sans font-bold text-4xl sm:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-[1.1] max-w-4xl mx-auto">
+            {t('hero_title')}
+          </h1>
+
+          {/* Supporting Statement */}
+          <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
+            {t('hero_subtitle')}
+          </p>
+
+          {/* Strict Action Hierarchy: Primary solid, Secondary outline, Tertiary quiet */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+            {/* Primary CTA: Solid Near-Black Ink */}
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => handleLaunchRole('FAMILY', '/report/missing')}
+              rightIcon={<ArrowRight className="w-4 h-4" />}
+            >
+              {t('hero_cta_missing')}
+            </Button>
+
+            {/* Secondary CTA: Outline White Button */}
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={() => handleLaunchRole('NGO', '/report/found')}
+              leftIcon={<Building2 className="w-4 h-4" />}
+            >
+              {t('hero_cta_found')}
+            </Button>
+
+            {/* Tertiary CTA: Quiet Text Link */}
+            <Link
+              to="/cases"
+              className="px-4 py-3 text-sm font-semibold text-slate-700 hover:text-orange-600 transition-colors flex items-center gap-1.5"
+            >
+              <Search className="w-4 h-4 text-slate-400" />
+              {t('hero_cta_search')}
+            </Link>
+          </div>
+
+          {/* Operational Capabilities Footnote */}
+          <div className="pt-4 border-t border-slate-200/80 flex flex-wrap items-center justify-center gap-y-2 gap-x-5 text-xs text-slate-500 font-mono">
+            <span className="flex items-center gap-1.5 text-slate-600">
+              <CheckCircle2 className="w-3.5 h-3.5 text-orange-600" /> {t('hero_trust_offline')}
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1.5 text-slate-600">
+              <Lock className="w-3.5 h-3.5 text-slate-800" /> {t('hero_trust_privacy')}
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1.5 text-slate-600">
+              <ShieldCheck className="w-3.5 h-3.5 text-orange-600" /> {t('hero_trust_safeguard')}
             </span>
           </div>
-          <div className="flex items-center gap-3 font-mono text-[11px] text-slate-500">
-            <span>{t('notice_ndrf')}</span>
-            <span>•</span>
-            <span>{t('notice_police')}</span>
-            <span>•</span>
-            <span>{t('notice_ambulance')}</span>
-            <span>•</span>
-            <span>{t('notice_childline')}</span>
-          </div>
-        </div>
-      </div>
 
-      {/* ── 01. HERO SECTION: ASYMMETRIC EDITORIAL NARRATIVE + OPERATIONAL RECONCILIATION DOSSIER ── */}
-      <section className="py-16 sm:py-20 lg:py-24 border-b border-slate-200/80">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            {/* Left: Narrative & Structured Action Hierarchy */}
-            <div className="lg:col-span-7 space-y-6">
-              {/* Plain Eyebrow Metadata */}
-              <div className="text-[11px] font-mono tracking-wider uppercase text-slate-400 font-semibold flex items-center gap-2">
-                <span>{t('hero_network_tag')}</span>
-                <span>•</span>
-                <span>{t('hero_simulated_tag')}</span>
-              </div>
-
-              {/* Editorial Headline */}
-              <h1 className="font-sans font-bold text-4xl sm:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-[1.1]">
-                {t('hero_title')}
-              </h1>
-
-              {/* Supporting Statement */}
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl font-normal">
-                {t('hero_subtitle')}
-              </p>
-
-              {/* Strict Action Hierarchy: Primary solid, Secondary outline, Tertiary quiet */}
-              <div className="pt-2 flex flex-wrap items-center gap-3">
-                {/* Primary CTA: Solid Near-Black Ink */}
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={() => handleLaunchRole('FAMILY', '/report/missing')}
-                  rightIcon={<ArrowRight className="w-4 h-4" />}
-                >
-                  {t('hero_cta_missing')}
-                </Button>
-
-                {/* Secondary CTA: Outline White Button */}
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={() => handleLaunchRole('NGO', '/report/found')}
-                  leftIcon={<Building2 className="w-4 h-4" />}
-                >
-                  {t('hero_cta_found')}
-                </Button>
-
-                {/* Tertiary CTA: Quiet Text Link */}
-                <Link
-                  to="/cases"
-                  className="px-4 py-3 text-sm font-semibold text-slate-700 hover:text-orange-600 transition-colors flex items-center gap-1.5"
-                >
-                  <Search className="w-4 h-4 text-slate-400" />
-                  {t('hero_cta_search')}
-                </Link>
-              </div>
-
-              {/* Operational Capabilities Footnote */}
-              <div className="pt-4 border-t border-slate-200/80 flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-slate-500 font-mono">
-                <span className="flex items-center gap-1.5 text-slate-600">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-orange-600" /> {t('hero_trust_offline')}
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1.5 text-slate-600">
-                  <Lock className="w-3.5 h-3.5 text-slate-800" /> {t('hero_trust_privacy')}
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1.5 text-slate-600">
-                  <ShieldCheck className="w-3.5 h-3.5 text-orange-600" /> {t('hero_trust_safeguard')}
-                </span>
-              </div>
-            </div>
-
-            {/* Right: Public-Safe Conceptual Identity Reconciliation Visual */}
-            <div className="lg:col-span-5">
-              <LandingReconciliationVisual />
-            </div>
+          {/* Public-Safe Conceptual Identity Reconciliation Visual Centered */}
+          <div className="pt-6 max-w-3xl mx-auto text-left">
+            <LandingReconciliationVisual />
           </div>
         </div>
       </section>
