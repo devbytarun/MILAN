@@ -1,0 +1,231 @@
+import React, { useState } from 'react';
+import { parseDisasterVoiceTranscript, ParsedVoiceReport } from '../../lib/voice-parser.ts';
+import { Mic, MicOff, Radio, Sparkles, Check, X, Volume2 } from 'lucide-react';
+import { Button } from '../ui/Button.tsx';
+import { Badge } from '../ui/Badge.tsx';
+
+interface VoiceIntakeModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onApplyParsedData: (parsed: ParsedVoiceReport) => void;
+}
+
+const SAMPLE_TRANSCRIPTS = [
+  {
+    title: 'NDRF Radio Call (Child / Haldwani)',
+    text: 'Rescue Boat 3 to base: Found female child, around 4 years old, unconscious and cannot speak. Wearing pink floral top. Heart-shaped birthmark on right shoulder. Location Haldwani bypass relief post.',
+  },
+  {
+    title: 'Camp Radio Log (Adult Male / Hinglish)',
+    text: 'NDRF Camp 2 entry: Male subject, approx 28 saal, self reported name Bir Kumar. Blood group B+, blue denim jacket hai, right eyebrow pe cut mark/scar hai. Found near Bridge Colony.',
+  },
+];
+
+export const VoiceIntakeModal: React.FC<VoiceIntakeModalProps> = ({
+  isOpen,
+  onClose,
+  onApplyParsedData,
+}) => {
+  const [transcript, setTranscript] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [parsedResult, setParsedResult] = useState<ParsedVoiceReport | null>(null);
+
+  if (!isOpen) return null;
+
+  const handleParse = (textToParse?: string) => {
+    const text = textToParse !== undefined ? textToParse : transcript;
+    if (!text.trim()) return;
+    const result = parseDisasterVoiceTranscript(text);
+    setParsedResult(result);
+  };
+
+  const handleApplyPreset = (text: string) => {
+    setTranscript(text);
+    handleParse(text);
+  };
+
+  const handleToggleRecording = () => {
+    if (!isRecording) {
+      setIsRecording(true);
+      // Simulate speech recognition in outdoor field condition
+      setTimeout(() => {
+        const sample = SAMPLE_TRANSCRIPTS[0].text;
+        setTranscript(sample);
+        setIsRecording(false);
+        handleParse(sample);
+      }, 2500);
+    } else {
+      setIsRecording(false);
+    }
+  };
+
+  const handleApply = () => {
+    if (parsedResult) {
+      onApplyParsedData(parsedResult);
+      onClose();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-modal bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white border border-slate-200 rounded-xl max-w-2xl w-full flex flex-col shadow-elevation-4 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+        {/* Header */}
+        <div className="p-5 bg-slate-900 text-white flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-pill bg-blue-600 flex items-center justify-center text-white">
+              <Radio className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white leading-tight">
+                Disaster Radio & Voice Intake Parser
+              </h2>
+              <p className="text-xs text-slate-400">
+                Extract physical clues, clothing, and communication status from speech
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 text-slate-400 hover:text-white rounded-pill hover:bg-slate-800 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-6 space-y-5 overflow-y-auto max-h-[75vh]">
+          {/* Audio Visualizer & Mic Button */}
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleToggleRecording}
+                className={`w-12 h-12 rounded-pill flex items-center justify-center transition-all ${
+                  isRecording
+                    ? 'bg-rose-600 text-white animate-pulse ring-4 ring-rose-200'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
+                }`}
+                title={isRecording ? 'Click to stop' : 'Click to speak'}
+              >
+                {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </button>
+              <div>
+                <div className="text-xs font-bold text-slate-900">
+                  {isRecording ? 'Listening to field audio stream...' : 'Field Microphone / Voice Input'}
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  {isRecording ? 'Speak clearly into device microphone' : 'Tap to speak, paste radio transcripts, or test samples'}
+                </div>
+              </div>
+            </div>
+
+            {isRecording && (
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-4 bg-rose-500 rounded-full animate-bounce"></span>
+                <span className="w-1.5 h-6 bg-rose-500 rounded-full animate-bounce [animation-delay:0.1s]"></span>
+                <span className="w-1.5 h-8 bg-rose-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                <span className="w-1.5 h-5 bg-rose-500 rounded-full animate-bounce [animation-delay:0.3s]"></span>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Preset Radios */}
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
+              Quick Test Scenarios (Relief Radio Dispatches)
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {SAMPLE_TRANSCRIPTS.map((s, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => handleApplyPreset(s.text)}
+                  className="p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-blue-50/50 hover:border-blue-300 text-left transition text-xs space-y-1 group"
+                >
+                  <div className="font-bold text-slate-800 flex items-center gap-1 group-hover:text-blue-700">
+                    <Volume2 className="w-3.5 h-3.5" />
+                    <span>{s.title}</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                    {s.text}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Transcript Input */}
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-semibold text-slate-700 uppercase tracking-wider">
+              Radio Log or Speech Transcript
+            </label>
+            <textarea
+              rows={3}
+              value={transcript}
+              onChange={(e) => {
+                setTranscript(e.target.value);
+                handleParse(e.target.value);
+              }}
+              placeholder="e.g. Female child, age around 4, pink clothing, heart birthmark on right shoulder..."
+              className="w-full px-3.5 py-2.5 text-xs text-slate-900 border border-slate-300 rounded-md outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+            />
+          </div>
+
+          {/* Live Extraction Results */}
+          {parsedResult && (
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-blue-600" />
+                  <span className="text-xs font-bold text-slate-900">Extracted Attributes</span>
+                </div>
+                <Badge
+                  variant={parsedResult.confidence >= 70 ? 'verified' : 'pending'}
+                  size="sm"
+                >
+                  {parsedResult.confidence}% Parse Confidence
+                </Badge>
+              </div>
+
+              {parsedResult.extractedEntities.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {parsedResult.extractedEntities.map((ent, i) => (
+                    <div
+                      key={i}
+                      className="p-2 bg-white rounded border border-slate-200 text-xs space-y-0.5"
+                    >
+                      <div className="text-[10px] text-slate-400 font-semibold uppercase">
+                        {ent.field.replace(/_/g, ' ')}
+                      </div>
+                      <div className="font-bold text-slate-800 truncate">{String(ent.value)}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-xs text-slate-500 italic">
+                  No attributes recognized yet. Type or speak descriptive characteristics.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+          <Button variant="outline-light" size="sm" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            disabled={!parsedResult || parsedResult.extractedEntities.length === 0}
+            onClick={handleApply}
+            leftIcon={<Check className="w-4 h-4" />}
+          >
+            Populate Report Form
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
