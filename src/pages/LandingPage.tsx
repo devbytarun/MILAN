@@ -12,11 +12,12 @@ import {
   ShieldCheck,
   CheckCircle2,
   Lock,
-  FileText,
-  Clock,
-  UserCheck,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button.tsx';
+import { LandingReconciliationVisual } from '../components/landing/LandingReconciliationVisual.tsx';
+import { LandingSignalExtraction } from '../components/landing/LandingSignalExtraction.tsx';
+import { LandingPipeline } from '../components/landing/LandingPipeline.tsx';
+import { LandingHumanVerification } from '../components/landing/LandingHumanVerification.tsx';
 
 export const LandingPage: React.FC = () => {
   const { profile, switchDemoRole } = useAuth();
@@ -125,120 +126,9 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right: Real Operational Software Visual (Actual Candidate Reconciliation Dossier) */}
+            {/* Right: Public-Safe Conceptual Identity Reconciliation Visual */}
             <div className="lg:col-span-5">
-              <div className="border border-[#dddddd] rounded-xl bg-white shadow-elevation-1 overflow-hidden">
-                {/* Dossier Header */}
-                <div className="bg-[#f8fafc] border-b border-[#dddddd] px-4 py-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#006400]" />
-                    <span className="font-mono text-xs font-bold text-[#181d26] tracking-wider uppercase">
-                      {t('dossier_title')}
-                    </span>
-                  </div>
-                  <span className="font-mono text-[10px] text-[#9297a0]">{t('dossier_uid')}</span>
-                </div>
-
-                {/* Compared Records Overview */}
-                <div className="p-4 border-b border-[#dddddd] space-y-3">
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="p-2.5 bg-[#f8fafc] rounded-lg border border-[#dddddd] space-y-1">
-                      <span className="text-[10px] font-mono text-[#9297a0] uppercase block">
-                        {t('dossier_source_a')}
-                      </span>
-                      <strong className="text-sm text-[#181d26] block">Bir Kumar</strong>
-                      <span className="text-[11px] text-[#41454d] block">
-                        Age ~28 • Male • Dehradun Relative Desk (09:15)
-                      </span>
-                    </div>
-
-                    <div className="p-2.5 bg-[#f8fafc] rounded-lg border border-[#dddddd] space-y-1">
-                      <span className="text-[10px] font-mono text-[#9297a0] uppercase block">
-                        {t('dossier_source_b')}
-                      </span>
-                      <strong className="text-sm text-[#006400] block">Veer Kumar</strong>
-                      <span className="text-[11px] text-[#41454d] block">
-                        Age 27 • Male • Camp Zone 2 Boat Rescue (11:42)
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Confidence Bar */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-mono">
-                      <span className="text-[#41454d]">{t('dossier_confidence_label')}</span>
-                      <span className="font-bold text-[#006400]">{t('dossier_confidence_val')}</span>
-                    </div>
-                    <div className="w-full bg-[#f8fafc] border border-[#dddddd] h-2 rounded-full overflow-hidden">
-                      <div className="bg-[#006400] h-full rounded-full w-[84%]" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Evidence Comparison Matrix (Compact structured rows) */}
-                <div className="divide-y divide-[#dddddd] text-xs">
-                  <div className="px-4 py-2.5 flex items-center justify-between">
-                    <div>
-                      <span className="font-medium text-[#181d26]">{t('dossier_scars_label')}</span>{' '}
-                      <span className="text-[#41454d]">{t('dossier_scars_val')}</span>
-                    </div>
-                    <span className="font-mono text-[10px] text-[#006400] font-semibold bg-[#f0fdf4] border border-[#bbf7d0] px-1.5 py-0.5 rounded">
-                      {t('dossier_scars_badge')}
-                    </span>
-                  </div>
-
-                  <div className="px-4 py-2.5 flex items-center justify-between">
-                    <div>
-                      <span className="font-medium text-[#181d26]">{t('dossier_clothing_label')}</span>{' '}
-                      <span className="text-[#41454d]">{t('dossier_clothing_val')}</span>
-                    </div>
-                    <span className="font-mono text-[10px] text-[#006400] font-semibold bg-[#f0fdf4] border border-[#bbf7d0] px-1.5 py-0.5 rounded">
-                      {t('dossier_clothing_badge')}
-                    </span>
-                  </div>
-
-                  <div className="px-4 py-2.5 flex items-center justify-between">
-                    <div>
-                      <span className="font-medium text-[#181d26]">{t('dossier_age_label')}</span>{' '}
-                      <span className="text-[#41454d]">{t('dossier_age_val')}</span>
-                    </div>
-                    <span className="font-mono text-[10px] text-[#006400] font-semibold bg-[#f0fdf4] border border-[#bbf7d0] px-1.5 py-0.5 rounded">
-                      {t('dossier_age_badge')}
-                    </span>
-                  </div>
-
-                  <div className="px-4 py-2.5 flex items-center justify-between">
-                    <div>
-                      <span className="font-medium text-[#181d26]">{t('dossier_zone_label')}</span>{' '}
-                      <span className="text-[#41454d]">{t('dossier_zone_val')}</span>
-                    </div>
-                    <span className="font-mono text-[10px] text-[#006400] font-semibold bg-[#f0fdf4] border border-[#bbf7d0] px-1.5 py-0.5 rounded">
-                      {t('dossier_zone_badge')}
-                    </span>
-                  </div>
-
-                  <div className="px-4 py-2.5 flex items-center justify-between">
-                    <div>
-                      <span className="font-medium text-[#181d26]">{t('dossier_blood_label')}</span>{' '}
-                      <span className="text-[#9297a0]">{t('dossier_blood_val')}</span>
-                    </div>
-                    <span className="font-mono text-[10px] text-[#9297a0] font-semibold bg-[#f8fafc] border border-[#dddddd] px-1.5 py-0.5 rounded">
-                      {t('dossier_blood_badge')}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Human Reviewer Gate Notice */}
-                <div className="p-3 bg-[#f5e9d4] border-t border-[#e0d0b5] text-xs flex items-start gap-2 text-[#181d26]">
-                  <Clock className="w-4 h-4 text-[#d9a441] shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-semibold block">{t('dossier_signoff_title')}</span>
-                    <span className="text-[11px] text-[#41454d]">
-                      {t('dossier_signoff_desc')}
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <LandingReconciliationVisual />
             </div>
           </div>
         </div>
@@ -344,64 +234,8 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Transformation Split Comparison */}
-          <div className="border border-[#dddddd] rounded-xl bg-white overflow-hidden grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-[#dddddd]">
-            {/* Left: Raw Field Signals */}
-            <div className="lg:col-span-5 p-6 sm:p-8 space-y-4">
-              <div className="flex items-center justify-between text-xs font-mono text-[#9297a0]">
-                <span>{t('trans_raw_title')}</span>
-                <span>VHF CH-16 LOG</span>
-              </div>
-              <div className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg font-mono text-xs text-[#181d26] leading-relaxed space-y-2">
-                <p className="text-[#aa2d00] font-bold">// RECORDED AUDIO DISPATCH (04:12 PM)</p>
-                <p>
-                  "Sector 4 rescue boat dispatch: Found adult male survivor near Haldwani bypass, age approximately 28 years. Subject is disoriented, wearing blue denim jacket and dark trousers. Has visible laceration scar on left eyebrow. Cannot give home address."
-                </p>
-              </div>
-              <p className="text-xs text-[#41454d] leading-relaxed">
-                Natural language parser extracts physical descriptors without requiring field workers to type into complex database forms while operating in the rain.
-              </p>
-            </div>
-
-            {/* Right: Normalized Structured Attributes */}
-            <div className="lg:col-span-7 p-6 sm:p-8 space-y-4">
-              <div className="flex items-center justify-between text-xs font-mono text-[#9297a0]">
-                <span>{t('trans_table_title')}</span>
-                <span className="text-[#006400] font-bold">{t('trans_col_confidence')}</span>
-              </div>
-
-              <div className="border border-[#dddddd] rounded-lg overflow-hidden divide-y divide-[#dddddd] text-xs">
-                <div className="grid grid-cols-3 p-2.5 bg-[#f8fafc] font-mono text-[#9297a0]">
-                  <div>{t('trans_col_attr')}</div>
-                  <div className="col-span-2">{t('trans_col_extracted')}</div>
-                </div>
-                <div className="grid grid-cols-3 p-2.5">
-                  <div className="font-mono text-[#41454d]">{t('trans_attr_name')}</div>
-                  <div className="col-span-2 font-semibold text-[#181d26]">Male</div>
-                </div>
-                <div className="grid grid-cols-3 p-2.5">
-                  <div className="font-mono text-[#41454d]">{t('trans_attr_age')}</div>
-                  <div className="col-span-2 font-semibold text-[#181d26]">28 Years (Tolerance ±2 yrs)</div>
-                </div>
-                <div className="grid grid-cols-3 p-2.5">
-                  <div className="font-mono text-[#41454d]">{t('trans_attr_clothing')}</div>
-                  <div className="col-span-2 font-semibold text-[#181d26]">Blue denim jacket, dark trousers</div>
-                </div>
-                <div className="grid grid-cols-3 p-2.5">
-                  <div className="font-mono text-[#41454d]">{t('trans_attr_marks')}</div>
-                  <div className="col-span-2 font-semibold text-[#181d26]">Scar on left eyebrow</div>
-                </div>
-                <div className="grid grid-cols-3 p-2.5">
-                  <div className="font-mono text-[#41454d]">Location Found</div>
-                  <div className="col-span-2 font-semibold text-[#181d26]">Haldwani bypass, Sector 4</div>
-                </div>
-                <div className="grid grid-cols-3 p-2.5 bg-[#f5e9d4]">
-                  <div className="font-mono text-[#aa2d00] font-bold">{t('trans_attr_status')}</div>
-                  <div className="col-span-2 font-bold text-[#181d26]">CANNOT_COMMUNICATE (Disoriented)</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Cinematic Public-Safe Extraction Visual */}
+          <LandingSignalExtraction />
         </div>
       </section>
 
@@ -420,64 +254,16 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Continuous Flow with Connecting Line */}
-          <div className="relative border-t border-[#dddddd] pt-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
-              {/* Stage 1 */}
-              <div className="space-y-2">
-                <div className="font-mono text-xs font-bold text-[#aa2d00]">01 / INTAKE</div>
-                <h3 className="font-semibold text-sm text-[#181d26]">{t('pipeline_s1_title')}</h3>
-                <p className="text-xs text-[#41454d] leading-relaxed">
-                  {t('pipeline_s1_desc')}
-                </p>
-              </div>
-
-              {/* Stage 2 */}
-              <div className="space-y-2">
-                <div className="font-mono text-xs font-bold text-[#aa2d00]">02 / NORMALIZE</div>
-                <h3 className="font-semibold text-sm text-[#181d26]">{t('pipeline_s2_title')}</h3>
-                <p className="text-xs text-[#41454d] leading-relaxed">
-                  {t('pipeline_s2_desc')}
-                </p>
-              </div>
-
-              {/* Stage 3 */}
-              <div className="space-y-2">
-                <div className="font-mono text-xs font-bold text-[#aa2d00]">03 / MATCH</div>
-                <h3 className="font-semibold text-sm text-[#181d26]">{t('pipeline_s3_title')}</h3>
-                <p className="text-xs text-[#41454d] leading-relaxed">
-                  {t('pipeline_s3_desc')}
-                </p>
-              </div>
-
-              {/* Stage 4 */}
-              <div className="space-y-2">
-                <div className="font-mono text-xs font-bold text-[#aa2d00]">04 / COMPARE</div>
-                <h3 className="font-semibold text-sm text-[#181d26]">{t('pipeline_s4_title')}</h3>
-                <p className="text-xs text-[#41454d] leading-relaxed">
-                  {t('pipeline_s4_desc')}
-                </p>
-              </div>
-
-              {/* Stage 5 */}
-              <div className="space-y-2">
-                <div className="font-mono text-xs font-bold text-[#006400]">05 / VERIFY</div>
-                <h3 className="font-semibold text-sm text-[#181d26]">{t('pipeline_s5_title')}</h3>
-                <p className="text-xs text-[#41454d] leading-relaxed">
-                  {t('pipeline_s5_desc')}
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* 5-Step Continuous End-to-End Pipeline */}
+          <LandingPipeline />
         </div>
       </section>
 
       {/* ── 06. HUMAN VERIFICATION & CHILD ANTI-TRAFFICKING (Trust Differentiator) ── */}
       <section className="py-16 sm:py-20 lg:py-24 border-b border-[#dddddd] bg-[#f8fafc]">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
-            {/* Left: Authority Description */}
-            <div className="lg:col-span-5 space-y-4">
+        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-8 lg:px-12 space-y-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="max-w-3xl space-y-3">
               <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#aa2d00]">
                 {t('safeguards_tag')}
               </span>
@@ -487,69 +273,21 @@ export const LandingPage: React.FC = () => {
               <p className="text-sm sm:text-base text-[#41454d] leading-relaxed">
                 {t('safeguards_desc')}
               </p>
-              <div className="pt-2">
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={() => handleLaunchRole('REVIEWER', '/review')}
-                  rightIcon={<ArrowRight className="w-4 h-4" />}
-                >
-                  Open Coordinator Review Queue
-                </Button>
-              </div>
             </div>
-
-            {/* Right: Human Verification Protocol Visual */}
-            <div className="lg:col-span-7 space-y-4">
-              <div className="border border-[#dddddd] rounded-xl bg-white p-6 sm:p-8 space-y-6">
-                <div className="flex items-center justify-between border-b border-[#dddddd] pb-4">
-                  <div>
-                    <span className="text-xs font-mono text-[#9297a0] block uppercase">
-                      GOVERNANCE PROTOCOL
-                    </span>
-                    <strong className="text-base text-[#181d26]">
-                      Section 370 IPC Dual-Authorization Handover
-                    </strong>
-                  </div>
-                  <span className="font-mono text-xs text-[#006400] font-bold bg-[#f0fdf4] border border-[#bbf7d0] px-2.5 py-1 rounded">
-                    PROTECTION ACTIVE
-                  </span>
-                </div>
-
-                <div className="space-y-3 text-xs">
-                  <div className="flex items-start gap-3 p-3 bg-[#f8fafc] rounded-lg border border-[#dddddd]">
-                    <UserCheck className="w-4 h-4 text-[#006400] shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-[#181d26] block">{t('safeguards_r1_title')}</strong>
-                      <span className="text-[#41454d]">
-                        {t('safeguards_r1_desc')}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3 bg-[#f8fafc] rounded-lg border border-[#dddddd]">
-                    <ShieldCheck className="w-4 h-4 text-[#aa2d00] shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-[#181d26] block">{t('safeguards_r2_title')}</strong>
-                      <span className="text-[#41454d]">
-                        {t('safeguards_r2_desc')}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3 bg-[#f8fafc] rounded-lg border border-[#dddddd]">
-                    <FileText className="w-4 h-4 text-[#181d26] shrink-0 mt-0.5" />
-                    <div>
-                      <strong className="text-[#181d26] block">{t('safeguards_r3_title')}</strong>
-                      <span className="text-[#41454d]">
-                        {t('safeguards_r3_desc')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="shrink-0">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => handleLaunchRole('REVIEWER', '/review')}
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+              >
+                Open Coordinator Review Queue
+              </Button>
             </div>
           </div>
+
+          {/* 4-Stage Human-in-the-Loop Progression & Anti-Trafficking Safeguards */}
+          <LandingHumanVerification />
         </div>
       </section>
 

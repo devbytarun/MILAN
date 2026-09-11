@@ -7,8 +7,8 @@ export const Footer: React.FC = () => {
   const { t } = useI18n();
 
   return (
-    <footer className="mt-auto bg-white text-[#333840] border-t border-[#dddddd] py-16">
-      <div className="w-full px-4 sm:px-6 lg:px-10">
+    <footer className="mt-auto bg-white text-[#333840] border-t border-[#dddddd] py-16 w-full max-w-full overflow-x-hidden">
+      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
           {/* Brand & Mission */}
           <div className="space-y-3 md:col-span-1">
@@ -21,11 +21,11 @@ export const Footer: React.FC = () => {
               </span>
             </div>
             <p className="text-sm leading-relaxed text-[#41454d]">
-              National disaster reconciliation connecting family missing-person reports, field rescue camps, and hospital emergency triage through explainable attribute matching and mandatory human evidence verification.
+              {t('footer_tagline')}
             </p>
             <div className="flex items-center gap-2 text-xs pt-1 text-[#0a2e0e] font-medium">
               <ShieldCheck className="w-4 h-4 shrink-0 text-[#0a2e0e]" />
-              <span>Zero automated confirmations — 100% human signed.</span>
+              <span>{t('footer_disclaimer')}</span>
             </div>
           </div>
 
@@ -33,7 +33,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-3 md:col-span-1">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#181d26] flex items-center gap-1.5">
               <PhoneCall className="w-3.5 h-3.5 text-[#aa2d00]" />
-              National Emergency Desks
+              {t('footer_emergency_contacts')}
             </h4>
             <div className="space-y-1.5 text-xs">
               <div className="flex items-center justify-between p-2.5 rounded-md bg-[#f8fafc] border border-[#dddddd]">
@@ -58,7 +58,7 @@ export const Footer: React.FC = () => {
           {/* Operational Protocols */}
           <div className="space-y-3 md:col-span-1">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#181d26]">
-              Operational Nodes
+              {t('footer_quick_links')}
             </h4>
             <ul className="space-y-2 text-xs text-[#41454d]">
               <li>
@@ -100,7 +100,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Bar with Transparency Disclosure */}
         <div className="pt-8 border-t border-[#dddddd] flex flex-col sm:flex-row items-center justify-between text-xs text-[#41454d] gap-3">
           <div>
-            © {new Date().getFullYear()} MILAN National Disaster Coordination Platform. [SIMULATED DRILL / DEMO DATA IN SANDBOX MODE].
+            {t('footer_copyright')}
           </div>
           <div className="flex items-center gap-3">
             <span className="font-mono text-[11px] px-2 py-0.5 rounded-sm bg-[#f8fafc] text-[#181d26] border border-[#dddddd]">

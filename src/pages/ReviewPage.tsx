@@ -10,6 +10,9 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Badge } from '../components/ui/Badge.tsx';
+import { useAuth } from '../context/AuthContext.tsx';
+import { hasPermission } from '../lib/permissions.ts';
+import { AccessDenied } from './AccessDenied.tsx';
 
 interface CandidatePair {
   sourceCase: FullCaseData;
@@ -18,10 +21,20 @@ interface CandidatePair {
 }
 
 export const ReviewPage: React.FC = () => {
+  const { profile } = useAuth();
   const [pairs, setPairs] = useState<CandidatePair[]>([]);
   const [activeTab, setActiveTab] = useState<'PENDING' | 'VERIFIED'>('PENDING');
   const [selectedPair, setSelectedPair] = useState<CandidatePair | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+
+  if (!hasPermission(profile?.role, 'REVIEW_MATCH')) {
+    return (
+      <AccessDenied
+        moduleName="Candidate Review Queue"
+        reason="Only authorized verification officers and administrators can access the candidate review queue."
+      />
+    );
+  }
 
   // Load and score candidate pairs
   const loadAndScorePairs = () => {

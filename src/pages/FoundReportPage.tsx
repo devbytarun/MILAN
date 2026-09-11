@@ -7,12 +7,13 @@ import {
   CheckCircle2,
   AlertCircle,
   Shield,
-  Radio,
-  Sparkles,
 } from 'lucide-react';
 import { Badge } from '../components/ui/Badge.tsx';
 import { VoiceIntakeModal } from '../components/common/VoiceIntakeModal.tsx';
 import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
+import { useAuth } from '../context/AuthContext.tsx';
+import { hasPermission } from '../lib/permissions.ts';
+import { AccessDenied } from './AccessDenied.tsx';
 
 const FOUND_STEPS: FormStep[] = [
   { id: 'comm', title: 'Communication Status', subtitle: 'Determine if survivor can provide their own details' },
@@ -22,12 +23,22 @@ const FOUND_STEPS: FormStep[] = [
 ];
 
 export const FoundReportPage: React.FC = () => {
+  const { profile } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submittedUid, setSubmittedUid] = useState<string | null>(null);
   const [commStatus, setCommStatus] = useState<CommunicationStatus>('CANNOT_COMMUNICATE');
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [voiceParseNotification, setVoiceParseNotification] = useState<string | null>(null);
+
+  if (!hasPermission(profile?.role, 'CREATE_FOUND_REPORT')) {
+    return (
+      <AccessDenied
+        moduleName="Rescue Intake Registration"
+        reason="Field rescue registration is restricted to authorized NGO coordinators and Army rescue officers."
+      />
+    );
+  }
 
   const handleApplyVoice = (parsed: ParsedVoiceReport) => {
     const a = parsed.attributes;
@@ -192,31 +203,7 @@ export const FoundReportPage: React.FC = () => {
       badgeText="Rescue Camp Intake"
       badgeColor="blue"
     >
-      {/* Field Radio / Voice Transcript Intake Banner */}
-      <div className="mb-6 p-4 rounded-xl bg-emerald-50/80 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-            <Radio className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-              <span>NDRF / Army VHF Radio & Field Voice Parser</span>
-              <span className="px-1.5 py-0.5 rounded bg-emerald-200/70 text-emerald-900 text-[10px] font-mono font-semibold">RAPID INTAKE</span>
-            </div>
-            <div className="text-xs text-slate-600 mt-0.5">
-              Paste radio transcripts or speak live field observations to rapidly extract survivor attributes and shock statuses.
-            </div>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setVoiceModalOpen(true)}
-          className="shrink-0 px-3.5 py-2 rounded-lg bg-[#181d26] hover:bg-[#2c333f] active:bg-[#3F3F46] text-white text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>VHF Radio Parser</span>
-        </button>
-      </div>
+
 
       {voiceParseNotification && (
         <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between">

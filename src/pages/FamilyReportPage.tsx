@@ -10,6 +10,9 @@ import {
 } from 'lucide-react';
 import { VoiceIntakeModal } from '../components/common/VoiceIntakeModal.tsx';
 import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
+import { useAuth } from '../context/AuthContext.tsx';
+import { hasPermission } from '../lib/permissions.ts';
+import { AccessDenied } from './AccessDenied.tsx';
 
 const FAMILY_STEPS: FormStep[] = [
   { id: 'identity', title: 'Basic Identity', subtitle: 'Name, age, gender and blood group' },
@@ -21,11 +24,21 @@ const FAMILY_STEPS: FormStep[] = [
 ];
 
 export const FamilyReportPage: React.FC = () => {
+  const { profile } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submittedUid, setSubmittedUid] = useState<string | null>(null);
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [voiceParseNotification, setVoiceParseNotification] = useState<string | null>(null);
+
+  if (!hasPermission(profile?.role, 'CREATE_MISSING_REPORT')) {
+    return (
+      <AccessDenied
+        moduleName="Missing Person Report Portal"
+        reason="Missing person reports are filed by families and verified disaster case officers."
+      />
+    );
+  }
 
   const handleApplyVoice = (parsed: ParsedVoiceReport) => {
     const a = parsed.attributes;

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getLocalCases, FullCaseData } from '../services/caseService.ts';
+import { getCasesForUser, FullCaseData } from '../services/caseService.ts';
+import { useAuth } from '../context/AuthContext.tsx';
 import { useI18n } from '../context/I18nContext.tsx';
+import { hasPermission } from '../lib/permissions.ts';
 import {
   Search,
   Filter,
@@ -16,11 +18,21 @@ import { Badge } from '../components/ui/Badge.tsx';
 
 export const CasesPage: React.FC = () => {
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const { t } = useI18n();
-  const [cases] = useState<FullCaseData[]>(() => getLocalCases());
+  const [cases, setCases] = useState<FullCaseData[]>(() => getCasesForUser(profile));
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState<'ALL' | 'MISSING' | 'FOUND'>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'VERIFIED_MATCH' | 'POSSIBLE_MATCH' | 'SEARCHING'>('ALL');
+
+  useEffect(() => {
+    setCases(getCasesForUser(profile));
+  }, [profile]);
+
+  const canReportMissing = hasPermission(profile?.role, 'CREATE_MISSING_REPORT');
+  const canReportFound = hasPermission(profile?.role, 'CREATE_FOUND_REPORT');
+  const canReview = hasPermission(profile?.role, 'REVIEW_MATCH');
+  const isFamily = profile?.role === 'FAMILY';
 
   const filtered = cases.filter((item) => {
     const { case: c, attributes: a, report: r } = item;
@@ -59,22 +71,26 @@ export const CasesPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            variant="coral"
-            size="sm"
-            onClick={() => navigate('/report/missing')}
-            leftIcon={<FilePlus className="w-3.5 h-3.5" />}
-          >
-            File Missing
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => navigate('/report/found')}
-            leftIcon={<FilePlus className="w-3.5 h-3.5" />}
-          >
-            Register Rescued
-          </Button>
+          {canReportMissing && (
+            <Button
+              variant="coral"
+              size="sm"
+              onClick={() => navigate('/report/missing')}
+              leftIcon={<FilePlus className="w-3.5 h-3.5" />}
+            >
+              File Missing
+            </Button>
+          )}
+          {canReportFound && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => navigate('/report/found')}
+              leftIcon={<FilePlus className="w-3.5 h-3.5" />}
+            >
+              Register Rescued
+            </Button>
+          )}
         </div>
       </div>
 
@@ -218,12 +234,30 @@ export const CasesPage: React.FC = () => {
                         </Badge>
                       </td>
                       <td className="p-4 text-right">
-                        <Link
-                          to={`/cases/${c.id}`}
-                          className="text-[#181d26] hover:underline font-semibold inline-flex items-center gap-1"
-                        >
-                          {t('cases_view_details')} <ArrowRight className="w-3 h-3" />
-                        </Link>
+                        {(() => {
+                          const isOwnCase =
+                            (c.created_by && (c.created_by === profile?.id || c.created_by === profile?.auth_user_id)) ||
+                            (isFamily && (c.created_by === 'family-demo' || c.id === 'case-demo-1'));
+
+                          const actionLabel = isOwnCase
+                            ? 'My Case Status'
+                            : canReview
+                            ? t('cases_view_details')
+                            : 'View Record';
+
+                          const targetUrl = isOwnCase && isFamily
+                            ? `/cases/${c.id}/status`
+                            : `/cases/${c.id}`;
+
+                          return (
+                            <Link
+                              to={targetUrl}
+                              className="text-[#181d26] hover:underline font-semibold inline-flex items-center gap-1"
+                            >
+                              {actionLabel} <ArrowRight className="w-3 h-3" />
+                            </Link>
+                          );
+                        })()}
                       </td>
                     </tr>
                   );

@@ -8,9 +8,9 @@ export const AppLayout: React.FC = () => {
   const isHomepage = location.pathname === '/';
 
   return (
-    <div className="min-h-screen flex flex-col font-body antialiased bg-white text-[#333840]">
+    <div className="min-h-screen flex flex-col font-body antialiased bg-white text-[#333840] overflow-x-hidden w-full max-w-full">
       <Navbar />
-      <main className={`flex-1 w-full ${isHomepage ? '' : 'max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-8'}`}>
+      <main className={`flex-1 w-full max-w-full ${isHomepage ? '' : 'max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-8'}`}>
         <Outlet />
       </main>
       <Footer />
