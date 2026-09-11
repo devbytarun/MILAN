@@ -14,7 +14,7 @@ DELETE FROM media;
 DELETE FROM person_attributes;
 DELETE FROM reports;
 DELETE FROM cases;
-DELETE FROM profiles WHERE auth_user_id LIKE '00000000-%';
+DELETE FROM profiles WHERE auth_user_id::TEXT LIKE '00000000-%';
 
 -- ============================================================
 -- DEMO PROFILES
