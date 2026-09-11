@@ -13,6 +13,7 @@ import {
   ChevronUp,
   Clipboard,
   Wand2,
+  Volume2,
 } from 'lucide-react';
 import { parseDisasterVoiceTranscript } from '../../lib/voice-parser.ts';
 import type { ParsedVoiceReport } from '../../lib/voice-parser.ts';
@@ -41,17 +42,54 @@ interface VoiceInputPanelProps {
   onParseComplete: (result: ParsedVoiceReport) => void;
 }
 
+/**
+ * Clean and deduplicate words and phrases caused by speech recognition engine loopbacks.
+ * Example: "my my name is my name is Veer" -> "My name is Veer."
+ */
+function cleanSpeechStatement(rawText: string): string {
+  if (!rawText) return '';
+  let cleaned = rawText.replace(/\s+/g, ' ').trim();
+
+  // 1. Remove consecutive identical duplicate words: "my my" -> "my", "is is" -> "is"
+  cleaned = cleaned.replace(/\b([a-zA-Z0-9_\u0900-\u097F]+)(\s+\1\b)+/gi, '$1');
+
+  // 2. Remove immediate repeated 2-word phrases: "name is name is" -> "name is"
+  cleaned = cleaned.replace(/\b([a-zA-Z0-9_\u0900-\u097F]+\s+[a-zA-Z0-9_\u0900-\u097F]+)(\s+\1\b)+/gi, '$1');
+
+  // 3. Remove immediate repeated 3-word phrases: "my name is my name is" -> "my name is"
+  cleaned = cleaned.replace(/\b([a-zA-Z0-9_\u0900-\u097F]+\s+[a-zA-Z0-9_\u0900-\u097F]+\s+[a-zA-Z0-9_\u0900-\u097F]+)(\s+\1\b)+/gi, '$1');
+
+  // 4. Capitalize first letter
+  if (cleaned.length > 0) {
+    cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  }
+
+  // 5. Add period if ends like a statement and doesn't already have punctuation
+  if (cleaned.length > 3 && !/[.?!,;]$/.test(cleaned)) {
+    cleaned += '.';
+  }
+
+  return cleaned;
+}
+
 export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplete }) => {
   const [transcript, setTranscript] = useState('');
   const [isListening, setIsListening] = useState(false);
+  const [listeningState, setListeningState] = useState<'idle' | 'listening' | 'recognizing' | 'committed'>('idle');
+  const [liveInterim, setLiveInterim] = useState('');
+  const [lastCommittedPhrase, setLastCommittedPhrase] = useState('');
   const [isParsing, setIsParsing] = useState(false);
   const [showSamples, setShowSamples] = useState(false);
   const [parseResult, setParseResult] = useState<ParsedVoiceReport | null>(null);
   const [micSupported, setMicSupported] = useState(true);
   const [pulseIntensity, setPulseIntensity] = useState(0);
+
   const recognitionRef = useRef<any>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const animFrameRef = useRef<number | null>(null);
+  const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const uncommittedBufferRef = useRef<string>('');
+  const lastCommittedTextRef = useRef<string>('');
 
   // Check for Web Speech API support
   useEffect(() => {
@@ -66,7 +104,7 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
     if (isListening) {
       let phase = 0;
       const animate = () => {
-        phase += 0.05;
+        phase += 0.06;
         setPulseIntensity(Math.abs(Math.sin(phase)) * 100);
         animFrameRef.current = requestAnimationFrame(animate);
       };
@@ -80,76 +118,167 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
     };
   }, [isListening]);
 
+  // Commit speech buffer cleanly to the main transcript
+  const commitSpeechBuffer = useCallback((rawPhrase: string) => {
+    const cleanPhrase = cleanSpeechStatement(rawPhrase);
+    if (!cleanPhrase || cleanPhrase === lastCommittedTextRef.current) {
+      setLiveInterim('');
+      uncommittedBufferRef.current = '';
+      return;
+    }
+
+    setListeningState('recognizing');
+
+    setTimeout(() => {
+      setTranscript((prev) => {
+        const trimmed = prev.trim();
+        if (!trimmed) {
+          return cleanPhrase;
+        }
+        // Don't append if already contains this exact phrase at the end
+        if (trimmed.endsWith(cleanPhrase)) {
+          return trimmed;
+        }
+        return `${trimmed} ${cleanPhrase}`;
+      });
+
+      lastCommittedTextRef.current = cleanPhrase;
+      setLastCommittedPhrase(cleanPhrase);
+      setLiveInterim('');
+      uncommittedBufferRef.current = '';
+      setListeningState('committed');
+
+      // Return to listening status after brief indicator
+      setTimeout(() => {
+        setListeningState((current) => (current === 'committed' ? 'listening' : current));
+      }, 700);
+    }, 150);
+  }, []);
+
   const startListening = useCallback(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) return;
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+    }
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'en-IN';
+    recognition.maxAlternatives = 1;
+
+    uncommittedBufferRef.current = '';
+    setLiveInterim('');
+    setListeningState('listening');
 
     recognition.onresult = (event: any) => {
-      let finalTranscript = '';
-      let interimTranscript = '';
+      let currentResultText = '';
+      let isFinalResult = false;
 
+      // Extract only the latest segment from the event results to prevent historical accumulation
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
+        currentResultText += result[0].transcript;
         if (result.isFinal) {
-          finalTranscript += result[0].transcript;
-        } else {
-          interimTranscript += result[0].transcript;
+          isFinalResult = true;
         }
       }
 
-      setTranscript((prev) => {
-        const base = prev ? prev + ' ' : '';
-        return (base + finalTranscript).trim() + (interimTranscript ? ' ' + interimTranscript : '');
-      });
+      currentResultText = currentResultText.trim();
+      if (!currentResultText) return;
+
+      uncommittedBufferRef.current = currentResultText;
+      setLiveInterim(currentResultText);
+      setListeningState('listening');
+
+      // Clear any pending pause debounce timer
+      if (pauseTimerRef.current) {
+        clearTimeout(pauseTimerRef.current);
+      }
+
+      // If marked as final by engine, commit promptly
+      if (isFinalResult) {
+        commitSpeechBuffer(currentResultText);
+        return;
+      }
+
+      // Google-mic style pause detection:
+      // Wait 800ms of silence after speaking before locking in the individual statement
+      pauseTimerRef.current = setTimeout(() => {
+        if (uncommittedBufferRef.current) {
+          commitSpeechBuffer(uncommittedBufferRef.current);
+        }
+      }, 800);
     };
 
     recognition.onerror = (event: any) => {
-      console.warn('Speech recognition error:', event.error);
-      setIsListening(false);
+      // Ignore normal abort / no-speech silence
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
+        console.warn('Speech recognition warning:', event.error);
+      }
+      if (event.error === 'not-allowed') {
+        setIsListening(false);
+        setListeningState('idle');
+      }
     };
 
     recognition.onend = () => {
+      // Flush any remaining buffered speech when stopped
+      if (uncommittedBufferRef.current) {
+        commitSpeechBuffer(uncommittedBufferRef.current);
+      }
       setIsListening(false);
+      setListeningState('idle');
     };
 
     recognitionRef.current = recognition;
-    recognition.start();
-    setIsListening(true);
-  }, []);
+    try {
+      recognition.start();
+      setIsListening(true);
+    } catch (err) {
+      console.warn('Failed to start speech recognition:', err);
+    }
+  }, [commitSpeechBuffer]);
 
   const stopListening = useCallback(() => {
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+    }
+    if (uncommittedBufferRef.current) {
+      commitSpeechBuffer(uncommittedBufferRef.current);
+    }
     if (recognitionRef.current) {
-      recognitionRef.current.stop();
+      try {
+        recognitionRef.current.stop();
+      } catch {}
       recognitionRef.current = null;
     }
     setIsListening(false);
-  }, []);
+    setListeningState('idle');
+    setLiveInterim('');
+  }, [commitSpeechBuffer]);
 
   const handleParse = useCallback(() => {
     if (!transcript.trim()) return;
     setIsParsing(true);
 
-    // Simulate a small processing delay for UX smoothness
     setTimeout(() => {
       const result = parseDisasterVoiceTranscript(transcript);
       setParseResult(result);
       setIsParsing(false);
       onParseComplete(result);
-    }, 800);
+    }, 600);
   }, [transcript, onParseComplete]);
 
   const handlePaste = useCallback(async () => {
     try {
       const text = await navigator.clipboard.readText();
       setTranscript((prev) => (prev ? prev + ' ' + text : text));
-    } catch {
-      // Clipboard API not available
-    }
+    } catch {}
   }, []);
 
   const loadSample = useCallback((text: string) => {
@@ -185,72 +314,115 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
   const ConfIcon = confidenceTier
     ? confidenceTier === 'HIGH'
       ? CheckCircle2
-      : confidenceTier === 'MEDIUM'
-      ? AlertTriangle
-      : XCircle
+    : confidenceTier === 'MEDIUM'
+    ? AlertTriangle
+    : XCircle
     : null;
 
   return (
     <div className="space-y-6">
-      {/* Microphone Section */}
+      {/* Microphone Section with Google-Style Visual Listener */}
       <div className="relative">
-        <div className="flex items-center justify-center mb-6">
+        <div className="flex flex-col items-center justify-center mb-4">
           <button
             onClick={isListening ? stopListening : startListening}
             disabled={!micSupported}
-            className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
+            className={`relative w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl ${
               isListening
-                ? 'bg-rose-600 shadow-lg shadow-rose-500/40 scale-110'
+                ? 'bg-gradient-to-tr from-rose-600 to-red-500 shadow-rose-500/50 scale-110'
                 : micSupported
-                ? 'bg-slate-800 hover:bg-slate-700 shadow-md hover:shadow-lg hover:shadow-blue-500/10 hover:scale-105'
+                ? 'bg-slate-800 hover:bg-slate-700 shadow-blue-500/10 hover:shadow-cyan-500/20 hover:scale-105 border border-slate-700'
                 : 'bg-slate-800/50 cursor-not-allowed opacity-50'
             }`}
-            title={isListening ? 'Stop Recording' : micSupported ? 'Start Recording' : 'Microphone not supported'}
+            title={isListening ? 'Tap to Stop Listening' : micSupported ? 'Tap to Start Speaking' : 'Microphone not supported'}
           >
-            {/* Pulse rings */}
+            {/* Pulsing Ripple Wave for Active Speech */}
             {isListening && (
               <>
                 <span
-                  className="absolute inset-0 rounded-full bg-rose-500/20 animate-ping"
-                  style={{ animationDuration: '1.5s' }}
+                  className="absolute inset-0 rounded-full bg-rose-500/30 animate-ping"
+                  style={{ animationDuration: '1.4s' }}
                 />
                 <span
-                  className="absolute rounded-full bg-rose-500/10"
+                  className="absolute rounded-full bg-rose-500/15"
                   style={{
-                    inset: `-${pulseIntensity * 0.15}px`,
-                    transition: 'inset 100ms ease',
+                    inset: `-${pulseIntensity * 0.18}px`,
+                    transition: 'inset 80ms ease-out',
                   }}
                 />
               </>
             )}
             {isListening ? (
-              <MicOff className="w-10 h-10 text-white relative z-10" />
+              <MicOff className="w-10 h-10 text-white relative z-10 animate-pulse" />
             ) : (
-              <Mic className="w-10 h-10 text-slate-300 relative z-10" />
+              <Mic className="w-10 h-10 text-cyan-400 relative z-10" />
             )}
           </button>
-        </div>
 
-        <div className="text-center mb-4">
-          {isListening ? (
-            <p className="text-sm text-rose-400 font-semibold animate-pulse flex items-center justify-center gap-2">
-              <span className="w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
-              Recording — Speak the field report clearly
-            </p>
-          ) : !micSupported ? (
-            <p className="text-xs text-slate-500">
-              Browser microphone not supported. Use text input or paste a transcript below.
-            </p>
-          ) : (
-            <p className="text-xs text-slate-400">
-              Tap the microphone to dictate a field report, or type/paste a transcript below.
-            </p>
-          )}
+          {/* Real-Time Google-Mic Status Indicator */}
+          <div className="mt-4 text-center">
+            {isListening ? (
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+                  {listeningState === 'recognizing'
+                    ? 'Processing Speech Statement...'
+                    : listeningState === 'committed'
+                    ? 'Statement Recognized!'
+                    : 'Listening... Speak naturally, then pause'}
+                </div>
+
+                {/* Live Real-Time Speech Chip (Google Mic Floating Text Preview) */}
+                {liveInterim && (
+                  <div className="max-w-md mx-auto px-4 py-2 bg-slate-900/90 border border-cyan-500/40 rounded-xl shadow-lg backdrop-blur-sm animate-fade-in">
+                    <div className="flex items-center gap-2 text-cyan-300 text-xs">
+                      <Volume2 className="w-3.5 h-3.5 animate-pulse shrink-0 text-cyan-400" />
+                      <span className="font-mono text-[11px] text-slate-400 shrink-0">Hearing:</span>
+                      <span className="font-medium truncate italic text-white">"{liveInterim}"</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Just Committed Confirmation */}
+                {listeningState === 'committed' && lastCommittedPhrase && (
+                  <div className="max-w-md mx-auto px-3 py-1.5 bg-emerald-950/60 border border-emerald-500/40 rounded-lg text-emerald-300 text-[11px] font-medium flex items-center justify-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Added: "{lastCommittedPhrase}"</span>
+                  </div>
+                )}
+              </div>
+            ) : !micSupported ? (
+              <p className="text-xs text-slate-500">
+                Browser microphone not supported. Use text input or paste a transcript below.
+              </p>
+            ) : (
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-slate-300">
+                  Tap microphone to dictate in English or Hindi / Hinglish.
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  Speaks $\rightarrow$ Pauses a few milliseconds $\rightarrow$ Automatically locks in clear individual statements without repeats.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Text Input Area */}
       <div className="relative">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <FileText className="w-3.5 h-3.5 text-blue-400" />
+            Field Transcript Buffer
+          </label>
+          {transcript && (
+            <span className="text-[10px] text-slate-500 font-mono">
+              {transcript.trim().split(/\s+/).filter(Boolean).length} words
+            </span>
+          )}
+        </div>
+
         <textarea
           ref={textareaRef}
           value={transcript}
@@ -258,26 +430,26 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
             setTranscript(e.target.value);
             setParseResult(null);
           }}
-          placeholder="Paste or type a radio transcript, field report, or voice memo here...&#10;&#10;Example: &quot;NDRF Battalion 4 reporting. Rescued a young male child, approximately 9 years old, from rooftop near Sector 4. Wearing red polo shirt, slim build, black hair...&quot;"
+          placeholder="Clean field transcript will automatically appear here as you speak...&#10;&#10;Or paste radio notes, e.g.:&#10;&quot;NDRF team reporting. Rescued Veer Kumar, male, approximately 28 years old, near bridge collapse. Wearing blue denim jacket. Has scar on left eyebrow. Blood group B+...&quot;"
           rows={6}
-          className="w-full px-4 py-3 text-sm bg-slate-800 border border-slate-700 rounded-xl text-slate-200 placeholder-slate-500 outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 resize-none transition font-mono"
+          className="w-full px-4 py-3 text-sm bg-slate-900 border border-slate-700/80 rounded-xl text-slate-100 placeholder-slate-500 outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 resize-none transition font-sans leading-relaxed"
         />
 
         {/* Action buttons below textarea */}
-        <div className="flex items-center justify-between mt-3">
+        <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <button
               onClick={handlePaste}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-600 rounded-lg transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:border-slate-600 rounded-lg transition"
             >
-              <Clipboard className="w-3.5 h-3.5" /> Paste
+              <Clipboard className="w-3.5 h-3.5 text-slate-400" /> Paste
             </button>
 
             <button
               onClick={() => setShowSamples(!showSamples)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-600 rounded-lg transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:border-slate-600 rounded-lg transition"
             >
-              <Radio className="w-3.5 h-3.5" /> Demo Transcripts
+              <Radio className="w-3.5 h-3.5 text-cyan-400" /> Demo Transcripts
               {showSamples ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
           </div>
@@ -288,8 +460,9 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
                 onClick={() => {
                   setTranscript('');
                   setParseResult(null);
+                  lastCommittedTextRef.current = '';
                 }}
-                className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-300 transition"
+                className="px-3 py-1.5 text-xs text-slate-500 hover:text-rose-400 transition"
               >
                 Clear
               </button>
@@ -299,17 +472,17 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
               disabled={!transcript.trim() || isParsing}
               className={`flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-xl transition shadow-sm ${
                 transcript.trim() && !isParsing
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-500/20'
-                  : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white shadow-blue-500/20'
+                  : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed'
               }`}
             >
               {isParsing ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Parsing...
+                  <Loader2 className="w-4 h-4 animate-spin text-white" /> Parsing Entities...
                 </>
               ) : (
                 <>
-                  <Wand2 className="w-4 h-4" /> Extract Fields
+                  <Wand2 className="w-4 h-4 text-cyan-200" /> Extract Disaster Fields
                 </>
               )}
             </button>
@@ -319,76 +492,114 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
 
       {/* Sample Transcripts Dropdown */}
       {showSamples && (
-        <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-3 space-y-2 backdrop-blur-sm">
-          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            Load a Demo Transcript
+        <div className="bg-slate-900 rounded-2xl border border-slate-700 p-4 space-y-3">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <Radio className="w-3.5 h-3.5 text-blue-400" /> Pre-Configured Emergency Radio Transcripts
           </div>
-          {SAMPLE_TRANSCRIPTS.map((sample, idx) => (
-            <button
-              key={idx}
-              onClick={() => loadSample(sample.text)}
-              className="w-full text-left p-3 bg-slate-900/60 hover:bg-slate-700/60 border border-slate-700 hover:border-blue-500/30 rounded-lg transition group"
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <Radio className="w-3.5 h-3.5 text-blue-400 group-hover:text-blue-300" />
-                <span className="text-xs font-semibold text-slate-200 group-hover:text-white">
-                  {sample.label}
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
-                {sample.text.slice(0, 150)}...
-              </p>
-            </button>
-          ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {SAMPLE_TRANSCRIPTS.map((s, idx) => (
+              <button
+                key={idx}
+                onClick={() => loadSample(s.text)}
+                className="text-left p-3 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 hover:border-cyan-500/40 transition group"
+              >
+                <div className="text-xs font-semibold text-slate-200 group-hover:text-cyan-300 transition">
+                  {s.label}
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">{s.text}</p>
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Parse Result Preview */}
+      {/* Parse Results Preview Card */}
       {parseResult && (
-        <div className={`border rounded-xl p-5 space-y-4 transition-all duration-500 ${confidenceBg}`}>
-          {/* Confidence Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {ConfIcon && <ConfIcon className={`w-6 h-6 ${confidenceColor}`} />}
-              <div>
-                <div className={`text-lg font-bold ${confidenceColor}`}>
-                  {parseResult.confidence}% Extraction Confidence
-                </div>
-                <div className="text-[11px] text-slate-400">
-                  {confidenceTier} CONFIDENCE — {parseResult.extractedEntities.length} entities extracted
-                </div>
-              </div>
+        <div className="bg-slate-900 rounded-2xl border border-slate-700 p-5 space-y-4 animate-fade-in">
+          <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-slate-800">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-cyan-400" />
+              <h3 className="font-bold text-slate-200 text-sm">NLP Extracted Entities</h3>
+              <span className="text-[10px] text-slate-400 font-mono">({parseResult.extractedEntities.length} fields)</span>
             </div>
-            <Sparkles className={`w-5 h-5 ${confidenceColor} opacity-60`} />
-          </div>
 
-          {/* Extracted Entities Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {parseResult.extractedEntities.map((entity, idx) => (
+            {confidenceTier && (
               <div
-                key={idx}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-900/40 rounded-lg border border-slate-700/50"
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${confidenceBg} ${confidenceColor}`}
               >
-                <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
-                <div className="truncate">
-                  <span className="text-[10px] text-slate-500 uppercase">{entity.field}: </span>
-                  <span className="text-[11px] text-slate-300">{String(entity.value)}</span>
-                </div>
+                {ConfIcon && <ConfIcon className="w-3.5 h-3.5" />}
+                <span>{parseResult.confidence}% {confidenceTier} CONFIDENCE</span>
               </div>
-            ))}
+            )}
           </div>
 
-          {/* Extracted Data Preview */}
-          <details className="group">
-            <summary className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-slate-200 cursor-pointer transition">
-              <FileText className="w-3.5 h-3.5" />
-              View Extracted Data Object
-              <ChevronDown className="w-3 h-3 group-open:rotate-180 transition-transform" />
-            </summary>
-            <pre className="mt-2 p-3 bg-slate-900/60 rounded-lg text-[11px] text-slate-400 overflow-auto max-h-64 font-mono border border-slate-700/40">
-              {JSON.stringify(parseResult.attributes, null, 2)}
-            </pre>
-          </details>
+          {/* Extracted Fields Badges */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {parseResult.attributes.p_full_name && (
+              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
+                <span className="text-[10px] text-slate-400 block">Name</span>
+                <span className="text-xs font-bold text-slate-200 truncate block">
+                  {parseResult.attributes.p_full_name}
+                </span>
+              </div>
+            )}
+            {parseResult.attributes.p_gender && (
+              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
+                <span className="text-[10px] text-slate-400 block">Gender</span>
+                <span className="text-xs font-bold text-slate-200">{parseResult.attributes.p_gender}</span>
+              </div>
+            )}
+            {parseResult.attributes.p_approximate_age && (
+              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
+                <span className="text-[10px] text-slate-400 block">Approx Age</span>
+                <span className="text-xs font-bold text-slate-200">{parseResult.attributes.p_approximate_age} yrs</span>
+              </div>
+            )}
+            {parseResult.attributes.p_blood_group && (
+              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
+                <span className="text-[10px] text-slate-400 block">Blood Group</span>
+                <span className="text-xs font-bold text-rose-400">{parseResult.attributes.p_blood_group}</span>
+              </div>
+            )}
+            {parseResult.attributes.p_comm_status && (
+              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
+                <span className="text-[10px] text-slate-400 block">Communication</span>
+                <span className="text-xs font-bold text-slate-200">{parseResult.attributes.p_comm_status}</span>
+              </div>
+            )}
+            {parseResult.attributes.p_clothing && (
+              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
+                <span className="text-[10px] text-slate-400 block">Clothing</span>
+                <span className="text-xs font-bold text-slate-200 truncate block">
+                  {parseResult.attributes.p_clothing}
+                </span>
+              </div>
+            )}
+            {(parseResult.attributes.p_scars || parseResult.attributes.p_birthmarks) && (
+              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
+                <span className="text-[10px] text-slate-400 block">Marks & Scars</span>
+                <span className="text-xs font-bold text-amber-300 truncate block">
+                  {parseResult.attributes.p_scars || parseResult.attributes.p_birthmarks}
+                </span>
+              </div>
+            )}
+            {parseResult.attributes.p_found_location && (
+              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
+                <span className="text-[10px] text-slate-400 block">Found Location</span>
+                <span className="text-xs font-bold text-slate-200 truncate block">
+                  {parseResult.attributes.p_found_location}
+                </span>
+              </div>
+            )}
+            {(parseResult.attributes.p_condition_status || parseResult.attributes.p_report_notes) && (
+              <div className="p-2.5 bg-slate-800/80 rounded-xl border border-slate-700/60">
+                <span className="text-[10px] text-slate-400 block">Condition / Notes</span>
+                <span className="text-xs font-bold text-cyan-300 truncate block">
+                  {parseResult.attributes.p_condition_status || parseResult.attributes.p_report_notes}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
