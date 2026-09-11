@@ -714,15 +714,190 @@ export const DashboardPage: React.FC = () => {
   }
 
   // -------------------------------------------------------------------------
-  // 5. ADMIN & VOLUNTEER (DEFAULT SYSTEM OVERVIEW)
+  // 5. VOLUNTEER DASHBOARD VIEW (COMMUNITY CITIZEN RESPONSE)
+  // -------------------------------------------------------------------------
+  if (role === 'VOLUNTEER') {
+    return (
+      <div className="space-y-8 pb-12">
+        {/* Header Banner */}
+        <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2.5">
+              <Badge variant="shade" size="sm">
+                {roleLabels.VOLUNTEER}
+              </Badge>
+              <Badge variant="cream" size="sm" icon={<Users className="w-3 h-3 text-[#181d26]" />}>
+                Field Volunteer Support
+              </Badge>
+            </div>
+            <h1 className="font-display text-2xl sm:text-3xl font-normal text-[#181d26]">
+              Welcome, {profile?.full_name || 'Rahul Verma'}
+            </h1>
+            <p className="text-xs sm:text-sm text-[#41454d]">
+              {profile?.organization_name || 'Civil Defense Volunteers'} • Community Disaster Relief & Victim Support
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => navigate('/cases')}
+              leftIcon={<Search className="w-4 h-4" />}
+              className="w-full md:w-auto whitespace-nowrap"
+            >
+              Browse Public Directory
+            </Button>
+          </div>
+        </div>
+
+        {/* Volunteer Metrics */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1">
+            <div className="text-[10px] font-semibold text-[#9297a0] uppercase tracking-wider">Public Missing Reports</div>
+            <div className="font-display text-3xl font-normal text-[#181d26] mt-2">128</div>
+            <div className="text-xs text-[#41454d] mt-1">Reports to cross-reference</div>
+          </div>
+
+          <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1">
+            <div className="text-[10px] font-semibold text-[#9297a0] uppercase tracking-wider">Shelter Arrivals</div>
+            <div className="font-display text-3xl font-normal text-[#181d26] mt-2">94</div>
+            <div className="text-xs text-[#41454d] mt-1">Accommodated in relief camps</div>
+          </div>
+
+          <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1">
+            <div className="text-[10px] font-semibold text-[#9297a0] uppercase tracking-wider">Active Relief Zones</div>
+            <div className="font-display text-3xl font-normal text-[#006400] mt-2">6</div>
+            <div className="text-xs text-[#41454d] mt-1">Camp coordination centers</div>
+          </div>
+
+          <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1">
+            <div className="text-[10px] font-semibold text-[#9297a0] uppercase tracking-wider">Verified Reunions</div>
+            <div className="font-display text-3xl font-normal text-[#006400] mt-2">32</div>
+            <div className="text-xs text-[#41454d] mt-1">Reunited by search teams</div>
+          </div>
+        </div>
+
+        {/* Volunteer Field Action & Guidance Modules */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1 flex flex-col justify-between space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 font-semibold text-sm text-[#181d26]">
+                <Search className="w-4 h-4 text-[#181d26]" />
+                Public Case Directory
+              </div>
+              <p className="text-xs text-[#41454d] leading-relaxed">
+                Look up registered missing persons by name, physical marks, or last-known district while assisting in shelters and relief distribution.
+              </p>
+            </div>
+            <Link to="/cases" className="text-xs font-semibold text-[#181d26] hover:underline flex items-center gap-1 pt-2">
+              Search Cases <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1 flex flex-col justify-between space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 font-semibold text-sm text-[#181d26]">
+                <Heart className="w-4 h-4 text-[#aa2d00]" />
+                Family Guidance Protocol
+              </div>
+              <p className="text-xs text-[#41454d] leading-relaxed">
+                When encountering searching relatives, guide them to register official reports via the Family Support Portal or at the nearest camp help desk.
+              </p>
+            </div>
+            <div className="text-[11px] text-[#9297a0] pt-2 border-t border-[#f1f3f5]">
+              Family Desk: NDRF Zone 2 Central Command
+            </div>
+          </div>
+
+          <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1 flex flex-col justify-between space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 font-semibold text-sm text-[#181d26]">
+                <Building2 className="w-4 h-4 text-[#181d26]" />
+                Camp Assistance & Triage
+              </div>
+              <p className="text-xs text-[#41454d] leading-relaxed">
+                Support camp officers with survivor needs. Immediately escalate unaccompanied minors or injured persons to authorized medical and child protection officers.
+              </p>
+            </div>
+            <div className="text-[11px] text-[#9297a0] pt-2 border-t border-[#f1f3f5]">
+              Escalation: Contact On-Site Camp Medical Unit
+            </div>
+          </div>
+        </div>
+
+        {/* Volunteer Code of Conduct & Safeguards */}
+        <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-4">
+          <div className="flex items-center gap-2 font-semibold text-[#181d26] text-base">
+            <ShieldCheck className="w-5 h-5 text-[#006400]" />
+            Volunteer Field Protocol & Ethical Safeguards
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg space-y-1.5">
+              <strong className="text-[#181d26] block font-semibold">1. Minor Protection</strong>
+              <p className="text-[#41454d] leading-relaxed">
+                Never separate an unaccompanied minor from shelter coordinators. All child reunions must follow official dual-officer magistrate sign-off.
+              </p>
+            </div>
+            <div className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg space-y-1.5">
+              <strong className="text-[#181d26] block font-semibold">2. Victim Dignity & Privacy</strong>
+              <p className="text-[#41454d] leading-relaxed">
+                Strictly do not photograph distressed survivors, injured persons, or post unverified case files to personal social media accounts.
+              </p>
+            </div>
+            <div className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg space-y-1.5">
+              <strong className="text-[#181d26] block font-semibold">3. Verified Escalation</strong>
+              <p className="text-[#41454d] leading-relaxed">
+                If you recognize someone from a missing report, immediately inform the on-site NDRF or police coordinator rather than promising a reunion.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Official Emergency & Relief Helplines */}
+        <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-4">
+          <div className="flex items-center gap-2 font-semibold text-[#181d26] text-base">
+            <Phone className="w-5 h-5 text-[#006400]" />
+            Official Emergency & Relief Helplines
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+            <a href="tel:1078" className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg hover:border-[#181d26] transition-colors block text-center">
+              <div className="font-mono text-xl font-black text-[#181d26]">1078</div>
+              <div className="text-xs font-semibold text-[#181d26] mt-1">NDMA Toll Free</div>
+              <div className="text-[11px] text-[#9297a0]">National Disaster Management</div>
+            </a>
+            <a href="tel:112" className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg hover:border-[#181d26] transition-colors block text-center">
+              <div className="font-mono text-xl font-black text-[#181d26]">112</div>
+              <div className="text-xs font-semibold text-[#181d26] mt-1">National Emergency</div>
+              <div className="text-[11px] text-[#9297a0]">Police, Fire & Rescue</div>
+            </a>
+            <a href="tel:1098" className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg hover:border-[#181d26] transition-colors block text-center">
+              <div className="font-mono text-xl font-black text-[#181d26]">1098</div>
+              <div className="text-xs font-semibold text-[#181d26] mt-1">Childline India</div>
+              <div className="text-[11px] text-[#9297a0]">Lost & Found Children</div>
+            </a>
+            <a href="tel:+919876543210" className="p-4 bg-[#f8fafc] border border-[#dddddd] rounded-lg hover:border-[#181d26] transition-colors block text-center">
+              <div className="font-mono text-base font-bold text-[#006400] truncate">+91 98765 43210</div>
+              <div className="text-xs font-semibold text-[#181d26] mt-1">Reunion Desk</div>
+              <div className="text-[11px] text-[#9297a0]">Central Camp Coordination</div>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // 6. ADMIN DASHBOARD VIEW (SYSTEM OVERVIEW & OVERSIGHT)
   // -------------------------------------------------------------------------
   return (
     <div className="space-y-8 pb-12">
+      {/* Header Banner */}
       <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-2.5">
             <Badge variant="shade" size="sm">
-              {roleLabels[role] || role}
+              {roleLabels.ADMIN}
             </Badge>
             <Badge variant="verified" size="sm" icon={<CheckCircle2 className="w-3 h-3" />}>
               System Coordination Grid
@@ -732,7 +907,7 @@ export const DashboardPage: React.FC = () => {
             Welcome, {profile?.full_name || 'Administrator'}
           </h1>
           <p className="text-xs sm:text-sm text-[#41454d]">
-            {profile?.organization_name || 'MILAN Disaster Coordination HQ'} • Central Grid Operations
+            {profile?.organization_name || 'MILAN Disaster Coordination HQ'} • Central Grid Operations & Oversight
           </p>
         </div>
 
@@ -752,6 +927,14 @@ export const DashboardPage: React.FC = () => {
             leftIcon={<ShieldCheck className="w-4 h-4" />}
           >
             Verification Audit
+          </Button>
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => navigate('/dossier')}
+            leftIcon={<FileText className="w-4 h-4" />}
+          >
+            Forensic Dossiers
           </Button>
         </div>
       </div>
@@ -783,23 +966,23 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Module Shortcuts Grid */}
+      {/* Complete Operational Modules Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1 space-y-3 flex flex-col justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-[#181d26] font-semibold text-sm">
               <Users className="w-4 h-4 text-[#181d26]" />
-              Family Reporting
+              Family Reporting Portal
             </div>
             <p className="text-xs text-[#41454d] leading-relaxed">
-              Record comprehensive physical details: height, hair colour, birthmarks, footwear, and personal clothing.
+              Record comprehensive missing person details: height, hair colour, birthmarks, footwear, and personal clothing.
             </p>
           </div>
           <Link
             to="/report/missing"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#181d26] hover:underline pt-3"
           >
-            Launch 6-Step Form <ArrowRight className="w-3.5 h-3.5" />
+            Launch Missing Intake <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
@@ -810,7 +993,7 @@ export const DashboardPage: React.FC = () => {
               Rescue Camp Intake
             </div>
             <p className="text-xs text-[#41454d] leading-relaxed">
-              Field reports for shelter intake. Automatically supports non-communicative and unidentified persons.
+              Field reports for shelter arrivals. Automatically supports non-communicative and unidentified persons.
             </p>
           </div>
           <Link
@@ -824,8 +1007,44 @@ export const DashboardPage: React.FC = () => {
         <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1 space-y-3 flex flex-col justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-[#181d26] font-semibold text-sm">
-              <ShieldCheck className="w-4 h-4 text-[#181d26]" />
-              Review & Verification
+              <Building2 className="w-4 h-4 text-[#1b61c9]" />
+              Hospital Patient Intake
+            </div>
+            <p className="text-xs text-[#41454d] leading-relaxed">
+              Register trauma patients, unconscious victims, and inpatient emergency referrals under clinical privacy.
+            </p>
+          </div>
+          <Link
+            to="/report/hospital"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#181d26] hover:underline pt-3"
+          >
+            Launch Hospital Intake <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1 space-y-3 flex flex-col justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-[#181d26] font-semibold text-sm">
+              <Radio className="w-4 h-4 text-[#181d26]" />
+              Radio & Voice AI Parser
+            </div>
+            <p className="text-xs text-[#41454d] leading-relaxed">
+              Transcribe tactical boat radio transmissions and emergency voice transcripts into structured case attributes.
+            </p>
+          </div>
+          <Link
+            to="/report/voice"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#181d26] hover:underline pt-3"
+          >
+            Open Voice Parser <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1 space-y-3 flex flex-col justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-[#181d26] font-semibold text-sm">
+              <ShieldCheck className="w-4 h-4 text-[#006400]" />
+              Review & Verification Audit
             </div>
             <p className="text-xs text-[#41454d] leading-relaxed">
               Side-by-side evidence inspection: view field comparisons, matched attributes, and conflict indicators.
@@ -836,6 +1055,24 @@ export const DashboardPage: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#181d26] hover:underline pt-3"
           >
             Review Candidates <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <div className="bg-white border border-[#dddddd] rounded-xl p-6 shadow-elevation-1 space-y-3 flex flex-col justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-[#181d26] font-semibold text-sm">
+              <FileText className="w-4 h-4 text-[#181d26]" />
+              Forensic Dossier Engine
+            </div>
+            <p className="text-xs text-[#41454d] leading-relaxed">
+              Multi-factor confidence scoring, discrepancy detection, and printable humanitarian verification certificates.
+            </p>
+          </div>
+          <Link
+            to="/dossier"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#181d26] hover:underline pt-3"
+          >
+            Forensic Dossiers <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>

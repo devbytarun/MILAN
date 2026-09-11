@@ -320,8 +320,8 @@ export function sanitizeCaseForUser(fullCase: FullCaseData, profile: Profile | n
     }
   }
 
-  // Family members should not see raw tactical/operational dispatch notes
-  if (role === 'FAMILY' && !isOwner) {
+  // Family and volunteer members should not see raw tactical/operational dispatch notes
+  if ((role === 'FAMILY' || role === 'VOLUNTEER') && !isOwner) {
     if (sanitized.report.report_notes) {
       sanitized.report.report_notes = '[Operational dispatch notes held by relief coordinator]';
     }

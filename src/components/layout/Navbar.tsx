@@ -134,7 +134,7 @@ export const Navbar: React.FC = () => {
                     : 'text-[#333840] hover:text-[#181d26] hover:bg-[#f8fafc]'
                 }`}
               >
-                {isFamily ? 'My Case Status' : t('nav_dashboard')}
+                {isFamily ? 'My Case Status' : role === 'VOLUNTEER' ? 'Volunteer Hub' : t('nav_dashboard')}
               </Link>
             )}
 
@@ -148,7 +148,7 @@ export const Navbar: React.FC = () => {
                 }`}
               >
                 <Search className="w-3.5 h-3.5" />
-                <span>{isFamily ? 'Public Directory' : t('nav_cases')}</span>
+                <span>{isFamily || role === 'VOLUNTEER' ? 'Public Directory' : t('nav_cases')}</span>
               </Link>
             )}
 
@@ -413,7 +413,7 @@ export const Navbar: React.FC = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#f8fafc]"
               >
-                {isFamily ? 'My Case Status' : t('nav_dashboard')}
+                {isFamily ? 'My Case Status' : role === 'VOLUNTEER' ? 'Volunteer Hub' : t('nav_dashboard')}
               </Link>
             )}
             {canViewCases && (
@@ -422,7 +422,7 @@ export const Navbar: React.FC = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#f8fafc]"
               >
-                {isFamily ? 'Public Directory' : t('nav_cases')}
+                {isFamily || role === 'VOLUNTEER' ? 'Public Directory' : t('nav_cases')}
               </Link>
             )}
             {canReportMissing && (

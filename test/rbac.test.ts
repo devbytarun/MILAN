@@ -139,6 +139,16 @@ function runRBACTests() {
   assert(canAccessRoute('NGO', '/report/found'), 'NGO route allowed: /report/found');
   assert(!canAccessRoute('ARMY_RESCUE', '/dossier'), 'ARMY_RESCUE route blocked: /dossier');
 
+  // VOLUNTEER route tests
+  assert(!canAccessRoute('VOLUNTEER', '/dossier'), 'VOLUNTEER route blocked: /dossier');
+  assert(!canAccessRoute('VOLUNTEER', '/review'), 'VOLUNTEER route blocked: /review');
+  assert(!canAccessRoute('VOLUNTEER', '/report/found'), 'VOLUNTEER route blocked: /report/found');
+  assert(!canAccessRoute('VOLUNTEER', '/report/missing'), 'VOLUNTEER route blocked: /report/missing');
+  assert(!canAccessRoute('VOLUNTEER', '/report/hospital'), 'VOLUNTEER route blocked: /report/hospital');
+  assert(!canAccessRoute('VOLUNTEER', '/report/voice'), 'VOLUNTEER route blocked: /report/voice');
+  assert(canAccessRoute('VOLUNTEER', '/cases'), 'VOLUNTEER route allowed: /cases');
+  assert(canAccessRoute('VOLUNTEER', '/dashboard'), 'VOLUNTEER route allowed: /dashboard');
+
   // ADMIN route tests
   assert(canAccessRoute('ADMIN', '/dossier'), 'ADMIN route allowed: /dossier');
   assert(canAccessRoute('ADMIN', '/review'), 'ADMIN route allowed: /review');
@@ -159,6 +169,8 @@ function runRBACTests() {
   assert(canViewField('HOSPITAL', 'medical'), 'HOSPITAL can view medical details');
 
   assert(!canViewField('FAMILY', 'internal_notes'), 'FAMILY cannot view internal dispatcher notes');
+  assert(!canViewField('VOLUNTEER', 'internal_notes'), 'VOLUNTEER cannot view internal dispatcher notes');
+  assert(!canViewField('VOLUNTEER', 'score'), 'VOLUNTEER cannot view match score');
   assert(canViewField('ARMY_RESCUE', 'internal_notes'), 'ARMY_RESCUE can view internal notes');
 
   // =========================================================================
@@ -240,6 +252,24 @@ function runRBACTests() {
   assert(
     sanitizedForFamily.attributes.condition_status !== mockCaseWithSensitiveData.attributes.condition_status,
     'Clinical trauma notes condition_status is protected for FAMILY view'
+  );
+
+  const volunteerProfile: Profile = {
+    id: 'user-volunteer-123',
+    auth_user_id: 'auth-volunteer-123',
+    full_name: 'Rahul Verma',
+    role: 'VOLUNTEER',
+    organization_name: 'Civil Defense Volunteers',
+    organization_type: null,
+    verification_status: 'APPROVED',
+    phone: null,
+    created_at: new Date().toISOString(),
+  };
+
+  const sanitizedForVolunteer = sanitizeCaseForUser(mockCaseWithSensitiveData, volunteerProfile);
+  assert(
+    sanitizedForVolunteer.report.report_notes !== mockCaseWithSensitiveData.report.report_notes,
+    'Confidential report_notes is masked for VOLUNTEER view'
   );
 
   const reviewerProfile: Profile = {
