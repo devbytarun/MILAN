@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { MatchResult } from '../../types/index.ts';
 import type { FullCaseData } from '../../services/caseService.ts';
+import { evaluateChildSafeguards } from '../../lib/anti-trafficking.ts';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -8,6 +9,7 @@ import {
   HelpCircle,
   X,
   FileCheck,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '../ui/Button.tsx';
 import { Badge } from '../ui/Badge.tsx';
@@ -29,8 +31,13 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
 }) => {
   const [selectedAction, setSelectedAction] = useState<'VERIFIED' | 'REJECTED' | 'MORE_INFO_NEEDED'>('VERIFIED');
   const [reason, setReason] = useState(
-    'Strong multi-attribute alignment on distinct forearm scar, sacred thread charm, and red polo shirt. Confirmed match.'
+    'Strong multi-attribute alignment on distinct physical scars, clothing clues, and facial identifiers. Confirmed positive match.'
   );
+  const [guardianProofVerified, setGuardianProofVerified] = useState(false);
+
+  const isMinor =
+    evaluateChildSafeguards(sourceCase.attributes.age, sourceCase.attributes.approximate_age).isMinor ||
+    evaluateChildSafeguards(candidateCase.attributes.age, candidateCase.attributes.approximate_age).isMinor;
 
   const rows = [
     {
@@ -87,88 +94,110 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-modal bg-canvas-night/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-canvas-light border border-hairline-light rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col shadow-elevation-4 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
-        {/* Header */}
-        <div className="p-6 bg-canvas-night text-on-dark flex items-center justify-between border-b border-hairline-dark">
+    <div className="fixed inset-0 z-modal bg-[#181d26]/80 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white border border-[#dddddd] rounded-xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-elevation-4 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+        {/* Header (Airtable dark surface) */}
+        <div className="p-6 bg-[#181d26] text-white flex items-center justify-between border-b border-[#333840]">
           <div>
-            <div className="flex items-center gap-2 text-xs text-aloe font-mono font-bold">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#a8d8c4]">
               <span>{sourceCase.case.case_uid} (Missing)</span>
               <span>↔</span>
               <span>{candidateCase.case.case_uid} (Found)</span>
             </div>
-            <h2 className="type-heading-lg text-on-dark mt-1">
+            <h2 className="font-display text-xl sm:text-2xl font-normal text-white mt-1">
               Side-by-Side Verification Audit
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-shade-40 hover:text-on-dark rounded-pill hover:bg-white/10 transition-colors"
+            className="p-2 text-[#9297a0] hover:text-white rounded-full hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Content Scrollable Table */}
+        {/* Content Scrollable Area */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {/* Match Score Banner */}
-          <div className="p-5 bg-canvas-cream border border-hairline-light rounded-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="p-5 bg-[#f8fafc] border border-[#dddddd] rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <div className="text-xs font-bold text-ink uppercase tracking-wide">
+              <div className="text-xs font-bold text-[#181d26] uppercase tracking-wide">
                 Algorithmic Confidence Assessment
               </div>
-              <p className="type-caption text-shade-60 mt-1">
+              <p className="type-caption text-[#41454d] mt-1">
                 {matchResult.explanation}
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
               <Badge
-                variant={matchResult.confidenceTier === 'HIGH' ? 'verified' : matchResult.confidenceTier === 'MEDIUM' ? 'pending' : 'shade'}
+                variant={matchResult.confidenceTier === 'HIGH' ? 'mint' : matchResult.confidenceTier === 'MEDIUM' ? 'pending' : 'shade'}
                 size="sm"
               >
                 {matchResult.confidenceTier} CONFIDENCE
               </Badge>
               <div className="text-right">
-                <div className="type-heading-xl font-bold text-ink">
+                <div className="font-display text-2xl font-bold text-[#181d26]">
                   {matchResult.score}%
                 </div>
-                <div className="text-[10px] uppercase font-semibold text-shade-40">Confidence Score</div>
+                <div className="text-[10px] uppercase font-semibold text-[#9297a0]">Confidence Score</div>
               </div>
             </div>
           </div>
 
+          {/* Child Safeguard Banner (if minor detected) */}
+          {isMinor && (
+            <div className="p-4 rounded-lg bg-[#fcab79]/15 border border-[#fcab79] text-xs text-[#aa2d00] space-y-2">
+              <div className="flex items-center gap-2 font-bold">
+                <AlertTriangle className="w-4 h-4 text-[#aa2d00] shrink-0" />
+                <span>ANTI-TRAFFICKING CHILD SAFEGUARD ENGAGED (MINOR UNDER 18)</span>
+              </div>
+              <p className="leading-relaxed">
+                National SOP mandates that unaccompanied minors cannot be discharged without verified government identification of the claimant guardian and anti-trafficking clearance.
+              </p>
+              <label className="flex items-center gap-2 font-semibold pt-1 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={guardianProofVerified}
+                  onChange={(e) => setGuardianProofVerified(e.target.checked)}
+                  className="rounded border-[#dddddd] text-[#aa2d00] focus:ring-[#aa2d00]"
+                />
+                <span>I confirm that valid guardian identity proof and biometric/photo alignment have been audited.</span>
+              </label>
+            </div>
+          )}
+
           {/* Comparison Table */}
-          <div className="border border-hairline-light rounded-md overflow-hidden">
+          <div className="border border-[#dddddd] rounded-lg overflow-hidden">
             <table className="w-full text-xs text-left">
-              <thead className="bg-canvas-cream text-shade-70 font-semibold border-b border-hairline-light">
+              <thead className="bg-[#f8fafc] text-[#333840] font-semibold border-b border-[#dddddd]">
                 <tr>
                   <th className="p-3.5 w-1/4">Attribute</th>
-                  <th className="p-3.5 w-[37.5%] border-l border-r border-hairline-light bg-aloe/15 text-ink font-bold">
+                  <th className="p-3.5 w-[37.5%] border-l border-r border-[#dddddd] bg-[#a8d8c4]/15 text-[#181d26] font-bold">
                     Family Missing Report ({sourceCase.case.case_uid})
                   </th>
-                  <th className="p-3.5 w-[37.5%] bg-canvas-cream text-ink font-bold">
+                  <th className="p-3.5 w-[37.5%] bg-[#f8fafc] text-[#181d26] font-bold">
                     Rescue Intake Report ({candidateCase.case.case_uid})
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline-light">
+              <tbody className="divide-y divide-[#dddddd]">
                 {rows.map((r) => (
                   <tr
                     key={r.label}
-                    className={r.highlight ? 'bg-aloe/10 font-medium' : 'hover:bg-canvas-cream/60 transition-colors'}
+                    className={r.highlight ? 'bg-[#a8d8c4]/10 font-medium' : 'hover:bg-[#f8fafc] transition-colors'}
                   >
-                    <td className="p-3.5 font-bold text-ink">
+                    <td className="p-3.5 font-bold text-[#181d26]">
                       {r.label}
                       {r.highlight && (
-                        <span className="block text-[10px] text-shade-50 font-semibold">
-                          ★ High Weight Factor
+                        <span className="block text-[10px] text-[#aa2d00] font-semibold">
+                          ★ High Weight Feature
                         </span>
                       )}
                     </td>
-                    <td className="p-3.5 text-ink border-l border-r border-hairline-light">
+                    <td className="p-3.5 text-[#181d26] border-l border-r border-[#dddddd]">
                       {r.source}
                     </td>
-                    <td className="p-3.5 text-ink">
+                    <td className="p-3.5 text-[#181d26]">
                       {r.candidate}
                     </td>
                   </tr>
@@ -178,9 +207,9 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
           </div>
 
           {/* Reviewer Action Box */}
-          <div className="bg-canvas-cream border border-hairline-light rounded-md p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-ink flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-ink" />
+          <div className="bg-[#f8fafc] border border-[#dddddd] rounded-lg p-5 space-y-4">
+            <h3 className="text-sm font-semibold text-[#181d26] flex items-center gap-2">
+              <FileCheck className="w-4 h-4 text-[#181d26]" />
               Coordinator Verification Decision
             </h3>
 
@@ -189,62 +218,62 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedAction('VERIFIED')}
-                className={`p-3.5 rounded-md border text-left transition-all duration-150 flex items-center justify-between ${
+                className={`p-3.5 rounded-lg border text-left transition-colors flex items-center justify-between ${
                   selectedAction === 'VERIFIED'
-                    ? 'bg-aloe text-ink border-aloe/80 shadow-sm font-semibold'
-                    : 'bg-canvas-light hover:bg-canvas-cream border-hairline-light text-shade-70'
+                    ? 'bg-[#181d26] text-white border-[#181d26] font-semibold shadow-sm'
+                    : 'bg-white hover:bg-[#f8fafc] border-[#dddddd] text-[#333840]'
                 }`}
               >
                 <div>
                   <div className="text-xs font-bold">VERIFY MATCH</div>
-                  <div className="text-[10px] text-shade-50">
+                  <div className={`text-[10px] ${selectedAction === 'VERIFIED' ? 'text-white/70' : 'text-[#9297a0]'}`}>
                     Confirmed positive reunion
                   </div>
                 </div>
-                <CheckCircle2 className="w-4 h-4 text-ink shrink-0" />
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
               </button>
 
               <button
                 type="button"
                 onClick={() => setSelectedAction('REJECTED')}
-                className={`p-3.5 rounded-md border text-left transition-all duration-150 flex items-center justify-between ${
+                className={`p-3.5 rounded-lg border text-left transition-colors flex items-center justify-between ${
                   selectedAction === 'REJECTED'
-                    ? 'bg-rose-50 text-rose-800 border-rose-300 shadow-sm font-semibold'
-                    : 'bg-canvas-light hover:bg-canvas-cream border-hairline-light text-shade-70'
+                    ? 'bg-[#aa2d00] text-white border-[#aa2d00] font-semibold shadow-sm'
+                    : 'bg-white hover:bg-[#f8fafc] border-[#dddddd] text-[#333840]'
                 }`}
               >
                 <div>
                   <div className="text-xs font-bold">REJECT MATCH</div>
-                  <div className="text-[10px] text-shade-50">
+                  <div className={`text-[10px] ${selectedAction === 'REJECTED' ? 'text-white/70' : 'text-[#9297a0]'}`}>
                     False positive candidate
                   </div>
                 </div>
-                <XCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <XCircle className="w-4 h-4 shrink-0" />
               </button>
 
               <button
                 type="button"
                 onClick={() => setSelectedAction('MORE_INFO_NEEDED')}
-                className={`p-3.5 rounded-md border text-left transition-all duration-150 flex items-center justify-between ${
+                className={`p-3.5 rounded-lg border text-left transition-colors flex items-center justify-between ${
                   selectedAction === 'MORE_INFO_NEEDED'
-                    ? 'bg-[#fef3c7] text-[#92400e] border-[#fde68a] shadow-sm font-semibold'
-                    : 'bg-canvas-light hover:bg-canvas-cream border-hairline-light text-shade-70'
+                    ? 'bg-[#f5e9d4] text-[#181d26] border-[#e0d0b5] font-semibold shadow-sm'
+                    : 'bg-white hover:bg-[#f8fafc] border-[#dddddd] text-[#333840]'
                 }`}
               >
                 <div>
                   <div className="text-xs font-bold">REQUEST MORE INFO</div>
-                  <div className="text-[10px] text-shade-50">
+                  <div className="text-[10px] text-[#9297a0]">
                     Require shelter photo/call
                   </div>
                 </div>
-                <HelpCircle className="w-4 h-4 text-[#92400e] shrink-0" />
+                <HelpCircle className="w-4 h-4 text-[#d9a441] shrink-0" />
               </button>
             </div>
 
             {/* Audit Notes */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-shade-70 uppercase tracking-wider">
-                Mandatory Reviewer Audit Reason <span className="text-rose-500">*</span>
+              <label className="block text-xs font-semibold text-[#333840] uppercase tracking-wider">
+                Evidentiary Audit Justification <span className="text-[#aa2d00]">*</span>
               </label>
               <textarea
                 rows={2}
@@ -252,17 +281,17 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Explain the evidentiary justification for this verification decision..."
-                className="w-full px-3.5 py-2.5 text-xs font-normal text-ink border border-hairline-light rounded-md outline-none focus:border-ink bg-canvas-light"
+                className="w-full px-3.5 py-2.5 text-xs text-[#181d26] border border-[#dddddd] rounded-md outline-none focus:border-[#181d26] bg-white"
               />
             </div>
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-canvas-cream border-t border-hairline-light flex items-center justify-end gap-3">
+        <div className="p-4 bg-white border-t border-[#dddddd] flex items-center justify-end gap-3">
           <Button
             type="button"
-            variant="outline-light"
+            variant="secondary"
             size="sm"
             onClick={onClose}
           >
@@ -270,12 +299,13 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
           </Button>
           <Button
             type="button"
-            variant="aloe"
+            variant="primary"
             size="sm"
+            disabled={isMinor && selectedAction === 'VERIFIED' && !guardianProofVerified}
             onClick={() => onConfirmAction(selectedAction, reason)}
             leftIcon={<ShieldCheck className="w-4 h-4" />}
           >
-            Record Decision in Audit Log
+            Confirm Decision in Audit Log
           </Button>
         </div>
       </div>

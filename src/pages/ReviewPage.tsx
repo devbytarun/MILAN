@@ -118,42 +118,42 @@ export const ReviewPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Header Banner */}
-      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-2.5">
             <Badge variant="mint" size="sm" icon={<ShieldCheck className="w-3 h-3" />}>
               Human Verification Audit
             </Badge>
-            <span className="text-xs text-shade-40 font-medium font-mono">
+            <span className="text-xs text-[#9297a0] font-medium font-mono">
               Deterministic Matching Engine v1.0
             </span>
           </div>
-          <h1 className="type-display-md text-ink mt-2">
+          <h1 className="font-display text-2xl sm:text-3xl font-normal text-[#181d26] mt-2">
             Match Verification Queue
           </h1>
-          <p className="type-caption text-shade-50">
+          <p className="text-sm text-[#41454d] mt-1">
             Audit ranked candidate pairs, inspect conflicting attributes, and verify positive reunions.
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1.5 bg-canvas-cream p-1.5 rounded-pill border border-hairline-light w-full sm:w-auto">
+        <div className="flex items-center gap-1.5 bg-[#f8fafc] p-1.5 rounded-xl border border-[#dddddd] w-full sm:w-auto">
           <button
             onClick={() => setActiveTab('PENDING')}
-            className={`px-4 py-2 rounded-pill text-xs font-medium transition-colors flex-1 sm:flex-initial ${
+            className={`px-4 py-2 rounded-lg text-xs font-medium transition-colors flex-1 sm:flex-initial ${
               activeTab === 'PENDING'
-                ? 'bg-ink text-on-primary font-semibold shadow-sm'
-                : 'text-shade-60 hover:text-ink'
+                ? 'bg-[#181d26] text-white font-semibold shadow-sm'
+                : 'text-[#41454d] hover:text-[#181d26]'
             }`}
           >
             Pending Review ({pairs.filter((p) => p.sourceCase.case.status !== 'VERIFIED_MATCH').length})
           </button>
           <button
             onClick={() => setActiveTab('VERIFIED')}
-            className={`px-4 py-2 rounded-pill text-xs font-medium transition-colors flex-1 sm:flex-initial ${
+            className={`px-4 py-2 rounded-lg text-xs font-medium transition-colors flex-1 sm:flex-initial ${
               activeTab === 'VERIFIED'
-                ? 'bg-aloe text-ink font-semibold shadow-sm'
-                : 'text-shade-60 hover:text-ink'
+                ? 'bg-[#0a2e0e] text-white font-semibold shadow-sm'
+                : 'text-[#41454d] hover:text-[#181d26]'
             }`}
           >
             Verified Reunions ({pairs.filter((p) => p.sourceCase.case.status === 'VERIFIED_MATCH').length})
@@ -163,14 +163,14 @@ export const ReviewPage: React.FC = () => {
 
       {/* Live Notification Banner */}
       {notification && (
-        <div className="p-4 bg-aloe border border-aloe/60 rounded-md text-xs text-ink flex items-center justify-between shadow-sm animate-in fade-in">
+        <div className="p-4 bg-[#a8d8c4]/30 border border-[#a8d8c4] rounded-lg text-xs text-[#006400] flex items-center justify-between shadow-sm animate-in fade-in">
           <div className="flex items-center gap-2 font-semibold">
-            <CheckCircle2 className="w-4 h-4 text-ink" />
+            <CheckCircle2 className="w-4 h-4 text-[#006400]" />
             {notification}
           </div>
           <button
             onClick={() => setNotification(null)}
-            className="text-ink hover:text-shade-70 font-bold px-2 py-1"
+            className="text-[#006400] hover:text-[#0a2e0e] font-bold px-2 py-1"
           >
             ✕
           </button>
@@ -211,12 +211,12 @@ export const ReviewPage: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-canvas-light border border-hairline-light rounded-lg p-16 text-center space-y-3 shadow-elevation-3">
-          <div className="w-12 h-12 rounded-pill bg-canvas-cream text-shade-40 flex items-center justify-center mx-auto border border-hairline-light">
+        <div className="bg-white border border-[#dddddd] rounded-xl p-16 text-center space-y-3 shadow-elevation-1">
+          <div className="w-12 h-12 rounded-full bg-[#f8fafc] text-[#9297a0] flex items-center justify-center mx-auto border border-[#dddddd]">
             <Inbox className="w-6 h-6" />
           </div>
-          <h3 className="type-heading-md text-ink">No Candidate Pairs in this Queue</h3>
-          <p className="type-caption text-shade-50 max-w-sm mx-auto">
+          <h3 className="font-display text-lg font-normal text-[#181d26]">No Candidate Pairs in this Queue</h3>
+          <p className="text-xs text-[#41454d] max-w-sm mx-auto">
             All candidates in this category have been processed, or no pairs exceed the 25% coarse similarity threshold.
           </p>
         </div>
