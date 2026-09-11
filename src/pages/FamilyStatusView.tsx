@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getLocalCases, FullCaseData } from '../services/caseService.ts';
 import {
   Heart,
@@ -10,34 +10,33 @@ import {
   MapPin,
   RefreshCw,
 } from 'lucide-react';
+import { Button } from '../components/ui/Button.tsx';
+import { Badge } from '../components/ui/Badge.tsx';
 
 export const FamilyStatusView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [caseData, setCaseData] = useState<FullCaseData | null>(() => {
+
+  const caseData: FullCaseData | null = React.useMemo(() => {
     const all = getLocalCases();
     return all.find((c) => c.case.id === id || c.case.case_uid === id) || null;
-  });
-  const [lastRefreshed] = useState<string>('Just now');
-
-  useEffect(() => {
-    const all = getLocalCases();
-    const found = all.find((c) => c.case.id === id || c.case.case_uid === id);
-    if (found) {
-      setCaseData(found);
-    }
   }, [id]);
 
   if (!caseData) {
     return (
-      <div className="max-w-xl mx-auto my-12 p-8 bg-white border border-slate-200 rounded-2xl text-center space-y-4">
-        <h2 className="text-xl font-bold text-slate-800">Case Not Found</h2>
-        <Link
-          to="/cases"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold"
+      <div className="max-w-xl mx-auto my-12 p-8 bg-canvas-light border border-hairline-light rounded-lg text-center space-y-4 shadow-elevation-3">
+        <h2 className="type-heading-lg text-ink">Case Not Found</h2>
+        <p className="type-caption text-shade-50">
+          The requested case identifier does not exist in the active shelter registry.
+        </p>
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => navigate('/cases')}
+          leftIcon={<ArrowLeft className="w-4 h-4" />}
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Cases Registry
-        </Link>
+          Back to Cases Registry
+        </Button>
       </div>
     );
   }
@@ -45,36 +44,41 @@ export const FamilyStatusView: React.FC = () => {
   const { case: c, attributes: a } = caseData;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 pb-12">
       {/* Top Navigation */}
       <div className="flex items-center justify-between">
-        <button
+        <Button
+          variant="outline-light"
+          size="sm"
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
+          leftIcon={<ArrowLeft className="w-4 h-4" />}
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Case Record
-        </button>
+          Back to Case Record
+        </Button>
 
-        <span className="text-xs text-slate-400 flex items-center gap-1">
-          <Clock className="w-3.5 h-3.5" /> Updated {lastRefreshed}
+        <span className="text-xs text-shade-40 flex items-center gap-1">
+          <Clock className="w-3.5 h-3.5" /> Updated Live
         </span>
       </div>
 
       {/* Main Empathetic Card */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-sm space-y-8">
+      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-10 shadow-elevation-3 space-y-8">
         {/* Header with Heart Icon */}
         <div className="text-center space-y-3">
-          <div className="w-14 h-14 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-            <Heart className="w-7 h-7 fill-rose-600/10" />
+          <div className="w-12 h-12 bg-aloe text-ink rounded-pill flex items-center justify-center mx-auto border border-aloe/40">
+            <Heart className="w-5 h-5 fill-ink/10 text-ink" />
           </div>
           <div>
-            <span className="text-[11px] font-mono font-bold tracking-widest text-slate-400 uppercase">
-              CASE TRACKING #{c.case_uid}
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Badge variant="shade" size="sm">CASE #{c.case_uid}</Badge>
+              <Badge variant={c.status === 'VERIFIED_MATCH' ? 'verified' : c.status === 'POSSIBLE_MATCH' ? 'pending' : 'mint'} size="sm">
+                {c.status}
+              </Badge>
+            </div>
+            <h1 className="type-display-md text-ink mt-1">
               Case Status: {a.full_name || 'Missing Relative'}
             </h1>
-            <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+            <p className="type-caption text-shade-50 max-w-md mx-auto mt-1.5">
               We know waiting in a disaster is difficult. Here is the exact, honest status of what relief teams are doing for your case right now.
             </p>
           </div>
@@ -82,50 +86,50 @@ export const FamilyStatusView: React.FC = () => {
 
         {/* Dynamic Status Block */}
         {c.status === 'VERIFIED_MATCH' ? (
-          <div className="p-6 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-300 rounded-2xl text-emerald-950 space-y-4 shadow-sm">
-            <div className="flex items-center gap-2 font-black text-lg text-emerald-900">
-              <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+          <div className="p-6 bg-aloe border border-aloe/80 rounded-md text-ink space-y-4">
+            <div className="flex items-center gap-2 font-bold text-base text-ink">
+              <CheckCircle2 className="w-5 h-5 text-ink" />
               Verified Match Confirmed!
             </div>
-            <p className="text-xs text-emerald-900 leading-relaxed font-medium">
+            <p className="type-caption text-ink leading-relaxed">
               Relief coordinators have verified that {a.full_name || 'your loved one'} has been located and safe at a designated relief shelter.
             </p>
 
-            <div className="p-4 bg-white/90 rounded-xl border border-emerald-200 space-y-2 text-xs text-slate-800 shadow-sm">
-              <div className="font-bold text-emerald-900 text-sm flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-emerald-600" /> Current Location & Contact
+            <div className="p-4 bg-canvas-light rounded-md border border-hairline-light space-y-2 text-xs text-ink shadow-sm">
+              <div className="font-bold text-ink text-sm flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-ink" /> Current Location & Contact
               </div>
               <div><strong>Relief Center:</strong> Camp Relief Zone 2 (NDRF Battalion 4 Shelter)</div>
               <div><strong>Coordinating Officer:</strong> Major Vikram Rathore</div>
-              <div><strong>Identification Case UID:</strong> <span className="font-mono font-bold bg-emerald-100 px-2 py-0.5 rounded text-emerald-900">{c.case_uid}</span></div>
-              <div className="pt-2 border-t border-emerald-100 flex items-center gap-2 text-emerald-800 font-bold">
+              <div><strong>Identification Case UID:</strong> <span className="font-mono font-bold bg-shade-30 px-2 py-0.5 rounded text-ink">{c.case_uid}</span></div>
+              <div className="pt-2 border-t border-hairline-light flex items-center gap-2 text-ink font-semibold">
                 <Phone className="w-4 h-4" /> 24/7 Family Reunion Desk: +91 98765 43210
               </div>
             </div>
           </div>
         ) : c.status === 'POSSIBLE_MATCH' ? (
-          <div className="p-6 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-300 rounded-2xl text-amber-950 space-y-4 shadow-sm">
-            <div className="flex items-center gap-2 font-black text-lg text-amber-900">
-              <Clock className="w-6 h-6 text-amber-600" />
+          <div className="p-6 bg-canvas-cream border border-hairline-light rounded-md space-y-4">
+            <div className="flex items-center gap-2 font-bold text-base text-ink">
+              <Clock className="w-5 h-5 text-amber-600" />
               Potential Match Being Verified by Relief Coordinators
             </div>
-            <p className="text-xs text-amber-900 leading-relaxed font-medium">
-              A potential candidate survivor in one of our rescue shelters shares key physical characteristics (matching surgical mark & clothing) with your report.
+            <p className="type-caption text-shade-60 leading-relaxed">
+              A potential candidate survivor in one of our rescue shelters shares key physical characteristics with your report.
             </p>
-            <div className="p-3.5 bg-white/80 rounded-xl border border-amber-200 text-xs text-amber-950 space-y-1">
-              <strong>Why hasn't this been confirmed yet?</strong>
-              <p className="text-[11px] text-slate-600 leading-relaxed">
+            <div className="p-4 bg-canvas-light rounded-md border border-hairline-light text-xs space-y-1">
+              <strong className="text-ink">Why hasn't this been confirmed yet?</strong>
+              <p className="type-caption text-shade-50 leading-relaxed">
                 We never make automatic decisions that could cause false hope. An authorized humanitarian reviewer is verifying the physical clues before connecting you directly.
               </p>
             </div>
           </div>
         ) : (
-          <div className="p-6 bg-gradient-to-br from-blue-50 to-slate-50 border border-blue-200 rounded-2xl text-blue-950 space-y-4 shadow-sm">
-            <div className="flex items-center gap-2 font-black text-lg text-blue-900">
-              <RefreshCw className="w-6 h-6 text-blue-600" />
+          <div className="p-6 bg-canvas-cream border border-hairline-light rounded-md space-y-3">
+            <div className="flex items-center gap-2 font-bold text-base text-ink">
+              <RefreshCw className="w-5 h-5 text-ink" />
               Active Search & Continuous Cross-Matching
             </div>
-            <p className="text-xs text-blue-900 leading-relaxed font-medium">
+            <p className="type-caption text-shade-60 leading-relaxed">
               Your report is registered and continuously checked against every incoming survivor admission across all field rescue camps and hospital beds.
             </p>
           </div>
@@ -133,41 +137,47 @@ export const FamilyStatusView: React.FC = () => {
 
         {/* Transparency Counters */}
         <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-            <div className="text-xl font-black text-slate-900">94</div>
-            <div className="text-[10px] text-slate-500 font-semibold uppercase mt-0.5">Shelter Intakes Checked</div>
+          <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md">
+            <div className="type-heading-xl font-light text-ink">94</div>
+            <div className="text-[10px] text-shade-50 font-semibold uppercase tracking-wider mt-1">Shelter Intakes Checked</div>
           </div>
-          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-            <div className="text-xl font-black text-blue-600">6</div>
-            <div className="text-[10px] text-slate-500 font-semibold uppercase mt-0.5">Relief Camps Active</div>
+          <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md">
+            <div className="type-heading-xl font-light text-ink">6</div>
+            <div className="text-[10px] text-shade-50 font-semibold uppercase tracking-wider mt-1">Relief Camps Active</div>
           </div>
-          <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-            <div className="text-xl font-black text-emerald-600">24/7</div>
-            <div className="text-[10px] text-slate-500 font-semibold uppercase mt-0.5">Matching Frequency</div>
+          <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md">
+            <div className="type-heading-xl font-light text-ink">24/7</div>
+            <div className="text-[10px] text-shade-50 font-semibold uppercase tracking-wider mt-1">Matching Frequency</div>
           </div>
         </div>
 
         {/* Recorded Details Snapshot */}
-        <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-2">
-          <div className="font-bold text-slate-800">Attributes Tracked in System:</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-600 text-[11px]">
-            <div>• Name: <strong>{a.full_name || '—'}</strong></div>
-            <div>• Age: <strong>{a.age || '—'} yrs</strong></div>
-            <div>• Clothing: <strong>{a.clothing || '—'}</strong></div>
-            <div>• Key Clue: <strong>{a.identifying_clue || '—'}</strong></div>
+        <div className="p-5 bg-canvas-cream border border-hairline-light rounded-md text-xs space-y-2">
+          <div className="font-semibold text-ink">Attributes Tracked in System:</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-shade-60 text-xs">
+            <div>• Name: <strong className="text-ink">{a.full_name || '—'}</strong></div>
+            <div>• Age: <strong className="text-ink">{a.age || '—'} yrs</strong></div>
+            <div>• Clothing: <strong className="text-ink">{a.clothing || '—'}</strong></div>
+            <div>• Key Clue: <strong className="text-ink">{a.identifying_clue || '—'}</strong></div>
           </div>
         </div>
 
         {/* Need Help CTA */}
         <div className="text-center pt-2">
-          <p className="text-xs text-slate-500 mb-3">
+          <p className="type-caption text-shade-50 mb-3">
             Have more photographs or updated details about what they were wearing?
           </p>
           <a
             href="tel:+919876543210"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow-sm"
+            className="inline-flex items-center gap-2"
           >
-            <Phone className="w-3.5 h-3.5" /> Call National Disaster Helpline (1078)
+            <Button
+              variant="primary"
+              size="md"
+              leftIcon={<Phone className="w-4 h-4" />}
+            >
+              Call National Disaster Helpline (1078)
+            </Button>
           </a>
         </div>
       </div>

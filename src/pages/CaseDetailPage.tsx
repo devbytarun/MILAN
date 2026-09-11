@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getLocalCases, FullCaseData } from '../services/caseService.ts';
 import {
@@ -9,79 +9,64 @@ import {
   ShieldCheck,
   FileText,
 } from 'lucide-react';
+import { Button } from '../components/ui/Button.tsx';
+import { Badge } from '../components/ui/Badge.tsx';
 
 export const CaseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [caseData, setCaseData] = useState<FullCaseData | null>(() => {
+
+  const caseData: FullCaseData | null = React.useMemo(() => {
     const all = getLocalCases();
     return all.find((c) => c.case.id === id || c.case.case_uid === id) || null;
-  });
-  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'ATTRIBUTES' | 'RECONCILIATION'>('OVERVIEW');
-
-  useEffect(() => {
-    const all = getLocalCases();
-    const found = all.find((c) => c.case.id === id || c.case.case_uid === id);
-    if (found) {
-      setCaseData(found);
-    }
   }, [id]);
+
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'ATTRIBUTES' | 'RECONCILIATION'>('OVERVIEW');
 
   if (!caseData) {
     return (
-      <div className="max-w-2xl mx-auto my-12 p-8 bg-white border border-slate-200 rounded-2xl text-center space-y-4">
-        <h2 className="text-xl font-bold text-slate-800">Case Record Not Found</h2>
-        <p className="text-xs text-slate-500">
+      <div className="max-w-2xl mx-auto my-12 p-8 bg-canvas-light border border-hairline-light rounded-lg text-center space-y-4 shadow-elevation-3">
+        <h2 className="type-heading-lg text-ink">Case Record Not Found</h2>
+        <p className="type-caption text-shade-50">
           The requested case identifier does not exist in the active shelter registry.
         </p>
-        <Link
-          to="/cases"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold"
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => navigate('/cases')}
+          leftIcon={<ArrowLeft className="w-4 h-4" />}
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Cases Registry
-        </Link>
+          Back to Cases Registry
+        </Button>
       </div>
     );
   }
 
   const { case: c, report: r, attributes: a } = caseData;
 
-  const statusColors = {
-    SUBMITTED: 'bg-slate-100 text-slate-700 border-slate-200',
-    SEARCHING: 'bg-blue-100 text-blue-800 border-blue-200',
-    NO_CANDIDATE: 'bg-slate-100 text-slate-700 border-slate-200',
-    POSSIBLE_MATCH: 'bg-amber-100 text-amber-800 border-amber-200',
-    UNDER_REVIEW: 'bg-purple-100 text-purple-800 border-purple-200',
-    VERIFIED_MATCH: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-    MATCH_REJECTED: 'bg-rose-100 text-rose-800 border-rose-200',
-    MORE_INFO_NEEDED: 'bg-amber-100 text-amber-800 border-amber-200',
-    CLOSED: 'bg-slate-100 text-slate-700 border-slate-200',
-    ARCHIVED: 'bg-slate-100 text-slate-700 border-slate-200',
-  };
-
   const timelineSteps = [
     {
       title: 'Report Registered in MILAN',
       date: new Date(c.created_at).toLocaleDateString(),
-      desc: `Case created with UID ${c.case_uid} by ${r.source_type} intake channel.`,
+      desc: `Case created with UID ${c.case_uid} via ${r.source_type} intake.`,
       done: true,
     },
     {
-      title: 'Distributed to Field Shelters',
-      date: 'Automatic Broadcast',
-      desc: 'Physical attributes distributed across all emergency relief nodes.',
+      title: 'Distributed to Relief Shelters',
+      date: 'Instant Broadcast',
+      desc: 'Physical identifiers distributed across all emergency shelter nodes.',
       done: true,
     },
     {
-      title: 'Multi-Attribute Matching',
+      title: 'Multi-Attribute Algorithmic Sweep',
       date: 'Continuous Pipeline',
       desc: c.status === 'POSSIBLE_MATCH' || c.status === 'VERIFIED_MATCH'
-        ? 'High-confidence candidate surfaced through weighted algorithm.'
+        ? 'High-confidence candidate surfaced through weighted similarity scoring.'
         : 'Algorithmic cross-referencing against rescue shelter intakes active.',
       done: c.status === 'POSSIBLE_MATCH' || c.status === 'VERIFIED_MATCH',
     },
     {
-      title: 'Coordinator Human Verification',
+      title: 'Coordinator Verification Decision',
       date: c.status === 'VERIFIED_MATCH' ? 'Audit Verified' : 'Pending',
       desc: c.status === 'VERIFIED_MATCH'
         ? 'Relief coordinator reviewed physical scar and clothing evidence.'
@@ -91,102 +76,108 @@ export const CaseDetailPage: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 pb-12">
       {/* Top Breadcrumb & Navigation */}
       <div className="flex items-center justify-between">
-        <button
+        <Button
+          variant="outline-light"
+          size="sm"
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
+          leftIcon={<ArrowLeft className="w-4 h-4" />}
         >
-          <ArrowLeft className="w-4 h-4" /> Back
-        </button>
+          Back
+        </Button>
 
-        <Link
-          to={`/cases/${c.id}/status`}
-          className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
-        >
-          <FileText className="w-3.5 h-3.5" /> Family Status Timeline View
+        <Link to={`/cases/${c.id}/status`}>
+          <Button
+            variant="aloe"
+            size="sm"
+            leftIcon={<FileText className="w-3.5 h-3.5" />}
+          >
+            Family Status View
+          </Button>
         </Link>
       </div>
 
       {/* Main Header Card */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
-          <div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded ${
-                  c.case_type === 'MISSING'
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : 'bg-blue-100 text-blue-800'
-                }`}
-              >
+      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-hairline-light pb-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2.5">
+              <Badge variant={c.case_type === 'MISSING' ? 'shade' : 'mint'} size="sm">
                 {c.case_type} PERSON CASE
-              </span>
-              <span className="font-mono text-xs font-bold text-slate-400">
+              </Badge>
+              <span className="font-mono text-xs font-bold text-shade-50">
                 {c.case_uid}
               </span>
             </div>
-            <h1 className="text-3xl font-black text-slate-900 mt-2">
+            <h1 className="type-display-md text-ink">
               {a.full_name || (c.case_type === 'FOUND' ? 'Unidentified Survivor' : 'Name Withheld')}
             </h1>
-            <p className="text-xs text-slate-500 mt-1 flex items-center gap-2">
+            <p className="type-caption text-shade-50 flex items-center gap-2">
               <span>Reported by {r.source_type}</span>
               <span>•</span>
               <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" /> {r.found_location || 'Location not recorded'}
+                <MapPin className="w-3.5 h-3.5 text-shade-40" /> {r.found_location || 'Location not recorded'}
               </span>
             </p>
           </div>
 
           {/* Status Badge */}
-          <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1">
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-extrabold border flex items-center gap-1.5 ${
-                statusColors[c.status] || 'bg-slate-100 text-slate-700'
-              }`}
+          <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1.5">
+            <Badge
+              variant={
+                c.status === 'VERIFIED_MATCH'
+                  ? 'verified'
+                  : c.status === 'POSSIBLE_MATCH'
+                  ? 'pending'
+                  : 'shade'
+              }
+              size="md"
+              icon={
+                c.status === 'VERIFIED_MATCH' ? (
+                  <CheckCircle2 className="w-4 h-4" />
+                ) : (
+                  <Clock className="w-4 h-4" />
+                )
+              }
             >
-              {c.status === 'VERIFIED_MATCH' ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              ) : (
-                <Clock className="w-4 h-4 text-amber-600" />
-              )}
               {c.status}
-            </span>
-            <span className="text-[10px] text-slate-400">
+            </Badge>
+            <span className="text-[10px] text-shade-40">
               Updated {new Date(c.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-slate-200 gap-6 text-xs font-bold">
+        <div className="flex border-b border-hairline-light gap-6 text-xs font-semibold">
           <button
             onClick={() => setActiveTab('OVERVIEW')}
-            className={`pb-3 border-b-2 transition ${
+            className={`pb-3 border-b-2 transition-colors duration-150 ${
               activeTab === 'OVERVIEW'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-ink text-ink font-bold'
+                : 'border-transparent text-shade-50 hover:text-ink'
             }`}
           >
             Case Overview
           </button>
           <button
             onClick={() => setActiveTab('ATTRIBUTES')}
-            className={`pb-3 border-b-2 transition ${
+            className={`pb-3 border-b-2 transition-colors duration-150 ${
               activeTab === 'ATTRIBUTES'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-ink text-ink font-bold'
+                : 'border-transparent text-shade-50 hover:text-ink'
             }`}
           >
-            Physical & Observable Attributes
+            Physical Attributes
           </button>
           <button
             onClick={() => setActiveTab('RECONCILIATION')}
-            className={`pb-3 border-b-2 transition ${
+            className={`pb-3 border-b-2 transition-colors duration-150 ${
               activeTab === 'RECONCILIATION'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-ink text-ink font-bold'
+                : 'border-transparent text-shade-50 hover:text-ink'
             }`}
           >
             Reconciliation & Shelter Info
@@ -197,55 +188,55 @@ export const CaseDetailPage: React.FC = () => {
         {activeTab === 'OVERVIEW' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <div className="text-slate-500 font-medium">Age & Demographics</div>
-                <div className="font-bold text-slate-900 text-sm">
+              <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md space-y-1">
+                <div className="text-shade-50 font-medium">Age & Demographics</div>
+                <div className="font-bold text-ink text-sm">
                   {a.age || a.approximate_age || 'Unknown'} Years • {a.gender || 'Not specified'}
                 </div>
-                <div className="text-slate-500 text-[11px]">
-                  Blood Group: <strong>{a.blood_group || 'Unknown'}</strong>
+                <div className="text-shade-60 type-caption">
+                  Blood Group: <strong className="text-ink">{a.blood_group || 'Unknown'}</strong>
                 </div>
               </div>
 
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <div className="text-slate-500 font-medium">Reporting Channel</div>
-                <div className="font-bold text-slate-900 text-sm">
+              <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md space-y-1">
+                <div className="text-shade-50 font-medium">Reporting Channel</div>
+                <div className="font-bold text-ink text-sm">
                   {r.source_type} Intake
                 </div>
-                <div className="text-slate-500 text-[11px]">
-                  Communication Status: <strong>{r.comm_status || 'Unknown'}</strong>
+                <div className="text-shade-60 type-caption">
+                  Communication Status: <strong className="text-ink">{r.comm_status || 'Unknown'}</strong>
                 </div>
               </div>
             </div>
 
             {/* Notes */}
             {r.report_notes && (
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
-                <div className="font-bold text-slate-700">Intake Notes:</div>
-                <p className="text-slate-600 leading-relaxed">{r.report_notes}</p>
+              <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md text-xs space-y-1">
+                <div className="font-bold text-ink">Intake Notes:</div>
+                <p className="type-caption text-shade-60 leading-relaxed">{r.report_notes}</p>
               </div>
             )}
 
             {/* Timeline */}
             <div className="space-y-4 pt-2">
-              <h3 className="text-sm font-bold text-slate-900">Case Reconciliation Milestones</h3>
-              <div className="space-y-4 pl-2 border-l-2 border-slate-200">
+              <h3 className="type-heading-md text-ink">Case Reconciliation Milestones</h3>
+              <div className="space-y-4 pl-2 border-l-2 border-hairline-light">
                 {timelineSteps.map((step, idx) => (
                   <div key={idx} className="relative pl-6">
                     <div
-                      className={`absolute -left-[9px] top-0.5 w-4 h-4 rounded-full border-2 bg-white flex items-center justify-center ${
-                        step.done ? 'border-emerald-500' : 'border-slate-300'
+                      className={`absolute -left-[9px] top-0.5 w-4 h-4 rounded-pill border-2 bg-canvas-light flex items-center justify-center ${
+                        step.done ? 'border-ink' : 'border-shade-40'
                       }`}
                     >
-                      {step.done && <span className="w-2 h-2 rounded-full bg-emerald-500"></span>}
+                      {step.done && <span className="w-2 h-2 rounded-pill bg-ink"></span>}
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className={`font-bold ${step.done ? 'text-slate-900' : 'text-slate-400'}`}>
+                      <span className={`font-semibold ${step.done ? 'text-ink' : 'text-shade-40'}`}>
                         {step.title}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-medium">{step.date}</span>
+                      <span className="text-[10px] text-shade-40 font-medium">{step.date}</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-0.5">{step.desc}</p>
+                    <p className="type-caption text-shade-50 mt-0.5">{step.desc}</p>
                   </div>
                 ))}
               </div>
@@ -256,50 +247,50 @@ export const CaseDetailPage: React.FC = () => {
         {/* TAB 2: ATTRIBUTES */}
         {activeTab === 'ATTRIBUTES' && (
           <div className="space-y-4 text-xs">
-            <div className="border border-slate-200 rounded-xl overflow-hidden divide-y divide-slate-100">
-              <div className="grid grid-cols-3 p-3 bg-slate-50 font-semibold text-slate-700">
+            <div className="border border-hairline-light rounded-md overflow-hidden divide-y divide-hairline-light">
+              <div className="grid grid-cols-3 p-3.5 bg-canvas-cream font-semibold text-shade-70">
                 <div>Feature</div>
                 <div className="col-span-2">Recorded Attributes</div>
               </div>
-              <div className="grid grid-cols-3 p-3">
-                <div className="font-medium text-slate-500">Alternative Names</div>
-                <div className="col-span-2 text-slate-900">{a.alternative_names || '—'}</div>
+              <div className="grid grid-cols-3 p-3.5">
+                <div className="font-medium text-shade-50">Alternative Names</div>
+                <div className="col-span-2 text-ink">{a.alternative_names || '—'}</div>
               </div>
-              <div className="grid grid-cols-3 p-3">
-                <div className="font-medium text-slate-500">Height & Weight</div>
-                <div className="col-span-2 text-slate-900">
+              <div className="grid grid-cols-3 p-3.5">
+                <div className="font-medium text-shade-50">Height & Weight</div>
+                <div className="col-span-2 text-ink">
                   {a.height_cm ? `${a.height_cm} cm` : '—'} • {a.weight_kg ? `${a.weight_kg} kg` : '—'} (Build: {a.build || '—'})
                 </div>
               </div>
-              <div className="grid grid-cols-3 p-3">
-                <div className="font-medium text-slate-500">Hair & Eyes</div>
-                <div className="col-span-2 text-slate-900">
+              <div className="grid grid-cols-3 p-3.5">
+                <div className="font-medium text-shade-50">Hair & Eyes</div>
+                <div className="col-span-2 text-ink">
                   Hair: {a.hair_colour || '—'} ({a.hair_description || '—'}), Eyes: {a.eye_colour || '—'}
                 </div>
               </div>
-              <div className="grid grid-cols-3 p-3">
-                <div className="font-medium text-slate-500">Clothing Recorded</div>
-                <div className="col-span-2 text-slate-900">{a.clothing || '—'}</div>
+              <div className="grid grid-cols-3 p-3.5">
+                <div className="font-medium text-shade-50">Clothing Recorded</div>
+                <div className="col-span-2 text-ink">{a.clothing || '—'}</div>
               </div>
-              <div className="grid grid-cols-3 p-3">
-                <div className="font-medium text-slate-500">Footwear</div>
-                <div className="col-span-2 text-slate-900">{a.footwear || '—'}</div>
+              <div className="grid grid-cols-3 p-3.5">
+                <div className="font-medium text-shade-50">Footwear</div>
+                <div className="col-span-2 text-ink">{a.footwear || '—'}</div>
               </div>
-              <div className="grid grid-cols-3 p-3">
-                <div className="font-medium text-slate-500">Accessories / Threads</div>
-                <div className="col-span-2 text-slate-900">{a.accessories || '—'}</div>
+              <div className="grid grid-cols-3 p-3.5">
+                <div className="font-medium text-shade-50">Accessories / Items</div>
+                <div className="col-span-2 text-ink">{a.accessories || '—'}</div>
               </div>
-              <div className="grid grid-cols-3 p-3">
-                <div className="font-medium text-slate-500">Scars & Marks</div>
-                <div className="col-span-2 text-slate-900 font-semibold text-blue-900">{a.scars || 'None recorded'}</div>
+              <div className="grid grid-cols-3 p-3.5">
+                <div className="font-medium text-shade-50">Scars & Marks</div>
+                <div className="col-span-2 text-ink font-semibold">{a.scars || 'None recorded'}</div>
               </div>
-              <div className="grid grid-cols-3 p-3">
-                <div className="font-medium text-slate-500">Birthmarks & Tattoos</div>
-                <div className="col-span-2 text-slate-900">{a.birthmarks || a.tattoos || 'None recorded'}</div>
+              <div className="grid grid-cols-3 p-3.5">
+                <div className="font-medium text-shade-50">Birthmarks & Tattoos</div>
+                <div className="col-span-2 text-ink">{a.birthmarks || a.tattoos || 'None recorded'}</div>
               </div>
-              <div className="grid grid-cols-3 p-3 bg-amber-50/50">
-                <div className="font-bold text-amber-900">Key Distinguishing Clue</div>
-                <div className="col-span-2 font-bold text-amber-900">{a.identifying_clue || 'None'}</div>
+              <div className="grid grid-cols-3 p-3.5 bg-aloe/15">
+                <div className="font-bold text-ink">Key Distinguishing Clue</div>
+                <div className="col-span-2 font-bold text-ink">{a.identifying_clue || 'None'}</div>
               </div>
             </div>
           </div>
@@ -309,43 +300,46 @@ export const CaseDetailPage: React.FC = () => {
         {activeTab === 'RECONCILIATION' && (
           <div className="space-y-6">
             {c.status === 'VERIFIED_MATCH' ? (
-              <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-4">
-                <div className="flex items-center gap-2.5 text-emerald-800 font-bold text-base">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+              <div className="p-6 bg-aloe border border-aloe/60 rounded-md space-y-4">
+                <div className="flex items-center gap-2.5 text-ink font-bold text-base">
+                  <CheckCircle2 className="w-6 h-6 text-ink" />
                   Verified Positive Match Confirmed
                 </div>
-                <p className="text-xs text-emerald-900 leading-relaxed">
+                <p className="type-caption text-ink leading-relaxed">
                   Relief coordinators have audited the evidence and verified that this case matches active rescue intake records. The person is safe and accounted for in the relief shelter network.
                 </p>
 
-                <div className="p-4 bg-white border border-emerald-200 rounded-xl space-y-2 text-xs text-slate-800">
-                  <div className="font-bold text-emerald-800 text-sm">Designated Reunion Location:</div>
+                <div className="p-4 bg-canvas-light border border-hairline-light rounded-md space-y-2 text-xs text-ink">
+                  <div className="font-bold text-ink text-sm">Designated Reunion Location:</div>
                   <div><strong>Shelter Camp:</strong> Camp Relief Zone 2 (NDRF Battalion 4 Intake)</div>
                   <div><strong>Designated Coordinator:</strong> Major Vikram Rathore</div>
-                  <div><strong>Helpline Verification PIN:</strong> <span className="font-mono font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded">{c.case_uid}</span></div>
+                  <div><strong>Helpline Verification PIN:</strong> <span className="font-mono font-bold bg-shade-30 px-2 py-0.5 rounded text-ink">{c.case_uid}</span></div>
                   <div><strong>Emergency Desk Contact:</strong> +91 98765 43210 (24/7 Disaster Helpline)</div>
                 </div>
               </div>
             ) : c.status === 'POSSIBLE_MATCH' ? (
-              <div className="p-6 bg-amber-50 border border-amber-200 rounded-2xl space-y-4">
-                <div className="flex items-center gap-2.5 text-amber-800 font-bold text-base">
+              <div className="p-6 bg-canvas-cream border border-hairline-light rounded-md space-y-4">
+                <div className="flex items-center gap-2.5 text-ink font-bold text-base">
                   <Clock className="w-6 h-6 text-amber-600" />
                   Potential Algorithmic Candidate Under Review
                 </div>
-                <p className="text-xs text-amber-900 leading-relaxed">
-                  Our weighted matching engine has flagged a high-similarity candidate record matching key physical clues (surgical scar & sacred thread). Coordinators are currently auditing evidence side-by-side.
+                <p className="type-caption text-shade-60 leading-relaxed">
+                  Our weighted matching engine has flagged a high-similarity candidate record matching key physical clues. Coordinators are currently auditing evidence side-by-side.
                 </p>
-                <Link
-                  to="/review"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-500 transition"
-                >
-                  <ShieldCheck className="w-4 h-4" /> Open Match Reviewer Audit
+                <Link to="/review">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    leftIcon={<ShieldCheck className="w-4 h-4" />}
+                  >
+                    Open Match Reviewer Audit
+                  </Button>
                 </Link>
               </div>
             ) : (
-              <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 text-xs text-slate-600">
-                <div className="font-bold text-slate-800 text-sm">Active Algorithmic Sweep</div>
-                <p>
+              <div className="p-6 bg-canvas-cream border border-hairline-light rounded-md space-y-2 text-xs text-shade-60">
+                <div className="font-bold text-ink text-sm">Active Algorithmic Sweep</div>
+                <p className="type-caption">
                   This case is continuously checked against all incoming survivor admissions from rescue boats, shelters, and medical intake desks.
                 </p>
               </div>
