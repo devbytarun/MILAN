@@ -9,6 +9,8 @@ import {
   X,
   FileCheck,
 } from 'lucide-react';
+import { Button } from '../ui/Button.tsx';
+import { Badge } from '../ui/Badge.tsx';
 
 interface SideBySideCompareProps {
   matchResult: MatchResult;
@@ -85,82 +87,88 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-modal bg-canvas-night/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-canvas-light border border-hairline-light rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col shadow-elevation-4 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="p-6 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+        <div className="p-6 bg-canvas-night text-on-dark flex items-center justify-between border-b border-hairline-dark">
           <div>
-            <div className="flex items-center gap-2 text-xs text-blue-300 font-mono font-bold">
+            <div className="flex items-center gap-2 text-xs text-aloe font-mono font-bold">
               <span>{sourceCase.case.case_uid} (Missing)</span>
               <span>↔</span>
               <span>{candidateCase.case.case_uid} (Found)</span>
             </div>
-            <h2 className="text-xl font-bold text-white mt-1">
+            <h2 className="type-heading-lg text-on-dark mt-1">
               Side-by-Side Verification Audit
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition"
+            className="p-2 text-shade-40 hover:text-on-dark rounded-pill hover:bg-white/10 transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content Scrollable Table */}
         <div className="p-6 overflow-y-auto flex-1 space-y-6">
           {/* Match Score Banner */}
-          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="p-5 bg-canvas-cream border border-hairline-light rounded-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <div className="text-xs font-bold text-emerald-800 uppercase tracking-wide">
+              <div className="text-xs font-bold text-ink uppercase tracking-wide">
                 Algorithmic Confidence Assessment
               </div>
-              <p className="text-xs text-emerald-900 mt-1">
+              <p className="type-caption text-shade-60 mt-1">
                 {matchResult.explanation}
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0">
+              <Badge
+                variant={matchResult.confidenceTier === 'HIGH' ? 'verified' : matchResult.confidenceTier === 'MEDIUM' ? 'pending' : 'shade'}
+                size="sm"
+              >
+                {matchResult.confidenceTier} CONFIDENCE
+              </Badge>
               <div className="text-right">
-                <div className="text-3xl font-black text-emerald-700">
+                <div className="type-heading-xl font-bold text-ink">
                   {matchResult.score}%
                 </div>
-                <div className="text-[10px] font-semibold text-emerald-800">Overall Match</div>
+                <div className="text-[10px] uppercase font-semibold text-shade-40">Confidence Score</div>
               </div>
             </div>
           </div>
 
           {/* Comparison Table */}
-          <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+          <div className="border border-hairline-light rounded-md overflow-hidden">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+              <thead className="bg-canvas-cream text-shade-70 font-semibold border-b border-hairline-light">
                 <tr>
                   <th className="p-3.5 w-1/4">Attribute</th>
-                  <th className="p-3.5 w-[37.5%] bg-emerald-50/70 text-emerald-900 border-l border-r border-slate-200">
+                  <th className="p-3.5 w-[37.5%] border-l border-r border-hairline-light bg-aloe/15 text-ink font-bold">
                     Family Missing Report ({sourceCase.case.case_uid})
                   </th>
-                  <th className="p-3.5 w-[37.5%] bg-blue-50/70 text-blue-900">
+                  <th className="p-3.5 w-[37.5%] bg-canvas-cream text-ink font-bold">
                     Rescue Intake Report ({candidateCase.case.case_uid})
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-hairline-light">
                 {rows.map((r) => (
                   <tr
                     key={r.label}
-                    className={r.highlight ? 'bg-amber-50/40 font-medium' : 'hover:bg-slate-50/70 transition'}
+                    className={r.highlight ? 'bg-aloe/10 font-medium' : 'hover:bg-canvas-cream/60 transition-colors'}
                   >
-                    <td className="p-3.5 font-bold text-slate-800">
+                    <td className="p-3.5 font-bold text-ink">
                       {r.label}
                       {r.highlight && (
-                        <span className="block text-[10px] text-amber-600 font-semibold">
+                        <span className="block text-[10px] text-shade-50 font-semibold">
                           ★ High Weight Factor
                         </span>
                       )}
                     </td>
-                    <td className="p-3.5 text-slate-800 border-l border-r border-slate-200 bg-emerald-50/10">
+                    <td className="p-3.5 text-ink border-l border-r border-hairline-light">
                       {r.source}
                     </td>
-                    <td className="p-3.5 text-slate-800 bg-blue-50/10">
+                    <td className="p-3.5 text-ink">
                       {r.candidate}
                     </td>
                   </tr>
@@ -170,72 +178,72 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
           </div>
 
           {/* Reviewer Action Box */}
-          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-indigo-600" />
+          <div className="bg-canvas-cream border border-hairline-light rounded-md p-5 space-y-4">
+            <h3 className="text-sm font-semibold text-ink flex items-center gap-2">
+              <FileCheck className="w-4 h-4 text-ink" />
               Coordinator Verification Decision
             </h3>
 
             {/* Action Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button
                 type="button"
                 onClick={() => setSelectedAction('VERIFIED')}
-                className={`p-3 rounded-xl border text-left transition flex items-center justify-between ${
+                className={`p-3.5 rounded-md border text-left transition-all duration-150 flex items-center justify-between ${
                   selectedAction === 'VERIFIED'
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                    : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-700'
+                    ? 'bg-aloe text-ink border-aloe/80 shadow-sm font-semibold'
+                    : 'bg-canvas-light hover:bg-canvas-cream border-hairline-light text-shade-70'
                 }`}
               >
                 <div>
                   <div className="text-xs font-bold">VERIFY MATCH</div>
-                  <div className={`text-[10px] ${selectedAction === 'VERIFIED' ? 'text-emerald-100' : 'text-slate-400'}`}>
+                  <div className="text-[10px] text-shade-50">
                     Confirmed positive reunion
                   </div>
                 </div>
-                <CheckCircle2 className="w-5 h-5" />
+                <CheckCircle2 className="w-4 h-4 text-ink shrink-0" />
               </button>
 
               <button
                 type="button"
                 onClick={() => setSelectedAction('REJECTED')}
-                className={`p-3 rounded-xl border text-left transition flex items-center justify-between ${
+                className={`p-3.5 rounded-md border text-left transition-all duration-150 flex items-center justify-between ${
                   selectedAction === 'REJECTED'
-                    ? 'bg-rose-600 text-white border-rose-600 shadow-sm'
-                    : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-700'
+                    ? 'bg-rose-50 text-rose-800 border-rose-300 shadow-sm font-semibold'
+                    : 'bg-canvas-light hover:bg-canvas-cream border-hairline-light text-shade-70'
                 }`}
               >
                 <div>
                   <div className="text-xs font-bold">REJECT MATCH</div>
-                  <div className={`text-[10px] ${selectedAction === 'REJECTED' ? 'text-rose-100' : 'text-slate-400'}`}>
+                  <div className="text-[10px] text-shade-50">
                     False positive candidate
                   </div>
                 </div>
-                <XCircle className="w-5 h-5" />
+                <XCircle className="w-4 h-4 text-rose-600 shrink-0" />
               </button>
 
               <button
                 type="button"
                 onClick={() => setSelectedAction('MORE_INFO_NEEDED')}
-                className={`p-3 rounded-xl border text-left transition flex items-center justify-between ${
+                className={`p-3.5 rounded-md border text-left transition-all duration-150 flex items-center justify-between ${
                   selectedAction === 'MORE_INFO_NEEDED'
-                    ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
-                    : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-700'
+                    ? 'bg-[#fef3c7] text-[#92400e] border-[#fde68a] shadow-sm font-semibold'
+                    : 'bg-canvas-light hover:bg-canvas-cream border-hairline-light text-shade-70'
                 }`}
               >
                 <div>
                   <div className="text-xs font-bold">REQUEST MORE INFO</div>
-                  <div className={`text-[10px] ${selectedAction === 'MORE_INFO_NEEDED' ? 'text-amber-100' : 'text-slate-400'}`}>
+                  <div className="text-[10px] text-shade-50">
                     Require shelter photo/call
                   </div>
                 </div>
-                <HelpCircle className="w-5 h-5" />
+                <HelpCircle className="w-4 h-4 text-[#92400e] shrink-0" />
               </button>
             </div>
 
             {/* Audit Notes */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-shade-70 uppercase tracking-wider">
                 Mandatory Reviewer Audit Reason <span className="text-rose-500">*</span>
               </label>
               <textarea
@@ -244,29 +252,31 @@ export const SideBySideCompare: React.FC<SideBySideCompareProps> = ({
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Explain the evidentiary justification for this verification decision..."
-                className="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                className="w-full px-3.5 py-2.5 text-xs font-normal text-ink border border-hairline-light rounded-md outline-none focus:border-ink bg-canvas-light"
               />
             </div>
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-slate-100 border-t border-slate-200 flex items-center justify-end gap-3">
-          <button
+        <div className="p-4 bg-canvas-cream border-t border-hairline-light flex items-center justify-end gap-3">
+          <Button
             type="button"
+            variant="outline-light"
+            size="sm"
             onClick={onClose}
-            className="px-4 py-2 border border-slate-300 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="aloe"
+            size="sm"
             onClick={() => onConfirmAction(selectedAction, reason)}
-            className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition"
+            leftIcon={<ShieldCheck className="w-4 h-4" />}
           >
-            <ShieldCheck className="w-4 h-4" />
             Record Decision in Audit Log
-          </button>
+          </Button>
         </div>
       </div>
     </div>
