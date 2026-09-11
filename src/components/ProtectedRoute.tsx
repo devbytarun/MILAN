@@ -26,8 +26,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   if (loading) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center p-6 text-center">
-        <div className="h-8 w-8 animate-spin rounded-pill border-2 border-[#181d26] border-t-transparent mb-4"></div>
-        <p className="text-xs text-[#9297a0] font-medium">Verifying authorization credentials...</p>
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-orange-600 border-t-transparent mb-4"></div>
+        <p className="text-xs text-slate-400 font-mono">Verifying authorization credentials...</p>
       </div>
     );
   }
@@ -49,22 +49,22 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Verification status check for operational roles
   if (profile.verification_status !== 'APPROVED') {
     return (
-      <div className="max-w-xl mx-auto my-16 p-8 bg-white border border-[#dddddd] rounded-xl shadow-elevation-1 text-center space-y-4">
-        <div className="inline-flex p-3 bg-[#f8fafc] text-[#181d26] rounded-full border border-[#dddddd] mb-2">
-          <Clock className="w-8 h-8 text-[#d9a441]" />
+      <div className="max-w-xl mx-auto my-16 p-8 bg-white border border-slate-200/90 rounded-2xl shadow-card text-center space-y-4 font-body">
+        <div className="inline-flex p-3 bg-amber-50 text-amber-600 rounded-2xl border border-amber-200 mb-2 shadow-sm">
+          <Clock className="w-8 h-8 text-amber-600" />
         </div>
         <div className="space-y-1">
           <div className="flex justify-center mb-1">
             <Badge variant="pending" size="sm">Verification Pending</Badge>
           </div>
-          <h2 className="font-display text-xl font-normal text-[#181d26]">Account Pending Verification</h2>
+          <h2 className="font-display text-xl font-semibold text-slate-900">Account Pending Verification</h2>
         </div>
-        <p className="text-xs text-[#41454d] leading-relaxed">
-          Your organization credential (<span className="font-semibold text-[#181d26]">{profile.organization_name || profile.role}</span>) is awaiting administrative audit before you can register official disaster records.
+        <p className="text-xs text-slate-600 leading-relaxed">
+          Your organization credential (<span className="font-semibold text-slate-900">{profile.organization_name || profile.role}</span>) is awaiting administrative audit before you can register official disaster records.
         </p>
-        <div className="p-4 bg-[#f8fafc] rounded-md text-xs text-[#41454d] border border-[#dddddd] text-left space-y-1">
-          <p className="font-semibold text-[#181d26]">Evaluation Mode:</p>
-          <p className="text-[11px] text-[#9297a0]">
+        <div className="p-4 bg-slate-50 rounded-xl text-xs text-slate-600 border border-slate-200/90 text-left space-y-1">
+          <p className="font-semibold text-slate-900">Evaluation Mode:</p>
+          <p className="text-[11px] text-slate-500">
             For rapid evaluation, switch personas from the top navigation bar or select an authorized Demo account on the login page.
           </p>
         </div>

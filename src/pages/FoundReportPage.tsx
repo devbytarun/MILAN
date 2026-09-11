@@ -14,6 +14,7 @@ import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { hasPermission } from '../lib/permissions.ts';
 import { AccessDenied } from './AccessDenied.tsx';
+import { Button } from '../components/ui/Button.tsx';
 
 const FOUND_STEPS: FormStep[] = [
   { id: 'comm', title: 'Communication Status', subtitle: 'Determine if survivor can provide their own details' },
@@ -141,52 +142,58 @@ export const FoundReportPage: React.FC = () => {
 
   if (submittedUid) {
     return (
-      <div className="max-w-2xl mx-auto my-8 bg-canvas-light border border-hairline-light rounded-lg p-8 shadow-elevation-3 text-center space-y-6">
-        <div className="w-16 h-16 bg-canvas-cream text-ink rounded-pill flex items-center justify-center mx-auto border border-hairline-light">
-          <CheckCircle2 className="w-8 h-8 text-ink" />
+      <div className="max-w-2xl mx-auto my-8 bg-white border border-slate-200/90 rounded-2xl p-8 shadow-card text-center space-y-6 font-body">
+        <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto border border-emerald-200 shadow-sm">
+          <CheckCircle2 className="w-8 h-8" />
         </div>
 
         <div>
-          <span className="inline-flex items-center text-[10px] font-semibold text-ink bg-canvas-cream px-3 py-1 rounded-pill uppercase tracking-wider border border-hairline-light">
+          <span className="inline-flex items-center text-[10px] font-mono font-semibold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-200">
             Found Person Intake Registered
           </span>
-          <h2 className="type-heading-xl text-ink mt-3">
+          <h2 className="font-display text-2xl font-bold text-slate-900 tracking-tight mt-3">
             Case Assigned to Shelter Registry
           </h2>
-          <p className="type-caption text-shade-50 mt-1">
+          <p className="text-xs text-slate-600 mt-1">
             The record is live and actively matched against missing person inquiries from family members.
           </p>
         </div>
 
         {/* UID Box */}
-        <div className="p-6 bg-canvas-night text-on-dark rounded-md shadow-elevation-1 max-w-sm mx-auto space-y-1 border border-hairline-dark">
-          <div className="text-[10px] font-semibold text-shade-40 uppercase tracking-widest">
+        <div className="p-6 bg-slate-900 text-white rounded-xl shadow-sm max-w-sm mx-auto space-y-1 border border-slate-800">
+          <div className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-widest">
             Milan Found UID
           </div>
-          <div className="text-3xl font-mono font-bold tracking-wider text-on-dark">
+          <div className="text-3xl font-mono font-bold tracking-wider text-orange-400">
             {submittedUid}
           </div>
-          <div className="text-[11px] text-shade-40">
+          <div className="text-[11px] text-slate-400">
             Reference this UID on camp identification badges and triage logs.
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <Link
-            to="/review"
-            className="w-full sm:w-auto px-6 py-2.5 bg-primary text-on-primary hover:bg-shade-70 font-semibold rounded-pill text-xs flex items-center justify-center gap-2 shadow-sm transition"
-          >
-            <Shield className="w-4 h-4" /> Check Candidate Matches
+          <Link to="/review" className="w-full sm:w-auto">
+            <Button
+              variant="brand"
+              size="md"
+              leftIcon={<Shield className="w-4 h-4" />}
+              className="w-full sm:w-auto"
+            >
+              Check Candidate Matches
+            </Button>
           </Link>
-          <button
+          <Button
+            variant="secondary"
+            size="md"
             onClick={() => {
               setSubmittedUid(null);
               setCurrentStep(0);
             }}
-            className="w-full sm:w-auto px-5 py-2.5 border border-ink hover:bg-canvas-cream text-ink font-semibold rounded-pill text-xs transition"
+            className="w-full sm:w-auto"
           >
             Intake Next Person
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -252,25 +259,25 @@ export const FoundReportPage: React.FC = () => {
                 <div
                   key={opt.id}
                   onClick={() => setCommStatus(opt.id as CommunicationStatus)}
-                  className={`p-4 rounded-md border cursor-pointer transition-all flex flex-col justify-between ${
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
                     commStatus === opt.id
-                      ? 'border-ink bg-canvas-cream ring-1 ring-ink'
-                      : 'border-hairline-light hover:border-shade-40 hover:bg-canvas-cream/50'
+                      ? 'border-orange-500 bg-orange-50/40 ring-2 ring-orange-500/20 shadow-sm'
+                      : 'border-slate-200/90 hover:border-slate-300 hover:bg-slate-50/60 bg-white'
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-bold text-ink">{opt.title}</span>
+                      <span className="text-xs font-bold text-slate-900">{opt.title}</span>
                       {commStatus === opt.id ? (
-                        <CheckCircle2 className="w-4 h-4 text-ink shrink-0" />
+                        <CheckCircle2 className="w-4 h-4 text-orange-600 shrink-0" />
                       ) : (
-                        <span className="w-4 h-4 rounded-pill border border-hairline-light"></span>
+                        <span className="w-4 h-4 rounded-full border border-slate-300"></span>
                       )}
                     </div>
-                    <p className="type-caption text-shade-50 leading-relaxed">{opt.desc}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed">{opt.desc}</p>
                   </div>
                   <div className="mt-3">
-                    <Badge variant={commStatus === opt.id ? 'mint' : 'shade'} size="sm">
+                    <Badge variant={commStatus === opt.id ? 'coral' : 'shade'} size="sm">
                       {opt.badge}
                     </Badge>
                   </div>
@@ -480,10 +487,10 @@ export const FoundReportPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md text-xs text-ink flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 text-ink shrink-0 mt-0.5" />
-            <div className="type-caption text-shade-60">
-              This report creates an official <strong className="text-ink">FOUND</strong> case. The matching pipeline will cross-match it against missing child and family records immediately.
+          <div className="p-4 bg-orange-50/60 border border-orange-200/80 rounded-xl text-xs text-slate-700 flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-orange-600 shrink-0 mt-0.5" />
+            <div className="text-slate-600">
+              This report creates an official <strong className="text-orange-950 font-semibold">FOUND</strong> case. The matching pipeline will cross-match it against missing child and family records immediately.
             </div>
           </div>
         </div>

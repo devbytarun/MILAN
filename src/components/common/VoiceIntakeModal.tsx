@@ -68,11 +68,11 @@ export const VoiceIntakeModal: React.FC<VoiceIntakeModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-modal bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white border border-slate-200 rounded-xl max-w-2xl w-full flex flex-col shadow-elevation-4 overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white border border-slate-200/90 rounded-2xl max-w-2xl w-full flex flex-col shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="p-5 bg-slate-900 text-white flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-pill bg-blue-600 flex items-center justify-center text-white">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-orange-600 flex items-center justify-center text-white shadow-sm">
               <Radio className="w-4 h-4" />
             </div>
             <div>
@@ -86,7 +86,7 @@ export const VoiceIntakeModal: React.FC<VoiceIntakeModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-pill hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -95,15 +95,15 @@ export const VoiceIntakeModal: React.FC<VoiceIntakeModalProps> = ({
         {/* Body */}
         <div className="p-6 space-y-5 overflow-y-auto max-h-[75vh]">
           {/* Audio Visualizer & Mic Button */}
-          <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={handleToggleRecording}
-                className={`w-12 h-12 rounded-pill flex items-center justify-center transition-all ${
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                   isRecording
                     ? 'bg-rose-600 text-white animate-pulse ring-4 ring-rose-200'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
+                    : 'bg-orange-600 hover:bg-orange-700 text-white shadow-sm'
                 }`}
                 title={isRecording ? 'Click to stop' : 'Click to speak'}
               >
@@ -140,9 +140,9 @@ export const VoiceIntakeModal: React.FC<VoiceIntakeModalProps> = ({
                   key={idx}
                   type="button"
                   onClick={() => handleApplyPreset(s.text)}
-                  className="p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-blue-50/50 hover:border-blue-300 text-left transition text-xs space-y-1 group"
+                  className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-orange-50/40 hover:border-orange-200 text-left transition text-xs space-y-1 group"
                 >
-                  <div className="font-bold text-slate-800 flex items-center gap-1 group-hover:text-blue-700">
+                  <div className="font-bold text-slate-800 flex items-center gap-1 group-hover:text-orange-600">
                     <Volume2 className="w-3.5 h-3.5" />
                     <span>{s.title}</span>
                   </div>
@@ -167,16 +167,16 @@ export const VoiceIntakeModal: React.FC<VoiceIntakeModalProps> = ({
                 handleParse(e.target.value);
               }}
               placeholder="e.g. Female child, age around 4, pink clothing, heart birthmark on right shoulder..."
-              className="w-full px-3.5 py-2.5 text-xs text-slate-900 border border-slate-300 rounded-md outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              className="w-full px-3.5 py-2.5 text-xs text-slate-900 bg-slate-50/50 border border-slate-200/90 rounded-xl outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all"
             />
           </div>
 
           {/* Live Extraction Results */}
           {parsedResult && (
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-3">
+            <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-xl space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-blue-600" />
+                  <Sparkles className="w-4 h-4 text-orange-600" />
                   <span className="text-xs font-bold text-slate-900">Extracted Attributes</span>
                 </div>
                 <Badge
@@ -192,7 +192,7 @@ export const VoiceIntakeModal: React.FC<VoiceIntakeModalProps> = ({
                   {parsedResult.extractedEntities.map((ent, i) => (
                     <div
                       key={i}
-                      className="p-2 bg-white rounded border border-slate-200 text-xs space-y-0.5"
+                      className="p-2 bg-white rounded-lg border border-slate-200 text-xs space-y-0.5"
                     >
                       <div className="text-[10px] text-slate-400 font-semibold uppercase">
                         {ent.field.replace(/_/g, ' ')}
@@ -212,11 +212,11 @@ export const VoiceIntakeModal: React.FC<VoiceIntakeModalProps> = ({
 
         {/* Footer */}
         <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
-          <Button variant="outline-light" size="sm" onClick={onClose}>
+          <Button variant="secondary" size="sm" onClick={onClose}>
             Cancel
           </Button>
           <Button
-            variant="primary"
+            variant="brand"
             size="sm"
             disabled={!parsedResult || parsedResult.extractedEntities.length === 0}
             onClick={handleApply}
