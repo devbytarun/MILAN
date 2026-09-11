@@ -80,14 +80,14 @@ export const CasesPage: React.FC = () => {
 
       {/* Filters Bar (Airtable Input & Pill Bar) */}
       <div className="bg-white border border-[#dddddd] rounded-xl p-4 sm:p-5 shadow-elevation-1 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-[#9297a0] absolute left-3.5 top-3.5" />
+        <div className="relative w-full md:w-96 flex items-center">
+          <Search className="w-4 h-4 text-[#9297a0] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             placeholder={t('cases_search_placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-3.5 py-2 text-xs border border-[#dddddd] rounded-md outline-none bg-white text-[#181d26] focus:border-[#181d26] transition-colors placeholder:text-[#9297a0]"
+            className="w-full !pl-10 pr-3.5 py-2 text-xs border border-[#dddddd] rounded-md outline-none bg-white text-[#181d26] focus:border-[#181d26] transition-colors placeholder:text-[#9297a0]"
           />
         </div>
 

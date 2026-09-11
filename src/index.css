@@ -167,17 +167,19 @@
   }
 
   /* ── Form Inputs Base Spec (44px height, 6px radius, hairline border) ── */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="tel"],
-  input[type="number"],
-  input[type="datetime-local"],
-  input[type="date"],
-  select,
-  textarea {
-    border: 1px solid var(--color-hairline) !important;
-    border-radius: var(--radius-sm) !important;
+  :where(
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="datetime-local"],
+    input[type="date"],
+    select,
+    textarea
+  ) {
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-sm);
     background-color: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-body);
@@ -187,14 +189,16 @@
     transition: border-color var(--duration-normal) var(--ease-out);
   }
 
-  input[type="text"]:not(textarea),
-  input[type="email"],
-  input[type="password"],
-  input[type="tel"],
-  input[type="number"],
-  input[type="datetime-local"],
-  input[type="date"],
-  select {
+  :where(
+    input[type="text"]:not(textarea),
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="datetime-local"],
+    input[type="date"],
+    select
+  ) {
     height: 44px;
   }
 
