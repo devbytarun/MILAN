@@ -32,7 +32,7 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-8 pb-12">
       {/* Profile Header Banner */}
-      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-2.5">
             <Badge variant="shade" size="sm">
@@ -57,7 +57,7 @@ export const DashboardPage: React.FC = () => {
         <div className="flex items-center gap-3 w-full md:w-auto">
           {profile?.role === 'FAMILY' && (
             <Button
-              variant="aloe"
+              variant="primary"
               size="md"
               onClick={() => navigate('/report/missing')}
               leftIcon={<PlusCircle className="w-4 h-4" />}
@@ -190,7 +190,7 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Case Registry Snapshot */}
-      <div className="bg-canvas-light border border-hairline-light rounded-lg p-6 sm:p-8 shadow-elevation-3 space-y-6">
+      <div className="bg-white border border-[#dddddd] rounded-xl p-6 sm:p-8 shadow-elevation-1 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="type-heading-lg text-ink">{t('nav_cases')}</h3>

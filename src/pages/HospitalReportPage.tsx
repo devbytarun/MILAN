@@ -6,8 +6,6 @@ import {
   CheckCircle2,
   Lock,
   Search,
-  Stethoscope,
-  Sparkles,
 } from 'lucide-react';
 import { VoiceIntakeModal } from '../components/common/VoiceIntakeModal.tsx';
 import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
@@ -183,31 +181,7 @@ export const HospitalReportPage: React.FC = () => {
       badgeText="Hospital Clinical Intake"
       badgeColor="purple"
     >
-      {/* Clinical / Paramedic Voice Log Banner */}
-      <div className="mb-6 p-4 rounded-xl bg-purple-50/80 border border-purple-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-            <Stethoscope className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-              <span>Paramedic & Clinical Voice Log Assistant</span>
-              <span className="px-1.5 py-0.5 rounded bg-purple-200/70 text-purple-900 text-[10px] font-mono font-semibold">MEDICAL INTAKE</span>
-            </div>
-            <div className="text-xs text-slate-600 mt-0.5">
-              Dictate or transcribe paramedic admission notes to extract vital anatomical clues, blood group, and triage trauma findings.
-            </div>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setVoiceModalOpen(true)}
-          className="shrink-0 px-3.5 py-2 rounded-lg bg-[#181d26] hover:bg-[#2c333f] active:bg-[#3F3F46] text-white text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs"
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Clinical Voice Log</span>
-        </button>
-      </div>
+
 
       {voiceParseNotification && (
         <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between">
