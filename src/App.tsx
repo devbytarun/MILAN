@@ -9,6 +9,8 @@ import { LoginPage } from './pages/LoginPage.tsx';
 import { SignupPage } from './pages/SignupPage.tsx';
 import { DashboardPage } from './pages/DashboardPage.tsx';
 import { CasesPage } from './pages/CasesPage.tsx';
+import { CaseDetailPage } from './pages/CaseDetailPage.tsx';
+import { FamilyStatusView } from './pages/FamilyStatusView.tsx';
 import { FamilyReportPage } from './pages/FamilyReportPage.tsx';
 import { FoundReportPage } from './pages/FoundReportPage.tsx';
 import { HospitalReportPage } from './pages/HospitalReportPage.tsx';
@@ -25,6 +27,8 @@ export const App: React.FC = () => {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/cases" element={<CasesPage />} />
+            <Route path="/cases/:id" element={<CaseDetailPage />} />
+            <Route path="/cases/:id/status" element={<FamilyStatusView />} />
 
             {/* Authenticated Dashboard */}
             <Route
