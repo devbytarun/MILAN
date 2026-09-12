@@ -7,6 +7,7 @@ import { AccessDenied } from './AccessDenied.tsx';
 import {
   MapPin,
   CheckCircle2,
+  Check,
   Clock,
   ArrowLeft,
   ShieldCheck,
@@ -304,29 +305,109 @@ export const CaseDetailPage: React.FC = () => {
             )}
 
             {/* Timeline */}
-            <div className="space-y-4 pt-2">
-              <h3 className="text-lg font-bold tracking-tight text-slate-900">
-                Case Reconciliation Milestones
-              </h3>
-              <div className="space-y-4 pl-2 border-l-2 border-slate-200">
-                {timelineSteps.map((step, idx) => (
-                  <div key={idx} className="relative pl-6">
-                    <div
-                      className={`absolute -left-[9px] top-0.5 w-4 h-4 rounded-full border-2 bg-white flex items-center justify-center ${
-                        step.done ? 'border-orange-500' : 'border-slate-200'
-                      }`}
-                    >
-                      {step.done && <span className="w-2 h-2 rounded-full bg-orange-500"></span>}
+            <div className="p-5 sm:p-6 bg-white border border-slate-200/90 rounded-2xl shadow-xs space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="text-base font-bold tracking-tight text-slate-900">
+                    Case Reconciliation Milestones
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    End-to-end audit tracking across shelter nodes and verification desks.
+                  </p>
+                </div>
+                <span className="inline-flex items-center gap-1.5 self-start sm:self-auto px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200/60">
+                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                  {timelineSteps.filter((s) => s.done).length} of {timelineSteps.length} Completed
+                </span>
+              </div>
+
+              <div className="space-y-0">
+                {timelineSteps.map((step, idx) => {
+                  const isLast = idx === timelineSteps.length - 1;
+                  const isCurrent = !step.done && (idx === 0 || timelineSteps[idx - 1].done);
+
+                  return (
+                    <div key={idx} className="flex gap-4 group">
+                      {/* Node indicator & connecting line */}
+                      <div className="flex flex-col items-center">
+                        <div
+                          className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                            step.done
+                              ? 'bg-orange-600 text-white shadow-xs ring-4 ring-orange-100/60'
+                              : isCurrent
+                              ? 'border-2 border-orange-500 bg-white text-orange-600 ring-4 ring-orange-50 shadow-xs'
+                              : 'border-2 border-slate-200 bg-white text-slate-300'
+                          }`}
+                        >
+                          {step.done ? (
+                            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                          ) : isCurrent ? (
+                            <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                          ) : (
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                          )}
+                        </div>
+                        {!isLast && (
+                          <div
+                            className={`w-0.5 my-1.5 flex-1 min-h-[36px] transition-colors ${
+                              step.done && timelineSteps[idx + 1].done
+                                ? 'bg-orange-500'
+                                : step.done
+                                ? 'bg-gradient-to-b from-orange-400 to-slate-200'
+                                : 'bg-slate-200'
+                            }`}
+                          />
+                        )}
+                      </div>
+
+                      {/* Content block */}
+                      <div className={`flex-1 pb-6 ${isLast ? 'pb-0' : ''}`}>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-sm font-semibold tracking-tight ${
+                                step.done
+                                  ? 'text-slate-900'
+                                  : isCurrent
+                                  ? 'text-orange-950 font-bold'
+                                  : 'text-slate-500'
+                              }`}
+                            >
+                              {step.title}
+                            </span>
+                            {isCurrent && (
+                              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-orange-100 text-orange-700">
+                                In Progress
+                              </span>
+                            )}
+                          </div>
+                          <span
+                            className={`inline-flex items-center self-start sm:self-auto px-2.5 py-0.5 rounded-full text-xs font-medium font-sans ${
+                              step.done
+                                ? 'bg-orange-50 text-orange-700 border border-orange-200/60'
+                                : isCurrent
+                                ? 'bg-amber-50 text-amber-800 border border-amber-200/80 font-semibold'
+                                : 'bg-slate-100 text-slate-500 border border-slate-200/60'
+                            }`}
+                          >
+                            {step.date}
+                          </span>
+                        </div>
+                        <p
+                          className={`text-xs mt-1 leading-relaxed ${
+                            step.done
+                              ? 'text-slate-600'
+                              : isCurrent
+                              ? 'text-slate-700 font-medium'
+                              : 'text-slate-400'
+                          }`}
+                        >
+                          {step.desc}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className={`font-semibold ${step.done ? 'text-slate-900' : 'text-slate-400'}`}>
-                        {step.title}
-                      </span>
-                      <span className="text-[11px] text-slate-400 font-medium font-mono">{step.date}</span>
-                    </div>
-                    <p className="text-xs text-slate-600 mt-0.5">{step.desc}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
