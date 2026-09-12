@@ -1,27 +1,4 @@
-export type LanguageCode =
-  | 'en'
-  | 'hi'
-  | 'bn'
-  | 'te'
-  | 'mr'
-  | 'ta'
-  | 'gu'
-  | 'kn'
-  | 'ml'
-  | 'pa'
-  | 'or'
-  | 'ur'
-  | 'as'
-  | 'ne'
-  | 'sd'
-  | 'sa'
-  | 'mai'
-  | 'kok'
-  | 'doi'
-  | 'brx'
-  | 'mni'
-  | 'sat'
-  | 'ks';
+export type LanguageCode = 'en' | 'hi';
 
 export interface LanguageInfo {
   code: LanguageCode;
