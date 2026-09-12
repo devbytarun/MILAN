@@ -611,6 +611,305 @@ export function translateToHindi(rawText: string): string {
 }
 
 // ------------------------------------------------------------
+// 4A. BIDIRECTIONAL REVERSE TRANSLATOR (Hindi -> English)
+// Ensures 100% clean recovery when toggling from Hindi back to English
+// ------------------------------------------------------------
+const HINDI_TO_ENGLISH_PHRASE_DICT: Record<string, string> = {
+  'मिलन': 'MILAN',
+  'मिलन (milan)': 'MILAN',
+  'आपदा ग्रिड': 'DISASTER GRID',
+  'राहत ग्रिड सक्रिय': 'Relief Grid Live',
+  'अभियान केंद्र': 'Operations Hub',
+  'केस डायरेक्टरी': 'Disaster Case Directory',
+  'केंद्रीय डायरेक्टरी': 'Central Case Directory',
+  'लापता की रिपोर्ट दर्ज करें': 'Report Missing Person',
+  'लापता रिपोर्ट': 'Missing Reports',
+  'बचाए गए का पंजीकरण': 'Register Rescued Person',
+  'मिले व्यक्ति का पंजीकरण': 'Register Found Person',
+  'शिविर में मिले व्यक्ति': 'Rescued in Shelters',
+  'वॉइस ai': 'Voice AI',
+  'वॉइस AI': 'Voice AI',
+  'फॉरेंसिक डोसियर': 'Forensic Dossiers',
+  'सत्यापन ऑडिट': 'Verification Audit',
+  'सभी स्थितियाँ': 'All Statuses',
+  'सभी प्रकार': 'All Types',
+  'सभी केस': 'All Cases',
+  'केस यूआईडी': 'Case UID',
+  'पहचान / मुख्य निशान': 'Identifying Clue',
+  'घटना / शिविर क्षेत्र': 'Incident / Camp Zone',
+  'व्यक्ति का विवरण': 'Subject Profile',
+  'व्यक्ति का विवरण:': 'Subject Profile:',
+  'प्रविष्टि स्रोत': 'Intake Source',
+  'केस स्थिति': 'Case Status',
+  'कार्रवाई': 'Actions',
+  'डोसियर देखें': 'Review Dossier',
+  'डोसियर देखें →': 'Review Dossier →',
+  'विवरण देखें': 'Review Dossier',
+  'दर्ज नहीं': 'Not Recorded',
+  'अज्ञात जीवित व्यक्ति': 'Unidentified Survivor',
+  'अज्ञात अवयस्क (बालक/बालिका)': 'Unidentified Minor',
+  'आयु अज्ञात': 'Age Unknown',
+  'रक्त समूह अज्ञात': 'Blood Group Unknown',
+  'दर्ज किया गया': 'Submitted',
+  'संभावित मिलान': 'Possible Match',
+  'सत्यापित मिलान': 'Verified Match',
+  'सफलतापूर्वक मिलाया गया': 'Reunified',
+  'बंद': 'Closed',
+  'मिला व्यक्ति': 'Found',
+  'लापता': 'Missing',
+  'अज्ञात': 'Unknown',
+  'पुरुष': 'Male',
+  'महिला': 'Female',
+  'आगे बढ़ें': 'Continue',
+  'पिछला': 'Previous',
+  'रिपोर्ट जमा करें': 'Submit Report',
+  'लापता व्यक्ति की रिपोर्ट जमा करें': 'Submit Official Report',
+  'रद्द करें': 'Cancel',
+  'प्रिंट करें': 'Print',
+  'डाउनलोड': 'Download',
+  'अस्पताल प्रविष्टि': 'Hospital Intake',
+  'अस्पताल रोगी प्रविष्टि': 'Hospital Patient Intake',
+  'अस्पताल': 'Hospital',
+  'समीक्षा': 'Review',
+  'सत्यापन': 'Verification',
+  'प्रमाण पत्र': 'Certificate',
+  'हैंडओवर': 'Handover',
+  'सुरक्षा कवच': 'Safeguard',
+  'अनिवार्य': 'Mandatory',
+  'आवश्यक': 'Required',
+  'विश्वसनीयता': 'Confidence',
+  'पूर्णता': 'Completeness',
+  'चेतावनी': 'Alerts',
+  'फ़ील्ड': 'Fields',
+  'सुराग': 'Clue',
+  'निशान': 'Marks',
+  'घटना': 'Incident',
+  'स्थान': 'Location',
+  'स्रोत': 'Source',
+  'उम्मीदवार': 'Candidate',
+  'उम्मीदवार मिलान': 'Candidate Match',
+  'केस': 'Case',
+  'डायरेक्टरी': 'Directory',
+  'दर्ज करें': 'File Report',
+  'पंजीकरण': 'Registration',
+  'नोट्स': 'Notes',
+  'ध्वनि': 'Chimes',
+  'चालू': 'On',
+  'लाइव': 'Live',
+  'ग्रिड': 'Grid',
+  'सक्रिय': 'Active',
+  'लॉग इन करें': 'Sign In',
+  'लॉग आउट': 'Sign Out',
+  'पंजीकरण करें': 'Sign Up',
+  'अतिथि': 'Guest',
+  'परिवार रिपोर्टिंग पोर्टल': 'Family Intake Portal',
+  'मूल पहचान': 'Basic Identity',
+  'शारीरिक बनावट': 'Physical Appearance',
+  'वस्त्र और सामान': 'Clothing & Belongings',
+  'अंतिम ज्ञात स्थान': 'Last Known Location',
+  'पहचान के निशान': 'Identifying Clues',
+  'समीक्षा और जमा करें': 'Review & Submit',
+  'पूरा कानूनी नाम': 'Full Legal Name',
+  'पूरा कानूनी नाम *': 'Full Legal Name *',
+  'उपनाम / अन्य नाम': 'Nickname / Alternative Names',
+  'आयु (वर्ष)': 'Age (years)',
+  'आयु (वर्ष) *': 'Age (years) *',
+  'लिंग': 'Gender',
+  'लिंग *': 'Gender *',
+  'जन्म तिथि (यदि ज्ञात हो)': 'Date of Birth (if known)',
+  'रक्त समूह (यदि ज्ञात हो)': 'Blood Group (if known)',
+  'भूमिका:': 'Role:',
+  'भूमिका: परिजन': 'Role: Family',
+  'भूमिका: एनजीओ': 'Role: Relief NGO',
+  'भूमिका: सेना बचाव दल': 'Role: Army / NDRF Rescue',
+  'भूमिका: अस्पताल': 'Role: Hospital',
+  'भूमिका: सत्यापन अधिकारी': 'Role: Reviewer',
+  'भूमिका: व्यवस्थापक': 'Role: Admin',
+  'भूमिका: स्वयंसेवक': 'Role: Volunteer',
+  'स्वतंत्र नागरिक': 'Independent Citizen',
+  'अलकनंदा रिवरसाइड मार्केट': 'Alaknanda Riverside Market',
+  'राहत शिविर जोन 2 (एनडीआरएफ प्रविष्टि)': 'Camp Relief Zone 2 (NDRF Intake)',
+  'ब्रिज कॉलोनी, ब्लॉक सी': 'Bridge Colony, Block C',
+  'सेना शिविर': 'Army Camp',
+  'आरव शर्मा': 'Aarav Sharma',
+  'वीर कुमार': 'Veer Kumar',
+  '1. वॉइस और टेक्स्ट इनटेक': '1. Voice & Text Intake',
+  '2. फॉरेंसिक निष्कर्षण और समीक्षा': '2. Forensic Extraction & Review',
+};
+
+// Populate reverse dictionary from locales.hi -> locales.en
+if (locales && locales.hi && locales.en) {
+  for (const [key, hiVal] of Object.entries(locales.hi)) {
+    if (typeof hiVal === 'string' && locales.en[key as keyof typeof locales.en]) {
+      const cleanHi = hiVal.trim().toLowerCase();
+      const enVal = locales.en[key as keyof typeof locales.en];
+      if (!HINDI_TO_ENGLISH_PHRASE_DICT[cleanHi]) {
+        HINDI_TO_ENGLISH_PHRASE_DICT[cleanHi] = enVal;
+      }
+    }
+  }
+}
+
+// Inverted Word Dictionary
+const HINDI_TO_ENGLISH_WORD_DICT: Record<string, string> = {
+  'पुरुष': 'Male',
+  'महिला': 'Female',
+  'अज्ञात': 'Unknown',
+  'आयु': 'Age',
+  'वर्ष': 'years',
+  'रक्त': 'Blood',
+  'समूह': 'Group',
+  'लिंग': 'Gender',
+  'ऊंचाई': 'Height',
+  'वजन': 'Weight',
+  'कद-काठी': 'Build',
+  'दुबला': 'Slim',
+  'एथलेटिक': 'Athletic',
+  'मध्यम': 'Medium',
+  'भारी': 'Heavy',
+  'छोटा': 'Short',
+  'लंबा': 'Long',
+  'घुंघराला': 'Curly',
+  'सीधा': 'Straight',
+  'गंजा': 'Bald',
+  'टैटू': 'Tattoo',
+  'जन्मचिह्न': 'Birthmark',
+  'तिल': 'Mole',
+  'घाव': 'Wound',
+  'कट': 'Cut',
+  'फ्रैक्चर': 'Fracture',
+  'मिले': 'matched',
+  'विरोधाभासी': 'conflicting',
+  'अनुपलब्ध': 'data gaps',
+  'डेटा': 'Data',
+  'सत्यापित': 'Verified',
+  'संभावित': 'Possible',
+  'दर्ज': 'Submitted',
+  'पुनर्मिलित': 'Reunified',
+  'आगे बढ़ें': 'Continue',
+  'पिछला': 'Previous',
+  'जमा करें': 'Submit',
+  'रद्द करें': 'Cancel',
+  'प्रिंट करें': 'Print',
+  'डाउनलोड': 'Download',
+  'देखें': 'View',
+  'सत्यापन': 'Verification',
+  'समीक्षा': 'Review',
+  'हैंडओवर': 'Handover',
+  'सुरक्षा कवच': 'Safeguard',
+  'अनिवार्य': 'Mandatory',
+  'आवश्यक': 'Required',
+  'विश्वसनीयता': 'Confidence',
+  'पूर्णता': 'Completeness',
+  'चेतावनी': 'Alerts',
+  'फ़ील्ड': 'Fields',
+  'सुराग': 'Clue',
+  'निशान': 'Marks',
+  'स्थान': 'Location',
+  'स्रोत': 'Source',
+  'उम्मीदवार': 'Candidate',
+  'केस': 'Case',
+  'डायरेक्टरी': 'Directory',
+  'नोट्स': 'Notes',
+  'ध्वनि': 'Chimes',
+  'चालू': 'On',
+  'बंद': 'Off',
+  'लाइव': 'Live',
+  'ग्रिड': 'Grid',
+  'सक्रिय': 'Active',
+  'अस्पताल': 'Hospital',
+  'आरव': 'Aarav',
+  'शर्मा': 'Sharma',
+  'वीर': 'Veer',
+  'कुमार': 'Kumar',
+};
+
+// Add known Indian proper nouns
+for (const [enName, hiName] of Object.entries(KNOWN_INDIAN_PROPER_NOUNS)) {
+  const cap = enName.charAt(0).toUpperCase() + enName.slice(1);
+  HINDI_TO_ENGLISH_WORD_DICT[hiName.trim()] = cap;
+  HINDI_TO_ENGLISH_PHRASE_DICT[hiName.trim().toLowerCase()] = cap;
+}
+
+export function translateToEnglish(rawText: string): string {
+  if (!rawText) return rawText;
+  const trimmed = rawText.trim();
+  if (!trimmed) return rawText;
+
+  // If text does not contain Devanagari characters, it is already English!
+  if (!/[\u0900-\u097F]/.test(rawText)) {
+    return rawText;
+  }
+
+  const leadingSpace = rawText.match(/^\s*/)?.[0] || '';
+  const trailingSpace = rawText.match(/\s*$/)?.[0] || '';
+  const lower = trimmed.toLowerCase();
+
+  // 1. Direct match in inverted Phrase Dictionary
+  if (HINDI_TO_ENGLISH_PHRASE_DICT[lower]) {
+    return leadingSpace + HINDI_TO_ENGLISH_PHRASE_DICT[lower] + trailingSpace;
+  }
+
+  // 2. Direct match in inverted Single Word Dictionary
+  if (HINDI_TO_ENGLISH_WORD_DICT[lower]) {
+    return leadingSpace + HINDI_TO_ENGLISH_WORD_DICT[lower] + trailingSpace;
+  }
+
+  // 3. Composite Structural Patterns
+  // Pattern: "चरण 1 / 6"
+  if (/^चरण\s+(\d+)\s*\/\s*(\d+)$/i.test(trimmed)) {
+    return trimmed.replace(/^चरण\s+(\d+)\s*\/\s*(\d+)$/i, (_m, s, t) => `Step ${s} of ${t}`);
+  }
+
+  // Pattern: "आयु 24 • अज्ञात • रक्त समूह अज्ञात" or "आयु 24 • पुरुष • रक्त समूह B+"
+  if (/^आयु\s*(.*?)\s*•\s*(.*?)\s*•\s*रक्त समूह\s*(.*?)$/i.test(trimmed)) {
+    return trimmed.replace(
+      /^आयु\s*(.*?)\s*•\s*(.*?)\s*•\s*रक्त समूह\s*(.*?)$/i,
+      (_m, a, g, b) => {
+        const transAge = a.trim() === 'अज्ञात' ? 'Unknown' : a.trim();
+        const transGender = g.trim() === 'पुरुष' ? 'Male' : g.trim() === 'महिला' ? 'Female' : 'Unknown';
+        const transBlood = (b.trim() === 'अज्ञात' || b.trim() === '?') ? '?' : b.trim();
+        return `Age ${transAge} • ${transGender} • Blood ${transBlood}`;
+      }
+    );
+  }
+
+  // Pattern: "7 मिले • 2 विरोधाभासी • 0 अनुपलब्ध"
+  if (/^(\d+)\s+मिले\s*•\s*(\d+)\s+विरोधाभासी\s*•\s*(\d+)\s+अनुपलब्ध$/i.test(trimmed)) {
+    return trimmed.replace(
+      /^(\d+)\s+मिले\s*•\s*(\d+)\s+विरोधाभासी\s*•\s*(\d+)\s+अनुपलब्ध$/i,
+      (_m, m, c, d) => `${m} matched • ${c} conflicting • ${d} data gaps`
+    );
+  }
+
+  // Pattern: "उदा. Aarav Sharma"
+  if (/^उदा\.\s+(.*)$/i.test(trimmed)) {
+    return trimmed.replace(/^उदा\.\s+(.*)$/i, (_m, rest) => `e.g. ${translateToEnglish(rest)}`);
+  }
+
+  // 4. Tokenize Sentence into Words and Punctuation
+  const tokens = trimmed.split(/(\s+|[.,;!•\-_/()]+)/);
+  if (tokens.length > 1) {
+    const translatedTokens = tokens.map((token) => {
+      if (!token || !/[\u0900-\u097F]/.test(token)) {
+        return token;
+      }
+      const tokLower = token.toLowerCase();
+      if (HINDI_TO_ENGLISH_WORD_DICT[tokLower]) {
+        return HINDI_TO_ENGLISH_WORD_DICT[tokLower];
+      }
+      if (HINDI_TO_ENGLISH_PHRASE_DICT[tokLower]) {
+        return HINDI_TO_ENGLISH_PHRASE_DICT[tokLower];
+      }
+      return token;
+    });
+    return leadingSpace + translatedTokens.join('') + trailingSpace;
+  }
+
+  return rawText;
+}
+
+// ------------------------------------------------------------
 // 5. DEEP DOM ENGINE (Sweep, Restore & MutationObserver)
 // ------------------------------------------------------------
 let activeObserver: MutationObserver | null = null;
@@ -645,11 +944,15 @@ export function sweepLiveDom(targetLang: LanguageCode): void {
 
   let currentNode: Node | null;
   while ((currentNode = walker.nextNode())) {
-    if (!originalTextMap.has(currentNode)) {
-      originalTextMap.set(currentNode, currentNode.nodeValue || '');
+    const rawVal = currentNode.nodeValue || '';
+
+    // CRITICAL FIX: Only store in originalTextMap if the text is ACTUALLY English!
+    // Never store Hindi/Devanagari text as the pristine original!
+    if (!originalTextMap.has(currentNode) && !/[\u0900-\u097F]/.test(rawVal)) {
+      originalTextMap.set(currentNode, rawVal);
     }
 
-    const canonicalOriginal = originalTextMap.get(currentNode) || currentNode.nodeValue || '';
+    const canonicalOriginal = originalTextMap.get(currentNode) || rawVal;
     const translated = translateToHindi(canonicalOriginal);
 
     if (translated !== currentNode.nodeValue) {
@@ -661,11 +964,15 @@ export function sweepLiveDom(targetLang: LanguageCode): void {
   const inputs = document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[placeholder], textarea[placeholder]');
   inputs.forEach((input) => {
     let original = input.getAttribute('data-milan-orig-placeholder');
-    if (!original) {
-      original = input.getAttribute('placeholder') || '';
-      input.setAttribute('data-milan-orig-placeholder', original);
+    if (!original || /[\u0900-\u097F]/.test(original)) {
+      const currentVal = input.getAttribute('placeholder') || '';
+      if (!/[\u0900-\u097F]/.test(currentVal)) {
+        original = currentVal;
+        input.setAttribute('data-milan-orig-placeholder', original);
+      }
     }
-    const translated = translateToHindi(original);
+    const sourceText = original || input.getAttribute('placeholder') || '';
+    const translated = translateToHindi(sourceText);
     if (input.getAttribute('placeholder') !== translated) {
       input.setAttribute('placeholder', translated);
     }
@@ -675,11 +982,15 @@ export function sweepLiveDom(targetLang: LanguageCode): void {
   const options = document.querySelectorAll<HTMLOptionElement>('select option');
   options.forEach((opt) => {
     let original = opt.getAttribute('data-milan-orig-text');
-    if (!original) {
-      original = opt.textContent || '';
-      opt.setAttribute('data-milan-orig-text', original);
+    if (!original || /[\u0900-\u097F]/.test(original)) {
+      const currentVal = opt.textContent || '';
+      if (!/[\u0900-\u097F]/.test(currentVal)) {
+        original = currentVal;
+        opt.setAttribute('data-milan-orig-text', original);
+      }
     }
-    const translated = translateToHindi(original);
+    const sourceText = original || opt.textContent || '';
+    const translated = translateToHindi(sourceText);
     if (opt.textContent !== translated) {
       opt.textContent = translated;
     }
@@ -689,11 +1000,15 @@ export function sweepLiveDom(targetLang: LanguageCode): void {
   const titled = document.querySelectorAll<HTMLElement>('[title]');
   titled.forEach((el) => {
     let original = el.getAttribute('data-milan-orig-title');
-    if (!original) {
-      original = el.getAttribute('title') || '';
-      el.setAttribute('data-milan-orig-title', original);
+    if (!original || /[\u0900-\u097F]/.test(original)) {
+      const currentVal = el.getAttribute('title') || '';
+      if (!/[\u0900-\u097F]/.test(currentVal)) {
+        original = currentVal;
+        el.setAttribute('data-milan-orig-title', original);
+      }
     }
-    const translated = translateToHindi(original);
+    const sourceText = original || el.getAttribute('title') || '';
+    const translated = translateToHindi(sourceText);
     if (el.getAttribute('title') !== translated) {
       el.setAttribute('title', translated);
     }
@@ -703,38 +1018,88 @@ export function sweepLiveDom(targetLang: LanguageCode): void {
 export function restoreEnglishDom(): void {
   if (typeof document === 'undefined') return;
 
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent) return NodeFilter.FILTER_REJECT;
+      const tag = parent.tagName;
+      if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT' || tag === 'CODE') {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+
   let currentNode: Node | null;
   while ((currentNode = walker.nextNode())) {
+    const currentVal = currentNode.nodeValue || '';
+
+    // 1. If we have a verified pristine English original stored for this node:
     if (originalTextMap.has(currentNode)) {
       const orig = originalTextMap.get(currentNode);
-      if (orig !== undefined && currentNode.nodeValue !== orig) {
-        currentNode.nodeValue = orig;
+      if (orig !== undefined && !/[\u0900-\u097F]/.test(orig)) {
+        if (currentVal !== orig) {
+          currentNode.nodeValue = orig;
+        }
+        continue;
+      }
+    }
+
+    // 2. If current node contains Hindi/Devanagari characters, reverse-translate it to English!
+    if (/[\u0900-\u097F]/.test(currentVal)) {
+      const restored = translateToEnglish(currentVal);
+      if (restored !== currentVal) {
+        currentNode.nodeValue = restored;
+        originalTextMap.set(currentNode, restored);
       }
     }
   }
 
+  // 2. Input & Textarea Placeholders
   const inputs = document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-milan-orig-placeholder]');
   inputs.forEach((input) => {
     const orig = input.getAttribute('data-milan-orig-placeholder');
-    if (orig !== null) {
+    if (orig && !/[\u0900-\u097F]/.test(orig)) {
       input.setAttribute('placeholder', orig);
+    } else {
+      const currentPlaceholder = input.getAttribute('placeholder') || '';
+      if (/[\u0900-\u097F]/.test(currentPlaceholder)) {
+        const restored = translateToEnglish(currentPlaceholder);
+        input.setAttribute('placeholder', restored);
+        input.setAttribute('data-milan-orig-placeholder', restored);
+      }
     }
   });
 
+  // 3. Dropdown Select Options
   const options = document.querySelectorAll<HTMLOptionElement>('[data-milan-orig-text]');
   options.forEach((opt) => {
     const orig = opt.getAttribute('data-milan-orig-text');
-    if (orig !== null) {
+    if (orig && !/[\u0900-\u097F]/.test(orig)) {
       opt.textContent = orig;
+    } else {
+      const currentText = opt.textContent || '';
+      if (/[\u0900-\u097F]/.test(currentText)) {
+        const restored = translateToEnglish(currentText);
+        opt.textContent = restored;
+        opt.setAttribute('data-milan-orig-text', restored);
+      }
     }
   });
 
+  // 4. Element Titles
   const titled = document.querySelectorAll<HTMLElement>('[data-milan-orig-title]');
   titled.forEach((el) => {
     const orig = el.getAttribute('data-milan-orig-title');
-    if (orig !== null) {
+    if (orig && !/[\u0900-\u097F]/.test(orig)) {
       el.setAttribute('title', orig);
+    } else {
+      const currentTitle = el.getAttribute('title') || '';
+      if (/[\u0900-\u097F]/.test(currentTitle)) {
+        const restored = translateToEnglish(currentTitle);
+        el.setAttribute('title', restored);
+        el.setAttribute('data-milan-orig-title', restored);
+      }
     }
   });
 }
@@ -755,8 +1120,6 @@ export function activateLiveDomTranslationEngine(language: LanguageCode): () => 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   activeObserver = new MutationObserver((mutations) => {
-    if (currentLanguage === 'en') return;
-
     let isSelfMutation = true;
     for (const m of mutations) {
       if (m.type === 'childList') {

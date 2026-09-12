@@ -1,7 +1,7 @@
 import { locales } from '../src/i18n/locales/index.ts';
 import { SUPPORTED_LANGUAGES } from '../src/i18n/languages.ts';
 import type { TranslationDictionary } from '../src/i18n/types.ts';
-import { translateToHindi, transliterateToHindi } from '../src/i18n/dom-translation-engine.ts';
+import { translateToHindi, transliterateToHindi, translateToEnglish } from '../src/i18n/dom-translation-engine.ts';
 
 function runTests() {
   console.log('🧪 Running MILAN Hindi & English Localization Verification Tests...\n');
@@ -91,6 +91,30 @@ function runTests() {
     totalErrors++;
   } else {
     console.log(`✅ PASSED: Phonetic transliteration "Aarav" ➔ "${nameDev}"`);
+  }
+
+  // 4. Test Reverse Translation (Hindi -> English)
+  console.log('\n--- 4. Testing Reverse Translation (Hindi ➔ English Restoration) ---');
+  const reversePhrases = [
+    { hi: 'लापता की रिपोर्ट दर्ज करें', expectedKeywords: ['Report', 'Missing'] },
+    { hi: 'बचाए गए का पंजीकरण', expectedKeywords: ['Rescued'] },
+    { hi: 'सभी स्थितियाँ', expectedKeywords: ['Statuses'] },
+    { hi: 'केस यूआईडी', expectedKeywords: ['UID'] },
+    { hi: 'अज्ञात जीवित व्यक्ति', expectedKeywords: ['Survivor'] },
+    { hi: 'चरण 1 / 6', expectedKeywords: ['Step 1 of 6'] },
+    { hi: 'आरव शर्मा', expectedKeywords: ['Aarav', 'Sharma'] },
+    { hi: 'आयु 24 • अज्ञात • रक्त समूह अज्ञात', expectedKeywords: ['Age 24'] },
+  ];
+
+  for (const item of reversePhrases) {
+    const enRestored = translateToEnglish(item.hi);
+    const hasKeywords = item.expectedKeywords.every(kw => enRestored.toLowerCase().includes(kw.toLowerCase()));
+    if (!hasKeywords || /[\u0900-\u097F]/.test(enRestored)) {
+      console.error(`❌ Reverse translation failed for "${item.hi}", got "${enRestored}"`);
+      totalErrors++;
+    } else {
+      console.log(`✅ PASSED: "${item.hi}" ➔ "${enRestored}"`);
+    }
   }
 
   // Final Summary
