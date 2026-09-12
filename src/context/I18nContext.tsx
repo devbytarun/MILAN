@@ -3,7 +3,7 @@ import { SUPPORTED_LANGUAGES } from '../i18n/languages.ts';
 import { LanguageCode, LanguageInfo, TranslationDictionary } from '../i18n/types.ts';
 import { locales } from '../i18n/locales/index.ts';
 
-import { activateLiveDomTranslationEngine } from '../i18n/dom-translation-engine.ts';
+import { activateLiveDomTranslationEngine, sweepLiveDom } from '../i18n/dom-translation-engine.ts';
 
 export { SUPPORTED_LANGUAGES };
 export type { LanguageCode, LanguageInfo, TranslationDictionary };
@@ -44,6 +44,11 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('milan_language', lang);
       } catch {
         // ignore
+      }
+      if (typeof window !== 'undefined') {
+        requestAnimationFrame(() => {
+          sweepLiveDom(lang);
+        });
       }
     }
   };

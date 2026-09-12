@@ -726,10 +726,343 @@ export function translateToHindi(rawText: string): string {
 }
 
 // ------------------------------------------------------------
-// 5. DEEP DOM ENGINE (Sweep, Restore & MutationObserver)
+// 5. BIDIRECTIONAL REVERSE TRANSLATION ENGINE (Hindi -> English)
+// Reverses Hindi Devanagari back to pristine natural English
+// ------------------------------------------------------------
+export function isDevanagari(text: string): boolean {
+  return /[\u0900-\u097F]/.test(text);
+}
+
+// Inverted dictionaries for instantaneous Reverse Translation (Hindi -> English)
+const REVERSE_LOCALES: Record<string, string> = {};
+for (const [key, hiVal] of Object.entries(locales.hi || {})) {
+  if (typeof hiVal === 'string' && hiVal.trim()) {
+    const enVal = (locales.en as unknown as Record<string, string>)[key];
+    if (enVal) {
+      REVERSE_LOCALES[hiVal.trim().toLowerCase()] = enVal;
+    }
+  }
+}
+
+const REVERSE_SENTENCES: Record<string, string> = {};
+for (const [en, hi] of Object.entries(HINDI_LEARNING_SENTENCES)) {
+  if (typeof hi === 'string' && hi.trim()) {
+    REVERSE_SENTENCES[hi.trim().toLowerCase()] = en;
+  }
+}
+
+const REVERSE_PHRASES: Record<string, string> = {};
+for (const [en, hi] of Object.entries(HINDI_PHRASE_DICTIONARY)) {
+  if (typeof hi === 'string' && hi.trim()) {
+    REVERSE_PHRASES[hi.trim().toLowerCase()] = en;
+  }
+}
+
+// Explicit Title-Cased / Proper UI Phrase Overrides for clean presentation
+const EXPLICIT_REVERSE_PHRASES: Record<string, string> = {
+  'अभियान केंद्र': 'Operations Center',
+  'केस डायरेक्टरी': 'Cases Directory',
+  'केंद्रीय डायरेक्टरी': 'Central Directory',
+  'लापता की रिपोर्ट दर्ज करें': 'File Missing Report',
+  'बचाए गए का पंजीकरण': 'Register Rescued',
+  'मिले व्यक्ति का पंजीकरण': 'Register Found',
+  'वॉइस ai': 'Voice AI',
+  'वॉइस AI': 'Voice AI',
+  'फॉरेंसिक डोसियर': 'Forensic Dossiers',
+  'भूमिका:': 'Role:',
+  'भूमिका: परिजन': 'Role: Family',
+  'भूमिका: एनजीओ': 'Role: NGO',
+  'भूमिका: सेना बचाव दल': 'Role: Army Rescue',
+  'भूमिका: अस्पताल': 'Role: Hospital',
+  'भूमिका: सत्यापन अधिकारी': 'Role: Reviewer',
+  'भूमिका: व्यवस्थापक': 'Role: Admin',
+  'भूमिका: स्वयंसेवक': 'Role: Volunteer',
+  'स्वतंत्र नागरिक': 'Independent Citizen',
+  'लॉग इन करें': 'Sign In',
+  'लॉग आउट': 'Sign Out',
+  'पंजीकरण करें': 'Sign Up',
+  'पंजीकरण': 'Register',
+  'अतिथि': 'Guest',
+  'डेमो भूमिका:': 'Demo Role:',
+  'सभी स्थितियाँ': 'All Statuses',
+  'सभी प्रकार': 'All Types',
+  'सभी केस': 'All Cases',
+  'लापता रिपोर्ट': 'Missing Reports',
+  'शिविर में मिले व्यक्ति': 'Found in Camp',
+  'केस यूआईडी': 'Case UID',
+  'पहचान / मुख्य निशान': 'Key Clue / Marks',
+  'घटना / शिविर क्षेत्र': 'Incident / Camp Sector',
+  'व्यक्ति का विवरण': 'Person Details',
+  'व्यक्ति का विवरण:': 'Person Details:',
+  'प्रविष्टि स्रोत': 'Intake Source',
+  'केस स्थिति': 'Case Status',
+  'कार्रवाई': 'Action',
+  'डोसियर देखें': 'View Dossier',
+  'डोसियर देखें →': 'View Dossier →',
+  'विवरण देखें': 'View Details',
+  'दर्ज नहीं': 'Not recorded',
+  'अज्ञात जीवित व्यक्ति': 'Unidentified Survivor',
+  'अज्ञात अवयस्क (बालक/बालिका)': 'Unidentified Minor',
+  'आयु अज्ञात': 'Age Unknown',
+  'रक्त समूह अज्ञात': 'Blood ?',
+  'दर्ज किया गया': 'Submitted',
+  'संभावित मिलान': 'Possible Match',
+  'सत्यापित मिलान': 'Verified Match',
+  'सफलतापूर्वक मिलाया गया': 'Reunified',
+  'बंद': 'Closed',
+  'मिला व्यक्ति': 'Found',
+  'लापता': 'Missing',
+  'अज्ञात': 'Unknown',
+  'पुरुष': 'Male',
+  'महिला': 'Female',
+  'मूल पहचान': 'Basic Identity',
+  'नाम, आयु, लिंग और रक्त समूह': 'Name, age, gender and blood group',
+  'चरण 1 / 6': 'Step 1 of 6',
+  'चरण 2 / 6': 'Step 2 of 6',
+  'चरण 3 / 6': 'Step 3 of 6',
+  'चरण 4 / 6': 'Step 4 of 6',
+  'चरण 5 / 6': 'Step 5 of 6',
+  'चरण 6 / 6': 'Step 6 of 6',
+  'शारीरिक बनावट': 'Physical Appearance',
+  'ऊंचाई, कद-काठी, रंग, बाल और आँखें': 'Height, build, complexion, hair and eyes',
+  'वस्त्र और सामान': 'Clothing & Belongings',
+  'ऊपरी, निचले वस्त्र, जूते, सामान': 'Upper, lower garments, footwear, accessories',
+  'अंतिम ज्ञात स्थान': 'Last Known Location',
+  'आपदा स्थल, समय और परिस्थिति': 'Disaster location, timestamp and circumstance',
+  'पहचान के निशान': 'Identifying Clues',
+  'निशान, जन्मचिह्न, मेडिकल इम्प्लांट, दांत': 'Scars, birthmarks, medical implants, dental',
+  'समीक्षा और जमा करें': 'Review & Submit',
+  'विवरण सत्यापित करें और केंद्रीय रजिस्ट्री में जमा करें': 'Verify details and submit to central registry',
+  'पूरा कानूनी नाम': 'Full Legal Name',
+  'पूरा कानूनी नाम *': 'Full Legal Name *',
+  'उपनाम / अन्य नाम': 'Nickname / alternative names',
+  'आयु (वर्ष)': 'Age (years)',
+  'आयु (वर्ष) *': 'Age (years) *',
+  'लिंग': 'Gender',
+  'लिंग *': 'Gender *',
+  'जन्म तिथि (यदि ज्ञात हो)': 'Date of birth (if known)',
+  'रक्त समूह (यदि ज्ञात हो)': 'Blood group (if known)',
+  'पिछला': 'Previous',
+  'आगे बढ़ें': 'Continue',
+  'रिपोर्ट जमा करें': 'Submit Report',
+  'लापता व्यक्ति की रिपोर्ट जमा करें': 'Submit Missing Person Report',
+  'फ़ील्ड निकालें और समीक्षा करें': 'Extract Fields & Review',
+  'फ़ील्ड निकालें और समीक्षा करें →': 'Extract Fields & Review →',
+  'फॉरेंसिक सत्यापन डोसियर': 'Forensic Verification Dossier',
+  'मानकीकृत सुराग': 'STANDARDIZED CLUES',
+  'सक्रिय केस': 'Active Cases',
+  'पहचाने गए मिलान': 'Matches Identified',
+  'पुनर्मिलित': 'Reunified',
+  'उच्च विश्वसनीयता मिलान': 'High Confidence Matches',
+  'हाल की गतिविधि': 'Recent Activity',
+  'त्वरित कार्रवाई': 'Quick Actions',
+  'राहत ग्रिड सक्रिय': 'Relief Grid Live',
+  'मिलन (milan)': 'MILAN',
+  'मिलन': 'MILAN',
+};
+for (const [hi, en] of Object.entries(EXPLICIT_REVERSE_PHRASES)) {
+  REVERSE_PHRASES[hi.toLowerCase()] = en;
+}
+
+const REVERSE_WORDS: Record<string, string> = {};
+for (const [en, hi] of Object.entries(HINDI_LEARNING_WORDS)) {
+  if (typeof hi === 'string' && hi.trim()) {
+    REVERSE_WORDS[hi.trim().toLowerCase()] = en;
+  }
+}
+for (const [en, hi] of Object.entries(HINDI_SINGLE_WORD_DICT)) {
+  if (typeof hi === 'string' && hi.trim()) {
+    REVERSE_WORDS[hi.trim().toLowerCase()] = en;
+  }
+}
+
+const REVERSE_PROPER_NOUNS: Record<string, string> = {};
+for (const [en, hi] of Object.entries(KNOWN_INDIAN_PROPER_NOUNS)) {
+  if (typeof hi === 'string' && hi.trim()) {
+    const capitalized = en.charAt(0).toUpperCase() + en.slice(1);
+    REVERSE_PROPER_NOUNS[hi.trim()] = capitalized;
+    REVERSE_PROPER_NOUNS[hi.trim().toLowerCase()] = capitalized;
+  }
+}
+
+export function translateToEnglish(rawText: string): string {
+  if (!rawText) return rawText;
+  const trimmed = rawText.trim();
+  if (!trimmed) return rawText;
+  if (!isDevanagari(trimmed)) return rawText;
+
+  const leadingSpace = rawText.match(/^\s*/)?.[0] || '';
+  const trailingSpace = rawText.match(/\s*$/)?.[0] || '';
+
+  const lower = trimmed.toLowerCase();
+
+  // 1. Direct match in Explicit Reverse Phrases
+  if (EXPLICIT_REVERSE_PHRASES[trimmed]) {
+    return leadingSpace + EXPLICIT_REVERSE_PHRASES[trimmed] + trailingSpace;
+  }
+  if (REVERSE_PHRASES[lower]) {
+    return leadingSpace + REVERSE_PHRASES[lower] + trailingSpace;
+  }
+
+  // 2. Direct match in Canonical Locale Reverse Lookup (locales.hi -> locales.en)
+  if (REVERSE_LOCALES[lower]) {
+    return leadingSpace + REVERSE_LOCALES[lower] + trailingSpace;
+  }
+
+  // 3. Direct match in Reverse Learning Sentences
+  if (REVERSE_SENTENCES[lower]) {
+    return leadingSpace + REVERSE_SENTENCES[lower] + trailingSpace;
+  }
+
+  // 4. Direct match in Reverse Proper Nouns (Names, Places)
+  if (REVERSE_PROPER_NOUNS[trimmed] || REVERSE_PROPER_NOUNS[lower]) {
+    return leadingSpace + (REVERSE_PROPER_NOUNS[trimmed] || REVERSE_PROPER_NOUNS[lower]) + trailingSpace;
+  }
+
+  // 5. Direct match in Reverse Words
+  if (REVERSE_WORDS[lower]) {
+    return leadingSpace + REVERSE_WORDS[lower] + trailingSpace;
+  }
+
+  // 6. Common Composite Template Patterns
+  // Pattern: "स्वागत है, {name}" -> "Welcome, {name}"
+  if (/^स्वागत\s+है,?\s*(.*)$/.test(trimmed)) {
+    return trimmed.replace(/^स्वागत\s+है,?\s*(.*)$/, (_m, name) => `Welcome, ${translateToEnglish(name)}`);
+  }
+
+  // Pattern: "अंतिम ज्ञात स्थान: {loc}" -> "Last seen: {loc}"
+  if (/^अंतिम\s+ज्ञात\s+स्थान:\s*(.*)$/.test(trimmed)) {
+    return trimmed.replace(/^अंतिम\s+ज्ञात\s+स्थान:\s*(.*)$/, (_m, loc) => `Last seen: ${translateToEnglish(loc)}`);
+  }
+
+  // Pattern: "पहचान का सुराग: {clue}" -> "Identifying clue: {clue}"
+  if (/^पहचान\s+का\s+सुराग:\s*(.*)$/.test(trimmed)) {
+    return trimmed.replace(/^पहचान\s+का\s+सुराग:\s*(.*)$/, (_m, clue) => `Identifying clue: ${translateToEnglish(clue)}`);
+  }
+
+  // Pattern: "{n} पंजीकृत रिपोर्टें" -> "{n} Registered Reports"
+  if (/^(\d+)\s+पंजीकृत\s+रिपोर्टें?$/.test(trimmed)) {
+    return trimmed.replace(/^(\d+)\s+पंजीकृत\s+रिपोर्टें?$/, (_m, count) => `${count} Registered Reports`);
+  }
+
+  // Pattern: "शुभ समाचार: {rest}" -> "Good news: {rest}"
+  if (/^शुभ\s+समाचार:\s*(.*)$/.test(trimmed)) {
+    return trimmed.replace(/^शुभ\s+समाचार:\s*(.*)$/, (_m, rest) => `Good news: ${translateToEnglish(rest)}`);
+  }
+
+  // Pattern: "चरण {x} / {y}" -> "Step {x} of {y}"
+  if (/^चरण\s+(\d+)\s*\/\s*(\d+)$/.test(trimmed)) {
+    return trimmed.replace(/^चरण\s+(\d+)\s*\/\s*(\d+)$/, (_m, s, t) => `Step ${s} of ${t}`);
+  }
+
+  // Pattern: "आयु {age} • {gender} • रक्त समूह {blood}" -> "Age {age} • {gender} • Blood {blood}"
+  if (/^आयु\s+(\d+|अज्ञात)\s*•\s*(.*?)\s*•\s*रक्त\s*समूह\s*(.*?)$/.test(trimmed)) {
+    return trimmed.replace(
+      /^आयु\s+(\d+|अज्ञात)\s*•\s*(.*?)\s*•\s*रक्त\s*समूह\s*(.*?)$/,
+      (_m, age, gen, bld) => {
+        const enAge = age === 'अज्ञात' ? 'Unknown' : age;
+        const enGen = translateToEnglish(gen);
+        const enBld = bld.trim() === 'अज्ञात' ? '?' : translateToEnglish(bld);
+        return `Age ${enAge} • ${enGen} • Blood ${enBld}`;
+      }
+    );
+  }
+
+  // 7. Tokenize by whitespace and punctuation for multi-word phrases
+  const tokens = trimmed.split(/(\s+|[.,;!•\-_/()]+)/);
+  if (tokens.length > 1) {
+    const restoredTokens = tokens.map((token) => {
+      if (!token || /^\s+$/.test(token) || /^[.,;!•\-_/()]+$/.test(token) || /^[0-9]+$/.test(token)) {
+        return token;
+      }
+      if (!isDevanagari(token)) {
+        return token;
+      }
+      const tokLower = token.toLowerCase();
+      if (REVERSE_PROPER_NOUNS[token] || REVERSE_PROPER_NOUNS[tokLower]) {
+        return REVERSE_PROPER_NOUNS[token] || REVERSE_PROPER_NOUNS[tokLower];
+      }
+      if (EXPLICIT_REVERSE_PHRASES[token] || EXPLICIT_REVERSE_PHRASES[tokLower]) {
+        return EXPLICIT_REVERSE_PHRASES[token] || EXPLICIT_REVERSE_PHRASES[tokLower];
+      }
+      if (REVERSE_WORDS[tokLower]) {
+        return REVERSE_WORDS[tokLower];
+      }
+      if (REVERSE_PHRASES[tokLower]) {
+        return REVERSE_PHRASES[tokLower];
+      }
+      if (REVERSE_SENTENCES[tokLower]) {
+        return REVERSE_SENTENCES[tokLower];
+      }
+      return token;
+    });
+
+    return leadingSpace + restoredTokens.join('') + trailingSpace;
+  }
+
+  return rawText;
+}
+
+// ------------------------------------------------------------
+// 6. DEEP DOM ENGINE (Sweep, Restore, Pre-warm & MutationObserver)
 // ------------------------------------------------------------
 let activeObserver: MutationObserver | null = null;
 let currentLanguage: LanguageCode = 'en';
+
+export function prewarmEnglishCache(): void {
+  if (typeof document === 'undefined') return;
+
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent) return NodeFilter.FILTER_REJECT;
+      const tag = parent.tagName;
+      if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT' || tag === 'CODE') {
+        return NodeFilter.FILTER_REJECT;
+      }
+      const val = node.nodeValue?.trim();
+      if (!val || /^[0-9.:\-\s/]+$/.test(val)) {
+        return NodeFilter.FILTER_SKIP;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+
+  let currentNode: Node | null;
+  while ((currentNode = walker.nextNode())) {
+    const val = currentNode.nodeValue || '';
+    if (val.trim() && !isDevanagari(val)) {
+      originalTextMap.set(currentNode, val);
+      if (!currentNode.parentElement?.getAttribute('data-milan-orig-en')) {
+        currentNode.parentElement?.setAttribute('data-milan-orig-en', val);
+      }
+    }
+  }
+
+  // Prewarm inputs
+  document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[placeholder], textarea[placeholder]').forEach((input) => {
+    const ph = input.getAttribute('placeholder') || '';
+    if (ph && !isDevanagari(ph) && !input.getAttribute('data-milan-orig-placeholder')) {
+      input.setAttribute('data-milan-orig-placeholder', ph);
+    }
+  });
+
+  // Prewarm options
+  document.querySelectorAll<HTMLOptionElement>('select option').forEach((opt) => {
+    const text = opt.textContent || '';
+    if (text && !isDevanagari(text) && !opt.getAttribute('data-milan-orig-text')) {
+      opt.setAttribute('data-milan-orig-text', text);
+    }
+  });
+
+  // Prewarm titles
+  document.querySelectorAll<HTMLElement>('[title]').forEach((el) => {
+    const title = el.getAttribute('title') || '';
+    if (title && !isDevanagari(title) && !el.getAttribute('data-milan-orig-title')) {
+      el.setAttribute('data-milan-orig-title', title);
+    }
+  });
+}
 
 export function sweepLiveDom(targetLang: LanguageCode): void {
   currentLanguage = targetLang;
@@ -760,13 +1093,31 @@ export function sweepLiveDom(targetLang: LanguageCode): void {
 
   let currentNode: Node | null;
   while ((currentNode = walker.nextNode())) {
-    if (!originalTextMap.has(currentNode)) {
-      originalTextMap.set(currentNode, currentNode.nodeValue || '');
+    const currentVal = currentNode.nodeValue || '';
+
+    // CRITICAL: Only record as original English if it does NOT contain Devanagari!
+    if (!originalTextMap.has(currentNode) && !isDevanagari(currentVal)) {
+      originalTextMap.set(currentNode, currentVal);
+      if (!currentNode.parentElement?.getAttribute('data-milan-orig-en')) {
+        currentNode.parentElement?.setAttribute('data-milan-orig-en', currentVal);
+      }
     }
 
-    const canonicalOriginal = originalTextMap.get(currentNode) || currentNode.nodeValue || '';
-    const translated = translateToHindi(canonicalOriginal);
+    // Get the canonical English text to translate
+    let sourceEnglish = originalTextMap.get(currentNode);
+    if (!sourceEnglish || isDevanagari(sourceEnglish)) {
+      const parentAttr = currentNode.parentElement?.getAttribute('data-milan-orig-en');
+      if (parentAttr && !isDevanagari(parentAttr)) {
+        sourceEnglish = parentAttr;
+        originalTextMap.set(currentNode, sourceEnglish);
+      }
+    }
 
+    if (!sourceEnglish) {
+      sourceEnglish = currentVal;
+    }
+
+    const translated = translateToHindi(sourceEnglish);
     if (translated !== currentNode.nodeValue) {
       currentNode.nodeValue = translated;
     }
@@ -776,11 +1127,13 @@ export function sweepLiveDom(targetLang: LanguageCode): void {
   const inputs = document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[placeholder], textarea[placeholder]');
   inputs.forEach((input) => {
     let original = input.getAttribute('data-milan-orig-placeholder');
-    if (!original) {
-      original = input.getAttribute('placeholder') || '';
+    const currentPh = input.getAttribute('placeholder') || '';
+    if (!original && !isDevanagari(currentPh)) {
+      original = currentPh;
       input.setAttribute('data-milan-orig-placeholder', original);
     }
-    const translated = translateToHindi(original);
+    const source = (original && !isDevanagari(original)) ? original : currentPh;
+    const translated = translateToHindi(source);
     if (input.getAttribute('placeholder') !== translated) {
       input.setAttribute('placeholder', translated);
     }
@@ -790,11 +1143,13 @@ export function sweepLiveDom(targetLang: LanguageCode): void {
   const options = document.querySelectorAll<HTMLOptionElement>('select option');
   options.forEach((opt) => {
     let original = opt.getAttribute('data-milan-orig-text');
-    if (!original) {
-      original = opt.textContent || '';
+    const currentText = opt.textContent || '';
+    if (!original && !isDevanagari(currentText)) {
+      original = currentText;
       opt.setAttribute('data-milan-orig-text', original);
     }
-    const translated = translateToHindi(original);
+    const source = (original && !isDevanagari(original)) ? original : currentText;
+    const translated = translateToHindi(source);
     if (opt.textContent !== translated) {
       opt.textContent = translated;
     }
@@ -804,11 +1159,13 @@ export function sweepLiveDom(targetLang: LanguageCode): void {
   const titled = document.querySelectorAll<HTMLElement>('[title]');
   titled.forEach((el) => {
     let original = el.getAttribute('data-milan-orig-title');
-    if (!original) {
-      original = el.getAttribute('title') || '';
+    const currentTitle = el.getAttribute('title') || '';
+    if (!original && !isDevanagari(currentTitle)) {
+      original = currentTitle;
       el.setAttribute('data-milan-orig-title', original);
     }
-    const translated = translateToHindi(original);
+    const source = (original && !isDevanagari(original)) ? original : currentTitle;
+    const translated = translateToHindi(source);
     if (el.getAttribute('title') !== translated) {
       el.setAttribute('title', translated);
     }
@@ -818,45 +1175,111 @@ export function sweepLiveDom(targetLang: LanguageCode): void {
 export function restoreEnglishDom(): void {
   if (typeof document === 'undefined') return;
 
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent) return NodeFilter.FILTER_REJECT;
+      const tag = parent.tagName;
+      if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT' || tag === 'CODE') {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+
   let currentNode: Node | null;
   while ((currentNode = walker.nextNode())) {
-    if (originalTextMap.has(currentNode)) {
-      const orig = originalTextMap.get(currentNode);
-      if (orig !== undefined && currentNode.nodeValue !== orig) {
-        currentNode.nodeValue = orig;
+    const currentVal = currentNode.nodeValue || '';
+
+    // If it has NO Devanagari, it is already in English/digits/symbols
+    if (!isDevanagari(currentVal)) {
+      if (currentVal.trim() && !originalTextMap.has(currentNode)) {
+        originalTextMap.set(currentNode, currentVal);
       }
+      continue;
     }
+
+    // It contains Devanagari! Restore it to English:
+    // 1. Check originalTextMap
+    const orig = originalTextMap.get(currentNode);
+    if (orig && !isDevanagari(orig) && orig.trim()) {
+      currentNode.nodeValue = orig;
+      continue;
+    }
+
+    // 2. Check parent element data-milan-orig-en
+    const parentOrig = currentNode.parentElement?.getAttribute('data-milan-orig-en');
+    if (parentOrig && !isDevanagari(parentOrig) && parentOrig.trim()) {
+      currentNode.nodeValue = parentOrig;
+      originalTextMap.set(currentNode, parentOrig);
+      continue;
+    }
+
+    // 3. Reverse Translate using Neural Hindi -> English Engine
+    const restored = translateToEnglish(currentVal);
+    currentNode.nodeValue = restored;
+    originalTextMap.set(currentNode, restored);
+    currentNode.parentElement?.setAttribute('data-milan-orig-en', restored);
   }
 
-  const inputs = document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-milan-orig-placeholder]');
+  // Restore input & textarea placeholders
+  const inputs = document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[placeholder], textarea[placeholder]');
   inputs.forEach((input) => {
     const orig = input.getAttribute('data-milan-orig-placeholder');
-    if (orig !== null) {
+    if (orig && !isDevanagari(orig)) {
       input.setAttribute('placeholder', orig);
+    } else {
+      const currentPh = input.getAttribute('placeholder') || '';
+      if (isDevanagari(currentPh)) {
+        const restored = translateToEnglish(currentPh);
+        input.setAttribute('placeholder', restored);
+        input.setAttribute('data-milan-orig-placeholder', restored);
+      }
     }
   });
 
-  const options = document.querySelectorAll<HTMLOptionElement>('[data-milan-orig-text]');
+  // Restore select options
+  const options = document.querySelectorAll<HTMLOptionElement>('select option');
   options.forEach((opt) => {
     const orig = opt.getAttribute('data-milan-orig-text');
-    if (orig !== null) {
+    if (orig && !isDevanagari(orig)) {
       opt.textContent = orig;
+    } else {
+      const currentText = opt.textContent || '';
+      if (isDevanagari(currentText)) {
+        const restored = translateToEnglish(currentText);
+        opt.textContent = restored;
+        opt.setAttribute('data-milan-orig-text', restored);
+      }
     }
   });
 
-  const titled = document.querySelectorAll<HTMLElement>('[data-milan-orig-title]');
+  // Restore element titles
+  const titled = document.querySelectorAll<HTMLElement>('[title]');
   titled.forEach((el) => {
     const orig = el.getAttribute('data-milan-orig-title');
-    if (orig !== null) {
+    if (orig && !isDevanagari(orig)) {
       el.setAttribute('title', orig);
+    } else {
+      const currentTitle = el.getAttribute('title') || '';
+      if (isDevanagari(currentTitle)) {
+        const restored = translateToEnglish(currentTitle);
+        el.setAttribute('title', restored);
+        el.setAttribute('data-milan-orig-title', restored);
+      }
     }
   });
 }
 
 export function activateLiveDomTranslationEngine(language: LanguageCode): () => void {
   currentLanguage = language;
-  sweepLiveDom(language);
+
+  if (language === 'en') {
+    prewarmEnglishCache();
+    restoreEnglishDom();
+  } else {
+    sweepLiveDom(language);
+  }
 
   if (activeObserver) {
     activeObserver.disconnect();
@@ -870,8 +1293,51 @@ export function activateLiveDomTranslationEngine(language: LanguageCode): () => 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   activeObserver = new MutationObserver((mutations) => {
-    if (currentLanguage === 'en') return;
+    // If in English mode, guard against rogue Devanagari text mutations and prewarm English nodes
+    if (currentLanguage === 'en') {
+      let hasDevanagariMutation = false;
+      for (const m of mutations) {
+        if (m.type === 'characterData' && isDevanagari(m.target.nodeValue || '')) {
+          hasDevanagariMutation = true;
+          break;
+        }
+        if (m.type === 'childList') {
+          for (let i = 0; i < m.addedNodes.length; i++) {
+            const added = m.addedNodes[i];
+            if (isDevanagari(added.textContent || '')) {
+              hasDevanagariMutation = true;
+              break;
+            }
+          }
+          if (hasDevanagariMutation) break;
+        }
+      }
 
+      if (hasDevanagariMutation) {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          restoreEnglishDom();
+        }, 20);
+      } else {
+        // Cache newly added English nodes
+        for (const m of mutations) {
+          if (m.type === 'childList') {
+            for (let i = 0; i < m.addedNodes.length; i++) {
+              const added = m.addedNodes[i];
+              if (added.nodeType === Node.TEXT_NODE) {
+                const text = added.nodeValue || '';
+                if (text.trim() && !isDevanagari(text)) {
+                  originalTextMap.set(added, text);
+                }
+              }
+            }
+          }
+        }
+      }
+      return;
+    }
+
+    // In Hindi mode, sweep new nodes
     let isSelfMutation = true;
     for (const m of mutations) {
       if (m.type === 'childList') {
@@ -909,3 +1375,4 @@ export function activateLiveDomTranslationEngine(language: LanguageCode): () => 
     }
   };
 }
+

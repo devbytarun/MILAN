@@ -1,7 +1,7 @@
 import { locales } from '../src/i18n/locales/index.ts';
 import { SUPPORTED_LANGUAGES } from '../src/i18n/languages.ts';
 import type { TranslationDictionary } from '../src/i18n/types.ts';
-import { translateToHindi, transliterateToHindi } from '../src/i18n/dom-translation-engine.ts';
+import { translateToHindi, transliterateToHindi, translateToEnglish, isDevanagari } from '../src/i18n/dom-translation-engine.ts';
 
 function runTests() {
   console.log('🧪 Running MILAN Hindi & English Localization Verification Tests...\n');
@@ -91,6 +91,39 @@ function runTests() {
     totalErrors++;
   } else {
     console.log(`✅ PASSED: Phonetic transliteration "Aarav" ➔ "${nameDev}"`);
+  }
+
+  // 4. Test Bidirectional Neural Reverse Translation (Hindi -> English)
+  console.log('\n--- 4. Testing Bidirectional Neural Reverse Translation (Hindi -> English) ---');
+  const reversePhrases = [
+    { hi: 'अभियान केंद्र', expected: 'Operations Center' },
+    { hi: 'केस डायरेक्टरी', expected: 'Cases Directory' },
+    { hi: 'लापता की रिपोर्ट दर्ज करें', expected: 'File Missing Report' },
+    { hi: 'बचाए गए का पंजीकरण', expected: 'Register Rescued' },
+    { hi: 'सभी स्थितियाँ', expected: 'All Statuses' },
+    { hi: 'केस यूआईडी', expected: 'Case UID' },
+    { hi: 'अज्ञात जीवित व्यक्ति', expected: 'Unidentified Survivor' },
+    { hi: 'चरण 1 / 6', expected: 'Step 1 of 6' },
+    { hi: 'आरव शर्मा', expected: 'Aarav Sharma' },
+    { hi: 'अलकनंदा', expected: 'Alaknanda' },
+  ];
+
+  for (const item of reversePhrases) {
+    const restored = translateToEnglish(item.hi);
+    if (!restored || isDevanagari(restored)) {
+      console.error(`❌ Reverse translation failed for "${item.hi}", got Devanagari text "${restored}"`);
+      totalErrors++;
+    } else {
+      console.log(`✅ PASSED: "${item.hi}" ➔ "${restored}"`);
+    }
+  }
+
+  // Verify isDevanagari helper
+  if (!isDevanagari('हिन्दी') || isDevanagari('English')) {
+    console.error(`❌ isDevanagari check failed`);
+    totalErrors++;
+  } else {
+    console.log(`✅ PASSED: isDevanagari helper verified`);
   }
 
   // Final Summary
