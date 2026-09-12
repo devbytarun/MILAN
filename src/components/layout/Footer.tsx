@@ -12,12 +12,9 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
           {/* Brand & Mission */}
           <div className="space-y-3 md:col-span-1">
-            <div className="flex items-center gap-2">
-              <span className="font-sans text-xl font-bold tracking-tight text-slate-900">
+            <div className="flex items-center">
+              <span className="font-brand text-2xl font-black tracking-[0.22em] text-slate-950 uppercase">
                 MILAN
-              </span>
-              <span className="text-[10px] uppercase font-mono font-semibold tracking-wider px-2 py-0.5 rounded-md bg-white text-slate-700 border border-slate-200 shadow-sm">
-                DISASTER GRID
               </span>
             </div>
             <p className="text-sm leading-relaxed text-slate-600">

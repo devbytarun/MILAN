@@ -19,9 +19,7 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import { Button } from '../ui/Button.tsx';
-import { Badge } from '../ui/Badge.tsx';
 import { LanguageSwitcher } from '../common/LanguageSwitcher.tsx';
-import { LiveStatusBeacon } from '../common/LiveStatusBeacon.tsx';
 
 export const Navbar: React.FC = () => {
   const { profile, signOut, switchDemoRole, isDemoMode } = useAuth();
@@ -103,28 +101,25 @@ export const Navbar: React.FC = () => {
       }`}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8 h-full max-w-full">
-        <div className="flex items-center justify-between h-full gap-2 sm:gap-4">
-          {/* Brand Logo & Live Status */}
-          <div className="flex items-center gap-3 shrink-0">
+        <div className="relative flex items-center justify-between h-full gap-2 sm:gap-4">
+          {/* Brand Logo (Premium MILAN Typography) */}
+          <div className="flex items-center shrink-0 z-10">
             <Link
               to="/"
-              className="flex items-center gap-2 group select-none whitespace-nowrap"
+              className="flex items-center group select-none whitespace-nowrap py-1"
               aria-label="MILAN Home"
             >
-              <span className="font-sans text-xl font-bold tracking-tight text-slate-900 group-hover:text-brand-primary transition-colors">
+              <span className="font-brand text-2xl sm:text-[26px] font-black tracking-[0.22em] text-slate-950 group-hover:text-orange-600 transition-colors uppercase">
                 MILAN
               </span>
-              <Badge variant="shade" size="sm">
-                DISASTER GRID
-              </Badge>
             </Link>
-            <div className="hidden 2xl:block border-l border-slate-200 pl-3 shrink-0">
-              <LiveStatusBeacon />
-            </div>
           </div>
 
-          {/* Desktop Nav Links (Streamlined, role-aware, overflow-free) */}
-          <nav className="hidden lg:flex items-center gap-1 shrink-0" aria-label="Main Navigation">
+          {/* Desktop Nav Links (Perfect Center Alignment) */}
+          <nav
+            className="hidden lg:flex items-center gap-1.5 absolute left-1/2 -translate-x-1/2 z-10"
+            aria-label="Main Navigation"
+          >
             {profile && (
               <Link
                 to="/dashboard"
@@ -277,7 +272,7 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Right Controls (Language / Role Switcher / Profile) */}
-          <div className="hidden lg:flex items-center gap-2 shrink-0">
+          <div className="hidden lg:flex items-center gap-2 shrink-0 z-10">
             {/* Language Switcher */}
             <LanguageSwitcher variant="pill" />
 
@@ -384,7 +379,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile Menu Trigger (lg:hidden) */}
-          <div className="lg:hidden flex items-center gap-2 shrink-0">
+          <div className="lg:hidden flex items-center gap-2 shrink-0 z-10">
             <LanguageSwitcher variant="compact" />
             <button
               type="button"
@@ -402,9 +397,7 @@ export const Navbar: React.FC = () => {
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-b border-slate-200 bg-white text-slate-900 px-4 pt-3 pb-6 space-y-4 shadow-dropdown animate-in fade-in duration-150">
-          <div className="pb-2 border-b border-slate-100">
-            <LiveStatusBeacon />
-          </div>
+
 
           <div className="space-y-1">
             {profile && (

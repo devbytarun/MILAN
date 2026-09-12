@@ -102,6 +102,16 @@ export default {
         },
       },
       fontFamily: {
+        brand: [
+          'Outfit',
+          'Inter Variable',
+          'Inter',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'sans-serif',
+        ],
         display: [
           'Inter Variable',
           'Inter',
