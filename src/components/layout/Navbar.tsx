@@ -101,9 +101,9 @@ export const Navbar: React.FC = () => {
       }`}
     >
       <div className="w-full px-4 sm:px-6 lg:px-8 h-full max-w-full">
-        <div className="relative flex items-center justify-between h-full gap-2 sm:gap-4">
+        <div className="flex items-center justify-between h-full gap-2 sm:gap-4 max-w-full">
           {/* Brand Logo (Premium MILAN Typography) */}
-          <div className="flex items-center shrink-0 z-10">
+          <div className="flex items-center shrink-0">
             <Link
               to="/"
               className="flex items-center group select-none whitespace-nowrap py-1"
@@ -115,17 +115,17 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Nav Links (Perfect Center Alignment) */}
+          {/* Desktop Nav Links (Streamlined, role-aware, in-flow & overflow-free) */}
           <nav
-            className="hidden lg:flex items-center gap-1.5 absolute left-1/2 -translate-x-1/2 z-10"
+            className="hidden lg:flex items-center justify-center gap-1 xl:gap-2 flex-1 min-w-0 px-1 xl:px-2"
             aria-label="Main Navigation"
           >
             {profile && (
               <Link
                 to="/dashboard"
-                className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap px-2.5 xl:px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                   isActive('/dashboard')
-                    ? 'bg-orange-50/80 text-orange-700 font-semibold border border-orange-200/60'
+                    ? 'bg-orange-50/90 text-orange-700 font-semibold border border-orange-200/70 shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
               >
@@ -136,13 +136,13 @@ export const Navbar: React.FC = () => {
             {canViewCases && (
               <Link
                 to="/cases"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                   isActive('/cases')
-                    ? 'bg-orange-50/80 text-orange-700 font-semibold border border-orange-200/60'
+                    ? 'bg-orange-50/90 text-orange-700 font-semibold border border-orange-200/70 shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
               >
-                <Search className="w-3.5 h-3.5" />
+                <Search className="w-3.5 h-3.5 shrink-0" />
                 <span>{isFamily || role === 'VOLUNTEER' ? 'Public Directory' : t('nav_cases')}</span>
               </Link>
             )}
@@ -151,13 +151,13 @@ export const Navbar: React.FC = () => {
             {isFamily && canReportMissing && (
               <Link
                 to="/report/missing"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                   isActive('/report/missing')
-                    ? 'bg-orange-50/80 text-orange-700 font-semibold border border-orange-200/60'
+                    ? 'bg-orange-50/90 text-orange-700 font-semibold border border-orange-200/70 shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
               >
-                <FilePlus className="w-3.5 h-3.5" />
+                <FilePlus className="w-3.5 h-3.5 shrink-0" />
                 <span>{t('nav_report_missing')}</span>
               </Link>
             )}
@@ -168,19 +168,19 @@ export const Navbar: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIntakeMenuOpen(!intakeMenuOpen)}
-                  className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
+                  className={`whitespace-nowrap flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                     isActive('/report/missing') ||
                     isActive('/report/found') ||
                     isActive('/report/hospital') ||
                     isActive('/report/voice')
-                      ? 'bg-orange-50/80 text-orange-700 font-semibold border border-orange-200/60'
+                      ? 'bg-orange-50/90 text-orange-700 font-semibold border border-orange-200/70 shadow-2xs'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                   }`}
                   aria-expanded={intakeMenuOpen}
                 >
-                  <PlusCircle className="w-3.5 h-3.5" />
+                  <PlusCircle className="w-3.5 h-3.5 shrink-0" />
                   <span>Intake Forms</span>
-                  <ChevronDown className="w-3 h-3 opacity-60" />
+                  <ChevronDown className="w-3 h-3 opacity-60 shrink-0" />
                 </button>
 
                 {intakeMenuOpen && (
@@ -245,13 +245,13 @@ export const Navbar: React.FC = () => {
             {canReview && (
               <Link
                 to="/review"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                   isActive('/review')
-                    ? 'bg-orange-50/80 text-orange-700 font-semibold border border-orange-200/60'
+                    ? 'bg-orange-50/90 text-orange-700 font-semibold border border-orange-200/70 shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
               >
-                <CheckCircle2 className="w-3.5 h-3.5" />
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                 <span>{t('nav_review')}</span>
               </Link>
             )}
@@ -259,20 +259,20 @@ export const Navbar: React.FC = () => {
             {canDossier && (
               <Link
                 to="/dossier"
-                className={`whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-colors ${
                   isActive('/dossier')
-                    ? 'bg-orange-50/80 text-orange-700 font-semibold border border-orange-200/60'
+                    ? 'bg-orange-50/90 text-orange-700 font-semibold border border-orange-200/70 shadow-2xs'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
                 }`}
               >
-                <FileText className="w-3.5 h-3.5 text-slate-900" />
+                <FileText className="w-3.5 h-3.5 shrink-0 text-slate-900" />
                 <span>{t('nav_forensic_dossiers')}</span>
               </Link>
             )}
           </nav>
 
           {/* Right Controls (Language / Role Switcher / Profile) */}
-          <div className="hidden lg:flex items-center gap-2 shrink-0 z-10">
+          <div className="hidden lg:flex items-center gap-1.5 xl:gap-2.5 shrink-0">
             {/* Language Switcher */}
             <LanguageSwitcher variant="pill" />
 
@@ -282,7 +282,7 @@ export const Navbar: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
-                  className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-medium transition-colors whitespace-nowrap shadow-sm"
+                  className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-medium transition-colors whitespace-nowrap shadow-xs"
                   title="Switch evaluation persona (Simulation Mode)"
                   aria-expanded={roleSwitcherOpen}
                 >
@@ -339,7 +339,7 @@ export const Navbar: React.FC = () => {
             {/* Profile or Auth CTAs */}
             {profile ? (
               <div className="flex items-center gap-2 pl-2 border-l border-slate-200 shrink-0">
-                <div className="hidden 2xl:block text-right whitespace-nowrap">
+                <div className="hidden xl:block text-right whitespace-nowrap">
                   <div className="text-xs font-semibold text-slate-900 leading-tight truncate max-w-[110px]">
                     {profile.full_name || 'Coordinator'}
                   </div>
@@ -379,7 +379,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile Menu Trigger (lg:hidden) */}
-          <div className="lg:hidden flex items-center gap-2 shrink-0 z-10">
+          <div className="lg:hidden flex items-center gap-2 shrink-0">
             <LanguageSwitcher variant="compact" />
             <button
               type="button"
@@ -397,8 +397,6 @@ export const Navbar: React.FC = () => {
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-b border-slate-200 bg-white text-slate-900 px-4 pt-3 pb-6 space-y-4 shadow-dropdown animate-in fade-in duration-150">
-
-
           <div className="space-y-1">
             {profile && (
               <Link
