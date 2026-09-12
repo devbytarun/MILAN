@@ -125,7 +125,6 @@ function runTests() {
   } else {
     console.log(`✅ PASSED: isDevanagari helper verified`);
   }
-
   // Final Summary
   console.log('\n========================================');
   if (totalErrors > 0) {

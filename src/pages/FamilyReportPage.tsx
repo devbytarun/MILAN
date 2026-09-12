@@ -13,6 +13,9 @@ import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
 import { useAuth } from '../context/AuthContext.tsx';
 import { hasPermission } from '../lib/permissions.ts';
 import { AccessDenied } from './AccessDenied.tsx';
+import { Button } from '../components/ui/Button.tsx';
+import { DemoAutoFillBar } from '../components/forms/DemoAutoFillBar.tsx';
+import { DEMO_PRESETS, DemoPresetKey } from '../data/demoPresets.ts';
 
 const FAMILY_STEPS: FormStep[] = [
   { id: 'identity', title: 'Basic Identity', subtitle: 'Name, age, gender and blood group' },
@@ -96,6 +99,41 @@ export const FamilyReportPage: React.FC = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleAutoFillDemo = (key: DemoPresetKey, fastForward = false) => {
+    const preset = DEMO_PRESETS[key].family;
+    setFormData({
+      fullName: preset.fullName,
+      alternativeNames: preset.alternativeNames,
+      age: preset.age,
+      gender: preset.gender,
+      dateOfBirth: preset.dateOfBirth,
+      bloodGroup: preset.bloodGroup,
+      heightCm: preset.heightCm,
+      weightKg: preset.weightKg,
+      build: preset.build,
+      hairDescription: preset.hairDescription,
+      hairColour: preset.hairColour,
+      eyeColour: preset.eyeColour,
+      skinDescription: preset.skinDescription,
+      clothing: preset.clothing,
+      footwear: preset.footwear,
+      accessories: preset.accessories,
+      belongings: preset.belongings,
+      foundLocation: preset.foundLocation,
+      foundAt: preset.foundAt,
+      reportNotes: preset.reportNotes,
+      birthmarks: preset.birthmarks,
+      scars: preset.scars,
+      tattoos: preset.tattoos,
+      anatomicalFeatures: preset.anatomicalFeatures,
+      identifyingClue: preset.identifyingClue,
+    });
+
+    if (fastForward) {
+      setCurrentStep(FAMILY_STEPS.length - 1);
+    }
+  };
+
   const handleNext = () => {
     if (currentStep < FAMILY_STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -153,41 +191,41 @@ export const FamilyReportPage: React.FC = () => {
   // Success Confirmation Screen
   if (submittedUid) {
     return (
-      <div className="max-w-2xl mx-auto my-8 bg-canvas-light border border-hairline-light rounded-lg p-8 shadow-elevation-3 text-center space-y-6">
-        <div className="w-16 h-16 bg-aloe text-ink rounded-pill flex items-center justify-center mx-auto border border-aloe/40">
-          <CheckCircle2 className="w-8 h-8 text-ink" />
+      <div className="max-w-2xl mx-auto my-8 bg-white border border-slate-200/90 rounded-2xl p-8 shadow-card text-center space-y-6 font-body">
+        <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto border border-emerald-200 shadow-sm">
+          <CheckCircle2 className="w-8 h-8" />
         </div>
 
         <div>
-          <span className="inline-flex items-center text-[10px] font-semibold text-ink bg-aloe px-3 py-1 rounded-pill uppercase tracking-wider border border-aloe/40">
+          <span className="inline-flex items-center text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-200 font-mono">
             Report Successfully Filed
           </span>
-          <h2 className="type-heading-xl text-ink mt-3">
+          <h2 className="font-display text-2xl font-bold text-slate-900 tracking-tight mt-3">
             Missing Person Case Created
           </h2>
-          <p className="type-caption text-shade-50 mt-1">
+          <p className="text-xs text-slate-600 mt-1">
             Your report has been broadcast to all active camp rescue shelters and hospital triage registries.
           </p>
         </div>
 
         {/* UID Box */}
-        <div className="p-6 bg-canvas-night text-on-dark rounded-md shadow-elevation-1 max-w-sm mx-auto space-y-1 border border-hairline-dark">
-          <div className="text-[10px] font-semibold text-shade-40 uppercase tracking-widest">
+        <div className="p-6 bg-slate-900 text-white rounded-xl shadow-sm max-w-sm mx-auto space-y-1 border border-slate-800">
+          <div className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-widest">
             Case Identification UID
           </div>
-          <div className="text-3xl font-mono font-bold tracking-wider text-aloe">
+          <div className="text-3xl font-mono font-bold tracking-wider text-orange-400">
             {submittedUid}
           </div>
-          <div className="text-[11px] text-shade-40">
+          <div className="text-[11px] text-slate-400">
             Save this UID to track case status or quote to relief officers.
           </div>
         </div>
 
-        <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md text-left text-xs text-ink space-y-2">
-          <div className="font-semibold flex items-center gap-1.5 text-ink">
-            <Sparkles className="w-4 h-4 text-ink" /> What Happens Next:
+        <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-xl text-left text-xs text-slate-700 space-y-2">
+          <div className="font-semibold flex items-center gap-1.5 text-slate-900">
+            <Sparkles className="w-4 h-4 text-orange-600" /> What Happens Next:
           </div>
-          <ul className="list-disc pl-5 space-y-1 text-shade-60 type-caption">
+          <ul className="list-disc pl-5 space-y-1 text-slate-600">
             <li>The algorithmic matching engine is actively cross-referencing field rescue intakes.</li>
             <li>If a high-confidence candidate is found, human reviewers will audit evidence before notifying you.</li>
             <li>You can check real-time progress anytime in the Cases Registry.</li>
@@ -195,37 +233,52 @@ export const FamilyReportPage: React.FC = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <Link
-            to="/cases"
-            className="w-full sm:w-auto px-6 py-2.5 bg-primary text-on-primary hover:bg-shade-70 font-semibold rounded-pill text-xs flex items-center justify-center gap-2 shadow-sm transition"
-          >
-            <Search className="w-4 h-4" /> View in Cases Registry
+          <Link to="/cases" className="w-full sm:w-auto">
+            <Button
+              variant="brand"
+              size="md"
+              leftIcon={<Search className="w-4 h-4" />}
+              className="w-full sm:w-auto"
+            >
+              View in Cases Registry
+            </Button>
           </Link>
-          <button
+          <Button
+            variant="secondary"
+            size="md"
             onClick={() => {
               setSubmittedUid(null);
               setCurrentStep(0);
             }}
-            className="w-full sm:w-auto px-5 py-2.5 border border-ink hover:bg-canvas-cream text-ink font-semibold rounded-pill text-xs transition"
+            className="w-full sm:w-auto"
           >
             File Another Report
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <FormStepWrapper
-      steps={FAMILY_STEPS}
-      currentStep={currentStep}
-      onPrev={handlePrev}
-      onNext={handleNext}
-      onSubmit={handleSubmit}
-      isSubmitting={submitting}
-      badgeText="Family Intake Portal"
-      badgeColor="emerald"
-    >
+    <div className="space-y-4">
+      <DemoAutoFillBar
+        formType="family"
+        onFill={(key) => handleAutoFillDemo(key, false)}
+        onFillAndFastForward={(key) => handleAutoFillDemo(key, true)}
+        currentStep={currentStep}
+        totalSteps={FAMILY_STEPS.length}
+      />
+
+      <FormStepWrapper
+        steps={FAMILY_STEPS}
+        currentStep={currentStep}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onSubmit={handleSubmit}
+        isSubmitting={submitting}
+        badgeText="Family Intake Portal"
+        badgeColor="emerald"
+      >
 
 
       {voiceParseNotification && (
@@ -556,8 +609,8 @@ export const FamilyReportPage: React.FC = () => {
       {/* STEP 5: Identifying Clues */}
       {currentStep === 4 && (
         <div className="space-y-4">
-          <div className="p-4 bg-canvas-cream border border-hairline-light rounded-md text-xs text-ink leading-relaxed">
-            <strong className="text-ink">Key Matching Feature:</strong> Physical clues (scars, birthmarks, accessories) are weighted highest in our algorithm when persons cannot speak their names.
+          <div className="p-4 bg-orange-50/60 border border-orange-200/80 rounded-xl text-xs text-slate-700 leading-relaxed">
+            <strong className="text-orange-900 font-semibold">Key Matching Feature:</strong> Physical clues (scars, birthmarks, accessories) are weighted highest in our algorithm when persons cannot speak their names.
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -662,5 +715,6 @@ export const FamilyReportPage: React.FC = () => {
         onApplyParsedData={handleApplyVoice}
       />
     </FormStepWrapper>
+    </div>
   );
 };
