@@ -881,18 +881,13 @@ const EXPLICIT_REVERSE_PHRASES: Record<string, string> = {
   'घटना': 'Incident',
   'स्थान': 'Location',
   'स्रोत': 'Source',
-  'उम्मीदवार': 'Candidate',
   'उम्मीदवार मिलान': 'Candidate Match',
-  'केस': 'Case',
-  'डायरेक्टरी': 'Directory',
   'दर्ज करें': 'File Report',
-  'पंजीकरण': 'Registration',
   'नोट्स': 'Notes',
   'ध्वनि': 'Chimes',
   'चालू': 'On',
   'लाइव': 'Live',
   'ग्रिड': 'Grid',
-  'सक्रिय': 'Active',
   'परिवार रिपोर्टिंग पोर्टल': 'Family Intake Portal',
 };
 for (const [hi, en] of Object.entries(EXPLICIT_REVERSE_PHRASES)) {
