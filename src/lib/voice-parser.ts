@@ -145,8 +145,8 @@ export function parseDisasterVoiceTranscript(transcript: string): ParsedVoiceRep
 
   // 5. BLOOD GROUP DETECTION
   const bloodMatch =
-    text.match(/\b(A|B|AB|O)\s*(\+|\-|positive|negative|pos|neg)(?!\w)/i) ||
-    lower.match(/blood(?:\s*group)?(?:\s*is)?\s*(A|B|AB|O)\s*(\+|\-|positive|negative|pos|neg)?/i);
+    text.match(/\b(A|B|AB|O)\s*(\+|-|positive|negative|pos|neg)(?!\w)/i) ||
+    lower.match(/blood(?:\s*group)?(?:\s*is)?\s*(A|B|AB|O)\s*(\+|-|positive|negative|pos|neg)?/i);
 
   if (bloodMatch) {
     const type = bloodMatch[1].toUpperCase();
@@ -157,7 +157,7 @@ export function parseDisasterVoiceTranscript(transcript: string): ParsedVoiceRep
   }
 
   // 6. HEIGHT EXTRACTION (Supports cm and feet/inches)
-  const heightFeetMatch = lower.match(/(?:height(?:\s*is|\s*was)?)\s*(\d{1})\s*(?:feet|foot|ft|\')\s*(\d{1,2})?\s*(?:inches|in|\")?/i);
+  const heightFeetMatch = lower.match(/(?:height(?:\s*is|\s*was)?)\s*(\d{1})\s*(?:feet|foot|ft|')\s*(\d{1,2})?\s*(?:inches|in|")?/i);
   const heightCmMatch =
     lower.match(/(?:height(?:\s*is|\s*was)?|lambai)\s*(\d{2,3})\s*(?:cm|centimeters?|cms)?\b/i) ||
     lower.match(/\b(\d{2,3})\s*(?:cm|centimeters?|cms)\b/i);

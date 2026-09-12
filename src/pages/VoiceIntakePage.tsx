@@ -76,15 +76,6 @@ export const VoiceIntakePage: React.FC = () => {
   const [submittedUid, setSubmittedUid] = useState<string | null>(null);
   const [copiedTranscript, setCopiedTranscript] = useState(false);
 
-  if (!hasPermission(profile?.role, 'USE_VOICE_AI')) {
-    return (
-      <AccessDenied
-        moduleName="Voice AI / Radio Parser"
-        reason="Voice radio parsing and tactical intake tools are restricted to operational field rescue personnel."
-      />
-    );
-  }
-
   const handleParseComplete = useCallback((result: ParsedVoiceReport) => {
     setParseResult(result);
     setEditableData(toFullInput(result.attributes, result.rawTranscript));
@@ -101,6 +92,15 @@ export const VoiceIntakePage: React.FC = () => {
     setMode('review');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  if (!hasPermission(profile?.role, 'USE_VOICE_AI')) {
+    return (
+      <AccessDenied
+        moduleName="Voice AI / Radio Parser"
+        reason="Voice radio parsing and tactical intake tools are restricted to operational field rescue personnel."
+      />
+    );
+  }
 
   const handleFieldChange = (field: keyof CreateCaseWithReportInput, value: string | number | undefined) => {
     if (!editableData) return;

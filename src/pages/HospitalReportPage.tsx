@@ -28,6 +28,28 @@ export const HospitalReportPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submittedUid, setSubmittedUid] = useState<string | null>(null);
 
+  const [hasExistingUid, setHasExistingUid] = useState(false);
+  const [existingUid, setExistingUid] = useState('');
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  const [voiceParseNotification, setVoiceParseNotification] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState({
+    hospitalName: 'City Trauma Center',
+    wardBed: 'Emergency Triage, Bed #14',
+    referralAmbulance: 'Ambulance NDRF-07',
+    fullName: '',
+    approximateAge: '40',
+    gender: 'Male',
+    bloodGroup: 'A+',
+    weightKg: '70',
+    conditionStatus: 'Moderate head trauma, stabilized with IV fluids',
+    anatomicalFeatures: 'Fracture on left fibula, old appendectomy scar',
+    clothing: 'Torn athletic hoodie, black track pants',
+    accessories: 'Silver ring left ring finger, Casio watch',
+    identifyingClue: 'Om tattoo on inner right wrist, Casio watch',
+    reportNotes: 'Admitted from bridge collapse sector; unconscious upon initial arrival.',
+  });
+
   if (!hasPermission(profile?.role, 'CREATE_HOSPITAL_REPORT')) {
     return (
       <AccessDenied
@@ -36,11 +58,6 @@ export const HospitalReportPage: React.FC = () => {
       />
     );
   }
-
-  const [hasExistingUid, setHasExistingUid] = useState(false);
-  const [existingUid, setExistingUid] = useState('');
-  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
-  const [voiceParseNotification, setVoiceParseNotification] = useState<string | null>(null);
 
   const handleApplyVoice = (parsed: ParsedVoiceReport) => {
     const a = parsed.attributes;
@@ -67,23 +84,6 @@ export const HospitalReportPage: React.FC = () => {
     );
     setVoiceModalOpen(false);
   };
-
-  const [formData, setFormData] = useState({
-    hospitalName: 'City Trauma Center',
-    wardBed: 'Emergency Triage, Bed #14',
-    referralAmbulance: 'Ambulance NDRF-07',
-    fullName: '',
-    approximateAge: '40',
-    gender: 'Male',
-    bloodGroup: 'A+',
-    weightKg: '70',
-    conditionStatus: 'Moderate head trauma, stabilized with IV fluids',
-    anatomicalFeatures: 'Fracture on left fibula, old appendectomy scar',
-    clothing: 'Torn athletic hoodie, black track pants',
-    accessories: 'Silver ring left ring finger, Casio watch',
-    identifyingClue: 'Om tattoo on inner right wrist, Casio watch',
-    reportNotes: 'Admitted from bridge collapse sector; unconscious upon initial arrival.',
-  });
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

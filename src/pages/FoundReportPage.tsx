@@ -34,6 +34,28 @@ export const FoundReportPage: React.FC = () => {
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [voiceParseNotification, setVoiceParseNotification] = useState<string | null>(null);
 
+  // Form State
+  const [formData, setFormData] = useState({
+    fullName: '',
+    approximateAge: '',
+    gender: 'Male',
+    bloodGroup: '',
+    build: 'Slim',
+    hairColour: 'Black',
+    clothing: '',
+    footwear: '',
+    accessories: '',
+    birthmarks: '',
+    scars: '',
+    tattoos: '',
+    identifyingClue: '',
+    foundLocation: 'Camp Relief Zone 2 (NDRF Intake)',
+    foundAt: new Date().toISOString().slice(0, 16),
+    referralInfo: 'Evacuated by NDRF Battalion 4',
+    reportNotes: '',
+    conditionStatus: 'Stable, responsive',
+  });
+
   if (!hasPermission(profile?.role, 'CREATE_FOUND_REPORT')) {
     return (
       <AccessDenied
@@ -69,28 +91,6 @@ export const FoundReportPage: React.FC = () => {
     );
     setVoiceModalOpen(false);
   };
-
-  // Form State
-  const [formData, setFormData] = useState({
-    fullName: '',
-    approximateAge: '',
-    gender: 'Male',
-    bloodGroup: '',
-    build: 'Slim',
-    hairColour: 'Black',
-    clothing: '',
-    footwear: '',
-    accessories: '',
-    birthmarks: '',
-    scars: '',
-    tattoos: '',
-    identifyingClue: '',
-    foundLocation: 'Camp Relief Zone 2 (NDRF Intake)',
-    foundAt: new Date().toISOString().slice(0, 16),
-    referralInfo: 'Evacuated by NDRF Battalion 4',
-    reportNotes: '',
-    conditionStatus: 'Stable, responsive',
-  });
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

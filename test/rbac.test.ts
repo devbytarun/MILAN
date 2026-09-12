@@ -2,13 +2,12 @@ import {
   ROLE_PERMISSIONS,
   hasPermission,
   canAccessRoute,
-  canViewCase,
   canViewField,
   sanitizeCaseForUser,
   Permission,
 } from '../src/lib/permissions.ts';
 import type { UserRole, Profile } from '../src/types/index.ts';
-import { INITIAL_DEMO_CASES, FullCaseData } from '../services/caseService.ts';
+import type { FullCaseData } from '../src/services/caseService.ts';
 
 function runRBACTests() {
   console.log('🔒 Running MILAN Role-Based Access Control (RBAC) Verification Tests...\n');

@@ -27,15 +27,6 @@ export const ReviewPage: React.FC = () => {
   const [selectedPair, setSelectedPair] = useState<CandidatePair | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
 
-  if (!hasPermission(profile?.role, 'REVIEW_MATCH')) {
-    return (
-      <AccessDenied
-        moduleName="Candidate Review Queue"
-        reason="Only authorized verification officers and administrators can access the candidate review queue."
-      />
-    );
-  }
-
   // Load and score candidate pairs
   const loadAndScorePairs = () => {
     const allCases = getLocalCases();
@@ -94,8 +85,19 @@ export const ReviewPage: React.FC = () => {
   };
 
   useEffect(() => {
-    loadAndScorePairs();
-  }, []);
+    if (hasPermission(profile?.role, 'REVIEW_MATCH')) {
+      loadAndScorePairs();
+    }
+  }, [profile?.role]);
+
+  if (!hasPermission(profile?.role, 'REVIEW_MATCH')) {
+    return (
+      <AccessDenied
+        moduleName="Candidate Review Queue"
+        reason="Only authorized verification officers and administrators can access the candidate review queue."
+      />
+    );
+  }
 
   const handleDecision = (
     pair: CandidatePair,

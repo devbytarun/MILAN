@@ -34,6 +34,35 @@ export const FamilyReportPage: React.FC = () => {
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [voiceParseNotification, setVoiceParseNotification] = useState<string | null>(null);
 
+  // Form State
+  const [formData, setFormData] = useState({
+    fullName: '',
+    alternativeNames: '',
+    age: '',
+    gender: 'Male',
+    dateOfBirth: '',
+    bloodGroup: '',
+    heightCm: '',
+    weightKg: '',
+    build: 'Medium',
+    hairDescription: '',
+    hairColour: 'Black',
+    eyeColour: 'Brown',
+    skinDescription: '',
+    clothing: '',
+    footwear: '',
+    accessories: '',
+    belongings: '',
+    foundLocation: '',
+    foundAt: new Date().toISOString().slice(0, 16),
+    reportNotes: '',
+    birthmarks: '',
+    scars: '',
+    tattoos: '',
+    anatomicalFeatures: '',
+    identifyingClue: '',
+  });
+
   if (!hasPermission(profile?.role, 'CREATE_MISSING_REPORT')) {
     return (
       <AccessDenied
@@ -65,35 +94,6 @@ export const FamilyReportPage: React.FC = () => {
     );
     setVoiceModalOpen(false);
   };
-
-  // Form State
-  const [formData, setFormData] = useState({
-    fullName: '',
-    alternativeNames: '',
-    age: '',
-    gender: 'Male',
-    dateOfBirth: '',
-    bloodGroup: '',
-    heightCm: '',
-    weightKg: '',
-    build: 'Medium',
-    hairDescription: '',
-    hairColour: 'Black',
-    eyeColour: 'Brown',
-    skinDescription: '',
-    clothing: '',
-    footwear: '',
-    accessories: '',
-    belongings: '',
-    foundLocation: '',
-    foundAt: new Date().toISOString().slice(0, 16),
-    reportNotes: '',
-    birthmarks: '',
-    scars: '',
-    tattoos: '',
-    anatomicalFeatures: '',
-    identifyingClue: '',
-  });
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

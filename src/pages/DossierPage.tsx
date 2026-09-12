@@ -189,15 +189,6 @@ export const DossierPage: React.FC = () => {
   const [dossier, setDossier] = useState<VerificationDossier | null>(null);
   const [showRawDossier, setShowRawDossier] = useState(false);
 
-  if (!hasPermission(profile?.role, 'VIEW_FORENSIC_DOSSIER')) {
-    return (
-      <AccessDenied
-        moduleName="Forensic Verification Dossier"
-        reason="Forensic similarity dossiers and algorithmic matrices are strictly restricted to humanitarian verification reviewers and system administrators."
-      />
-    );
-  }
-
   useEffect(() => {
     if (!sourceId || !candidateId) return;
 
@@ -298,6 +289,15 @@ export const DossierPage: React.FC = () => {
 
     setDossier(generatedDossier);
   }, [sourceId, candidateId]);
+
+  if (!hasPermission(profile?.role, 'VIEW_FORENSIC_DOSSIER')) {
+    return (
+      <AccessDenied
+        moduleName="Forensic Verification Dossier"
+        reason="Forensic similarity dossiers and algorithmic matrices are strictly restricted to humanitarian verification reviewers and system administrators."
+      />
+    );
+  }
 
   const handlePrint = () => {
     if (!dossier) return;
