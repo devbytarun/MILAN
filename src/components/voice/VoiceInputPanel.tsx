@@ -58,6 +58,11 @@ function playAssistantChime(type: 'start' | 'lock') {
 // Sample transcripts for field demonstration
 const SAMPLE_TRANSCRIPTS = [
   {
+    badge: '⚡ DEMO SCENARIO',
+    label: 'Aarav Sharma — NDRF Rescue Dispatch (Child, 6)',
+    text: `Control, this is NDRF Battalion 8 Boat 3 reporting. We pulled a 6-year-old male child from the flooded riverbank near Alaknanda market. The boy is in shock and non-verbal. He is wearing a blue Batman superhero t-shirt with dark denim shorts, and one blue Velcro sneaker. He has a distinct curved scar above his right eyebrow, a small brown mole on his left shoulder, and a black sacred thread tied on his right wrist with a small red whistle lanyard. Blood group B+, slim build, short black wavy hair. Currently transferring to Camp Relief Zone 4 child welfare tent. Over.`,
+  },
+  {
     badge: 'NDRF RESCUE',
     label: 'NDRF Boat Team — Rescued 9yo Child',
     text: `Control, this is NDRF Battalion 4 boat team reporting. We just pulled a young male child, approximately 9 years old, from a rooftop near Alaknanda Riverside Market. The child is in shock and unable to speak. He is wearing a soiled red collared polo shirt with dark shorts. Has a visible scar on his left forearm and a black thread on his right wrist with a metallic charm. Slim build, short black hair. Blood group B+. Currently being transported to Camp Relief Zone 2 for intake. Condition stable, non-verbal due to trauma shock. Over.`,

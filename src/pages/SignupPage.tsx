@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.tsx';
 import type { UserRole } from '../types/index.ts';
-import { UserPlus, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { UserPlus, AlertCircle, CheckCircle2, Zap, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/Button.tsx';
 import { Input } from '../components/ui/Input.tsx';
 import { Badge } from '../components/ui/Badge.tsx';
@@ -73,6 +73,15 @@ export const SignupPage: React.FC = () => {
     }
   };
 
+  const handleAutoFillDemo = () => {
+    setRole('ARMY_RESCUE');
+    setFullName('Major Vikram Rathore');
+    setEmail('vikram.rathore@ndrf.gov.in');
+    setPassword('RescuePass2026!');
+    setPhone('+91 98111 22334');
+    setOrgName('NDRF 8th Battalion Rapid Response');
+  };
+
   return (
     <div className="max-w-2xl mx-auto my-12 space-y-6 pb-16">
       <div className="text-center space-y-2">
@@ -85,6 +94,33 @@ export const SignupPage: React.FC = () => {
         <p className="text-xs text-slate-600">
           Select your operational role to establish proper data access and reporting authorization.
         </p>
+      </div>
+
+      {/* Presentation Demo Autofill Bar */}
+      <div className="bg-gradient-to-r from-orange-50/90 via-amber-50/70 to-orange-50/90 border border-orange-200/90 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3 animate-fade-in">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-orange-600 text-white flex items-center justify-center font-bold text-xs shadow-sm shrink-0">
+            <Zap className="w-4 h-4 fill-white" />
+          </div>
+          <div>
+            <div className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              Pitch Presentation Demo
+            </div>
+            <p className="text-[11px] text-slate-600">
+              Autofill realistic NDRF officer credentials for live demonstration.
+            </p>
+          </div>
+        </div>
+        <Button
+          type="button"
+          variant="brand"
+          size="sm"
+          onClick={handleAutoFillDemo}
+          leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+          className="shrink-0"
+        >
+          ⚡ Auto-Fill Demo Registration
+        </Button>
       </div>
 
       <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-card space-y-6">

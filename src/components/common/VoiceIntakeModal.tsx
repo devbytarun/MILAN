@@ -12,6 +12,10 @@ interface VoiceIntakeModalProps {
 
 const SAMPLE_TRANSCRIPTS = [
   {
+    title: '⚡ Demo: Aarav Sharma (Child, 6)',
+    text: 'Control, this is NDRF Battalion 8 Boat 3 reporting. Pulled 6-year-old male child from riverbank near Alaknanda market. Non-verbal from shock. Blue Batman superhero t-shirt, dark denim shorts, curved scar above right eyebrow, brown mole on left shoulder, black sacred thread on right wrist with red whistle lanyard. Blood group B+, short black hair. Location Camp Relief Zone 4.',
+  },
+  {
     title: 'NDRF Radio Call (Child / Haldwani)',
     text: 'Rescue Boat 3 to base: Found female child, around 4 years old, unconscious and cannot speak. Wearing pink floral top. Heart-shaped birthmark on right shoulder. Location Haldwani bypass relief post.',
   },

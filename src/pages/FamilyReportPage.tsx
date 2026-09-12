@@ -14,6 +14,8 @@ import { useAuth } from '../context/AuthContext.tsx';
 import { hasPermission } from '../lib/permissions.ts';
 import { AccessDenied } from './AccessDenied.tsx';
 import { Button } from '../components/ui/Button.tsx';
+import { DemoAutoFillBar } from '../components/forms/DemoAutoFillBar.tsx';
+import { DEMO_PRESETS, DemoPresetKey } from '../data/demoPresets.ts';
 
 const FAMILY_STEPS: FormStep[] = [
   { id: 'identity', title: 'Basic Identity', subtitle: 'Name, age, gender and blood group' },
@@ -95,6 +97,41 @@ export const FamilyReportPage: React.FC = () => {
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAutoFillDemo = (key: DemoPresetKey, fastForward = false) => {
+    const preset = DEMO_PRESETS[key].family;
+    setFormData({
+      fullName: preset.fullName,
+      alternativeNames: preset.alternativeNames,
+      age: preset.age,
+      gender: preset.gender,
+      dateOfBirth: preset.dateOfBirth,
+      bloodGroup: preset.bloodGroup,
+      heightCm: preset.heightCm,
+      weightKg: preset.weightKg,
+      build: preset.build,
+      hairDescription: preset.hairDescription,
+      hairColour: preset.hairColour,
+      eyeColour: preset.eyeColour,
+      skinDescription: preset.skinDescription,
+      clothing: preset.clothing,
+      footwear: preset.footwear,
+      accessories: preset.accessories,
+      belongings: preset.belongings,
+      foundLocation: preset.foundLocation,
+      foundAt: preset.foundAt,
+      reportNotes: preset.reportNotes,
+      birthmarks: preset.birthmarks,
+      scars: preset.scars,
+      tattoos: preset.tattoos,
+      anatomicalFeatures: preset.anatomicalFeatures,
+      identifyingClue: preset.identifyingClue,
+    });
+
+    if (fastForward) {
+      setCurrentStep(FAMILY_STEPS.length - 1);
+    }
   };
 
   const handleNext = () => {
@@ -223,16 +260,25 @@ export const FamilyReportPage: React.FC = () => {
   }
 
   return (
-    <FormStepWrapper
-      steps={FAMILY_STEPS}
-      currentStep={currentStep}
-      onPrev={handlePrev}
-      onNext={handleNext}
-      onSubmit={handleSubmit}
-      isSubmitting={submitting}
-      badgeText="Family Intake Portal"
-      badgeColor="emerald"
-    >
+    <div className="space-y-4">
+      <DemoAutoFillBar
+        formType="family"
+        onFill={(key) => handleAutoFillDemo(key, false)}
+        onFillAndFastForward={(key) => handleAutoFillDemo(key, true)}
+        currentStep={currentStep}
+        totalSteps={FAMILY_STEPS.length}
+      />
+
+      <FormStepWrapper
+        steps={FAMILY_STEPS}
+        currentStep={currentStep}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onSubmit={handleSubmit}
+        isSubmitting={submitting}
+        badgeText="Family Intake Portal"
+        badgeColor="emerald"
+      >
 
 
       {voiceParseNotification && (
@@ -669,5 +715,6 @@ export const FamilyReportPage: React.FC = () => {
         onApplyParsedData={handleApplyVoice}
       />
     </FormStepWrapper>
+    </div>
   );
 };

@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { useI18n } from '../context/I18nContext.tsx';
 import { VoiceInputPanel } from '../components/voice/VoiceInputPanel.tsx';
 import { submitCaseReport } from '../services/caseService.ts';
-import type { ParsedVoiceReport } from '../lib/voice-parser.ts';
+import { parseDisasterVoiceTranscript, type ParsedVoiceReport } from '../lib/voice-parser.ts';
+import { DemoAutoFillBar } from '../components/forms/DemoAutoFillBar.tsx';
+import { DEMO_PRESETS, DemoPresetKey } from '../data/demoPresets.ts';
 import type { CreateCaseWithReportInput } from '../types/index.ts';
 import { Button } from '../components/ui/Button.tsx';
 import { useAuth } from '../context/AuthContext.tsx';
@@ -84,6 +86,16 @@ export const VoiceIntakePage: React.FC = () => {
   }
 
   const handleParseComplete = useCallback((result: ParsedVoiceReport) => {
+    setParseResult(result);
+    setEditableData(toFullInput(result.attributes, result.rawTranscript));
+    setMode('review');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleAutoFillDemo = useCallback((key: DemoPresetKey, _fastForward = false) => {
+    const preset = DEMO_PRESETS[key];
+    if (!preset) return;
+    const result = parseDisasterVoiceTranscript(preset.voiceTranscript);
     setParseResult(result);
     setEditableData(toFullInput(result.attributes, result.rawTranscript));
     setMode('review');
@@ -204,6 +216,15 @@ export const VoiceIntakePage: React.FC = () => {
             Dictate naturally in the field or paste emergency radio transcripts. MILAN extracts standardized forensic entities without external cloud dependencies.
           </p>
         </div>
+
+        {/* Presentation Demo Autofill Bar */}
+        <DemoAutoFillBar
+          formType="voice"
+          onFill={(key) => handleAutoFillDemo(key, false)}
+          onFillAndFastForward={(key) => handleAutoFillDemo(key, true)}
+          currentStep={mode === 'input' ? 0 : 1}
+          totalSteps={2}
+        />
 
         {/* Mode Step Stepper Bar */}
         <div className="flex items-center justify-between flex-wrap gap-4">

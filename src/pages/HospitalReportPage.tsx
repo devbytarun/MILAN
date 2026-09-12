@@ -13,6 +13,8 @@ import { useAuth } from '../context/AuthContext.tsx';
 import { hasPermission } from '../lib/permissions.ts';
 import { AccessDenied } from './AccessDenied.tsx';
 import { Button } from '../components/ui/Button.tsx';
+import { DemoAutoFillBar } from '../components/forms/DemoAutoFillBar.tsx';
+import { DEMO_PRESETS, DemoPresetKey } from '../data/demoPresets.ts';
 
 const HOSPITAL_STEPS: FormStep[] = [
   { id: 'triage', title: 'Hospital Referral & Triage', subtitle: 'Link existing Milan UID or register new clinical patient' },
@@ -85,6 +87,32 @@ export const HospitalReportPage: React.FC = () => {
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAutoFillDemo = (key: DemoPresetKey, fastForward = false) => {
+    const preset = DEMO_PRESETS[key].hospital;
+    setHasExistingUid(false);
+    setExistingUid('');
+    setFormData({
+      hospitalName: preset.hospitalName,
+      wardBed: preset.wardBed,
+      referralAmbulance: preset.referralAmbulance,
+      fullName: preset.fullName,
+      approximateAge: preset.approximateAge,
+      gender: preset.gender,
+      bloodGroup: preset.bloodGroup,
+      weightKg: preset.weightKg,
+      conditionStatus: preset.conditionStatus,
+      anatomicalFeatures: preset.anatomicalFeatures,
+      clothing: preset.clothing,
+      accessories: preset.accessories,
+      identifyingClue: preset.identifyingClue,
+      reportNotes: preset.reportNotes,
+    });
+
+    if (fastForward) {
+      setCurrentStep(HOSPITAL_STEPS.length - 1);
+    }
   };
 
   const handleNext = () => {
@@ -191,16 +219,25 @@ export const HospitalReportPage: React.FC = () => {
   }
 
   return (
-    <FormStepWrapper
-      steps={HOSPITAL_STEPS}
-      currentStep={currentStep}
-      onPrev={handlePrev}
-      onNext={handleNext}
-      onSubmit={handleSubmit}
-      isSubmitting={submitting}
-      badgeText="Hospital Clinical Intake"
-      badgeColor="purple"
-    >
+    <div className="space-y-4">
+      <DemoAutoFillBar
+        formType="hospital"
+        onFill={(key) => handleAutoFillDemo(key, false)}
+        onFillAndFastForward={(key) => handleAutoFillDemo(key, true)}
+        currentStep={currentStep}
+        totalSteps={HOSPITAL_STEPS.length}
+      />
+
+      <FormStepWrapper
+        steps={HOSPITAL_STEPS}
+        currentStep={currentStep}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onSubmit={handleSubmit}
+        isSubmitting={submitting}
+        badgeText="Hospital Clinical Intake"
+        badgeColor="purple"
+      >
 
 
       {voiceParseNotification && (
@@ -425,5 +462,6 @@ export const HospitalReportPage: React.FC = () => {
         onApplyParsedData={handleApplyVoice}
       />
     </FormStepWrapper>
+    </div>
   );
 };

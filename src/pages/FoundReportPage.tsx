@@ -15,6 +15,8 @@ import { useAuth } from '../context/AuthContext.tsx';
 import { hasPermission } from '../lib/permissions.ts';
 import { AccessDenied } from './AccessDenied.tsx';
 import { Button } from '../components/ui/Button.tsx';
+import { DemoAutoFillBar } from '../components/forms/DemoAutoFillBar.tsx';
+import { DEMO_PRESETS, DemoPresetKey } from '../data/demoPresets.ts';
 
 const FOUND_STEPS: FormStep[] = [
   { id: 'comm', title: 'Communication Status', subtitle: 'Determine if survivor can provide their own details' },
@@ -92,6 +94,35 @@ export const FoundReportPage: React.FC = () => {
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAutoFillDemo = (key: DemoPresetKey, fastForward = false) => {
+    const preset = DEMO_PRESETS[key].found;
+    setCommStatus(preset.commStatus);
+    setFormData({
+      fullName: preset.fullName,
+      approximateAge: preset.approximateAge,
+      gender: preset.gender,
+      bloodGroup: preset.bloodGroup,
+      build: preset.build,
+      hairColour: preset.hairColour,
+      clothing: preset.clothing,
+      footwear: preset.footwear,
+      accessories: preset.accessories,
+      birthmarks: preset.birthmarks,
+      scars: preset.scars,
+      tattoos: preset.tattoos,
+      identifyingClue: preset.identifyingClue,
+      foundLocation: preset.foundLocation,
+      foundAt: preset.foundAt,
+      referralInfo: preset.referralInfo,
+      reportNotes: preset.reportNotes,
+      conditionStatus: preset.conditionStatus,
+    });
+
+    if (fastForward) {
+      setCurrentStep(FOUND_STEPS.length - 1);
+    }
   };
 
   const handleNext = () => {
@@ -200,16 +231,25 @@ export const FoundReportPage: React.FC = () => {
   }
 
   return (
-    <FormStepWrapper
-      steps={FOUND_STEPS}
-      currentStep={currentStep}
-      onPrev={handlePrev}
-      onNext={handleNext}
-      onSubmit={handleSubmit}
-      isSubmitting={submitting}
-      badgeText="Rescue Camp Intake"
-      badgeColor="blue"
-    >
+    <div className="space-y-4">
+      <DemoAutoFillBar
+        formType="found"
+        onFill={(key) => handleAutoFillDemo(key, false)}
+        onFillAndFastForward={(key) => handleAutoFillDemo(key, true)}
+        currentStep={currentStep}
+        totalSteps={FOUND_STEPS.length}
+      />
+
+      <FormStepWrapper
+        steps={FOUND_STEPS}
+        currentStep={currentStep}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        onSubmit={handleSubmit}
+        isSubmitting={submitting}
+        badgeText="Rescue Camp Intake"
+        badgeColor="blue"
+      >
 
 
       {voiceParseNotification && (
@@ -501,5 +541,6 @@ export const FoundReportPage: React.FC = () => {
         onApplyParsedData={handleApplyVoice}
       />
     </FormStepWrapper>
+    </div>
   );
 };
