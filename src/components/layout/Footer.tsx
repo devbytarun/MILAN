@@ -80,10 +80,10 @@ export const Footer: React.FC = () => {
           <div className="space-y-3 md:col-span-1">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
               <Radio className="w-3.5 h-3.5 text-orange-600" />
-              Regional Language Access
+              Bilingual Language Access
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              MILAN supports all 22 Eighth Schedule Indian Languages + English with full RTL support for crisis field operations.
+              MILAN provides real-time bilingual access in Hindi and English with deep Devanagari neural translation and phonetic transliteration for crisis relief operations.
             </p>
             <div className="pt-1">
               <LanguageSwitcher variant="footer" />
