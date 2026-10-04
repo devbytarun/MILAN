@@ -4,6 +4,8 @@ import { Mic, MicOff, Radio, Sparkles, Check, X, Volume2 } from 'lucide-react';
 import { Button } from '../ui/Button.tsx';
 import { Badge } from '../ui/Badge.tsx';
 
+import { useI18n } from '../../context/I18nContext.tsx';
+
 interface VoiceIntakeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -11,6 +13,14 @@ interface VoiceIntakeModalProps {
 }
 
 const SAMPLE_TRANSCRIPTS = [
+  {
+    title: '⚡ हिन्दी डेमो: आरव शर्मा (बालक, ६ वर्ष)',
+    text: 'कंट्रोल, यह एनडीआरएफ का संदेश है। हमने अलकनंदा नदी तट के पास से एक 6 साल के लड़के को बचाया है। बच्चे का नाम आरव शर्मा है। लड़का सदमे में है और बोल नहीं सकता। उसने नीली टी-शर्ट और गहरे रंग का निक्कर पहना है। दाहिनी भौंह पर चोट का निशान है और दाहिनी कलाई पर काला धागा है। रक्त समूह बी पॉजिटिव है। हल्का शरीर और छोटे काले बाल हैं।',
+  },
+  {
+    title: '⚡ हिन्दी उत्तरजीवी: वीर कुमार (२४ वर्ष)',
+    text: 'भीमताल राहत शिविर से एनडीआरएफ टीम। एक 24 साल का पुरुष मिला है। उसने काली जैकेट और जींस पहनी है। दाहिनी कलाई पर ॐ का टैटू है और बाएं हाथ पर तिल है। पूरा नाम वीर कुमार है और वह बात कर सकता है। रक्त समूह ओ पॉजिटिव है। कद 175 सेमी और वजन 70 किलो है। एथलेटिक शरीर है।',
+  },
   {
     title: '⚡ Demo: Aarav Sharma (Child, 6)',
     text: 'Control, this is NDRF Battalion 8 Boat 3 reporting. Pulled 6-year-old male child from riverbank near Alaknanda market. Non-verbal from shock. Blue Batman superhero t-shirt, dark denim shorts, curved scar above right eyebrow, brown mole on left shoulder, black sacred thread on right wrist with red whistle lanyard. Blood group B+, short black hair. Location Camp Relief Zone 4.',
@@ -30,6 +40,7 @@ export const VoiceIntakeModal: React.FC<VoiceIntakeModalProps> = ({
   onClose,
   onApplyParsedData,
 }) => {
+  const { language } = useI18n();
   const [transcript, setTranscript] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [parsedResult, setParsedResult] = useState<ParsedVoiceReport | null>(null);
@@ -53,11 +64,12 @@ export const VoiceIntakeModal: React.FC<VoiceIntakeModalProps> = ({
       setIsRecording(true);
       // Simulate speech recognition in outdoor field condition
       setTimeout(() => {
-        const sample = SAMPLE_TRANSCRIPTS[0].text;
+        const sampleIndex = language === 'hi' ? 0 : 2;
+        const sample = SAMPLE_TRANSCRIPTS[sampleIndex].text;
         setTranscript(sample);
         setIsRecording(false);
         handleParse(sample);
-      }, 2500);
+      }, 2000);
     } else {
       setIsRecording(false);
     }

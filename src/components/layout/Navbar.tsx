@@ -17,7 +17,15 @@ import {
   Radio,
   FileText,
   PlusCircle,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
+import {
+  isNetworkOffline,
+  setSimulatedOffline,
+  getPendingOfflineCount,
+  flushOfflineQueue,
+} from '../../lib/offline-sync.ts';
 import { Button } from '../ui/Button.tsx';
 import { LanguageSwitcher } from '../common/LanguageSwitcher.tsx';
 
@@ -30,6 +38,12 @@ export const Navbar: React.FC = () => {
   const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
   const [intakeMenuOpen, setIntakeMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isOffline, setIsOffline] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return isNetworkOffline();
+  });
+  const [pendingQueueCount, setPendingQueueCount] = useState<number>(0);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const intakeMenuRef = useRef<HTMLDivElement>(null);
 
@@ -83,6 +97,43 @@ export const Navbar: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const updateStatus = () => {
+      setIsOffline(isNetworkOffline());
+      setPendingQueueCount(getPendingOfflineCount());
+    };
+
+    updateStatus();
+
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    const interval = setInterval(updateStatus, 3000);
+
+    return () => {
+      window.removeEventListener('online', updateStatus);
+      window.removeEventListener('offline', updateStatus);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleToggleOffline = async () => {
+    const nextState = !isOffline;
+    setIsOffline(nextState);
+    setSimulatedOffline(nextState);
+
+    if (!nextState) {
+      setIsSyncing(true);
+      try {
+        await flushOfflineQueue();
+      } catch (err) {
+        console.warn('Sync flush note:', err);
+      } finally {
+        setIsSyncing(false);
+        setPendingQueueCount(getPendingOfflineCount());
+      }
+    }
+  };
+
   const handleRoleChange = (role: UserRole) => {
     switchDemoRole(role);
     setRoleSwitcherOpen(false);
@@ -102,8 +153,8 @@ export const Navbar: React.FC = () => {
     >
       <div className="w-full px-4 sm:px-6 lg:px-8 h-full max-w-full">
         <div className="flex items-center justify-between h-full gap-2 sm:gap-4 max-w-full">
-          {/* Brand Logo (Premium MILAN Typography) */}
-          <div className="flex items-center shrink-0">
+          {/* Brand Logo & Offline/Online Disaster Mode Toggle */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               to="/"
               className="flex items-center group select-none whitespace-nowrap py-1"
@@ -113,6 +164,45 @@ export const Navbar: React.FC = () => {
                 MILAN
               </span>
             </Link>
+
+            {/* Offline / Online Disaster Blackout Mode Toggle */}
+            <button
+              type="button"
+              onClick={handleToggleOffline}
+              title={
+                isOffline
+                  ? 'Disaster Blackout Simulated (Offline queue active. Click to reconnect & sync)'
+                  : 'Live Network Online (Click to simulate Disaster Blackout mode)'
+              }
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-200 select-none shadow-2xs ${
+                isOffline
+                  ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100 hover:border-amber-400'
+                  : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300'
+              }`}
+            >
+              {isOffline ? (
+                <>
+                  <WifiOff className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    <span>OFFLINE</span>
+                    {pendingQueueCount > 0 && (
+                      <span className="px-1.5 py-0.2 rounded-full bg-amber-200 text-amber-900 font-mono text-[10px] font-bold">
+                        {pendingQueueCount}
+                      </span>
+                    )}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Wifi className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{isSyncing ? 'SYNCING...' : 'ONLINE'}</span>
+                  </span>
+                </>
+              )}
+            </button>
           </div>
 
           {/* Desktop Nav Links (Streamlined, role-aware, in-flow & overflow-free) */}

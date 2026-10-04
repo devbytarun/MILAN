@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase.ts';
+import { isNetworkOffline, enqueueOfflineReport } from '../lib/offline-sync.ts';
 import type {
   Case,
   Report,
@@ -348,8 +349,10 @@ export async function submitCaseReport(input: CreateCaseWithReportInput): Promis
 
   saveLocalCase(fullRecord);
 
-  // If Supabase is configured with active keys, persist to database
-  if (isSupabaseConfigured) {
+  // If network is offline (simulated or real blackout), queue for auto-sync
+  if (isNetworkOffline()) {
+    enqueueOfflineReport(input);
+  } else if (isSupabaseConfigured) {
     try {
       await supabase.rpc('create_case_with_report', {
         p_case_type: input.p_case_type,

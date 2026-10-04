@@ -148,6 +148,7 @@ export const DEMO_PRESETS = {
     } as HospitalDemoPreset,
 
     voiceTranscript: `Control, this is NDRF Battalion 8 Boat 3 reporting. We pulled a 6-year-old male child from the flooded riverbank near Alaknanda market. The boy is in shock and non-verbal. He is wearing a blue Batman superhero t-shirt with dark denim shorts, and one blue Velcro sneaker. He has a distinct curved scar above his right eyebrow, a small brown mole on his left shoulder, and a black sacred thread tied on his right wrist with a small red whistle lanyard. Blood group B+, slim build, short black wavy hair. Currently transferring to Camp Relief Zone 4 child welfare tent. Over.`,
+    voiceTranscriptHindi: `कंट्रोल, यह एनडीआरएफ का संदेश है। हमने अलकनंदा नदी तट के पास से एक 6 साल के लड़के को बचाया है। बच्चे का नाम आरव शर्मा है। लड़का सदमे में है और बोल नहीं सकता। उसने नीली टी-शर्ट और गहरे रंग का निक्कर पहना है। दाहिनी भौंह पर चोट का निशान है और दाहिनी कलाई पर काला धागा है। रक्त समूह बी पॉजिटिव है। हल्का शरीर और छोटे काले बाल हैं।`,
   },
 
   // --------------------------------------------------------------------------
@@ -227,6 +228,7 @@ export const DEMO_PRESETS = {
     } as HospitalDemoPreset,
 
     voiceTranscript: `Control, volunteer unit Bhimtal reporting. We have identified survivor Veer Kumar, male, age 24, athletic build, 184 centimeters tall. Has long black hair, mountain tattoo on left forearm, Casio digital watch. Suffering from right knee pain. Transferred to Camp Alpha medical tent for checkup. Over.`,
+    voiceTranscriptHindi: `भीमताल राहत शिविर से एनडीआरएफ टीम। एक 24 साल का पुरुष मिला है। उसने काली जैकेट और जींस पहनी है। दाहिनी कलाई पर ॐ का टैटू है और बाएं हाथ पर तिल है। पूरा नाम वीर कुमार है और वह बात कर सकता है। रक्त समूह ओ पॉजिटिव है। कद 175 सेमी और वजन 70 किलो है। एथलेटिक शरीर है।`,
   },
 };
 

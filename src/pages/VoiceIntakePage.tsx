@@ -68,7 +68,7 @@ function toFullInput(attrs: Partial<CreateCaseWithReportInput>, rawTranscript: s
 
 export const VoiceIntakePage: React.FC = () => {
   const { profile } = useAuth();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [mode, setMode] = useState<PageMode>('input');
   const [parseResult, setParseResult] = useState<ParsedVoiceReport | null>(null);
   const [editableData, setEditableData] = useState<CreateCaseWithReportInput | null>(null);
@@ -86,12 +86,15 @@ export const VoiceIntakePage: React.FC = () => {
   const handleAutoFillDemo = useCallback((key: DemoPresetKey, _fastForward = false) => {
     const preset = DEMO_PRESETS[key];
     if (!preset) return;
-    const result = parseDisasterVoiceTranscript(preset.voiceTranscript);
+    const textToUse = (language === 'hi' && (preset as any).voiceTranscriptHindi)
+      ? (preset as any).voiceTranscriptHindi
+      : preset.voiceTranscript;
+    const result = parseDisasterVoiceTranscript(textToUse);
     setParseResult(result);
     setEditableData(toFullInput(result.attributes, result.rawTranscript));
     setMode('review');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  }, [language]);
 
   if (!hasPermission(profile?.role, 'USE_VOICE_AI')) {
     return (

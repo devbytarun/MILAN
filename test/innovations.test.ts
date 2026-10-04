@@ -49,6 +49,21 @@ assert(parsed2.attributes.p_blood_group === 'B+', 'Extracts blood group B+');
 assert(parsed2.attributes.p_full_name === 'Bir Kumar', 'Extracts self-reported name Bir Kumar');
 assert(parsed2.attributes.p_scars?.includes('scar') === true, 'Extracts eyebrow scar');
 
+// Test Case 3: Pure Hindi Devanagari Child Radio Report
+const radioLog3 = "कंट्रोल, यह एनडीआरएफ का संदेश है। हमने अलकनंदा नदी तट के पास से एक 6 साल के लड़के को बचाया है। बच्चे का नाम आरव शर्मा है। लड़का सदमे में है और बोल नहीं सकता। उसने नीली टी-शर्ट और गहरे रंग का निक्कर पहना है। दाहिनी भौंह पर चोट का निशान है और दाहिनी कलाई पर काला धागा है। रक्त समूह बी पॉजिटिव है। हल्का शरीर और छोटे काले बाल हैं।";
+const parsed3 = parseDisasterVoiceTranscript(radioLog3);
+
+console.log('Parsed Hindi Entities:', parsed3.extractedEntities.map(e => `${e.field}: ${e.value}`));
+assert(parsed3.attributes.p_gender === 'Male', 'Voice parser detects Male gender from Hindi');
+assert(parsed3.attributes.p_age === 6, 'Voice parser detects age 6 from Hindi 6 साल');
+assert(parsed3.attributes.p_full_name === 'आरव शर्मा', 'Voice parser extracts Hindi Devanagari full name आरव शर्मा');
+assert(parsed3.attributes.p_comm_status === 'CANNOT_COMMUNICATE', 'Voice parser detects non-verbal from बोल नहीं सकता');
+assert(parsed3.attributes.p_blood_group === 'B+', 'Voice parser detects blood group B+ from रक्त समूह बी पॉजिटिव');
+assert(parsed3.attributes.p_build === 'Slim', 'Voice parser detects Slim build from हल्का शरीर');
+assert(parsed3.attributes.p_source_type === 'ARMY_RESCUE', 'Voice parser infers ARMY_RESCUE from एनडीआरएफ');
+assert(parsed3.attributes.p_condition_status === 'SHOCK', 'Voice parser detects SHOCK from सदमे में');
+assert(parsed3.confidence >= 80, 'High extraction confidence for complete Hindi transcript');
+
 
 console.log('\n========================================');
 console.log('2. TESTING EVIDENCE DOSSIER & DISCREPANCIES');

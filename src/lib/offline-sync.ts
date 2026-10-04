@@ -51,6 +51,23 @@ class OfflineStorageAdapter {
 
 export const offlineStorage = new OfflineStorageAdapter();
 
+export function isNetworkOffline(): boolean {
+  if (typeof window === 'undefined') return false;
+  const simulated = window.localStorage?.getItem('milan_simulated_offline') === 'true';
+  return simulated || (typeof navigator !== 'undefined' && !navigator.onLine);
+}
+
+export function setSimulatedOffline(offline: boolean): void {
+  if (typeof window === 'undefined') return;
+  if (offline) {
+    window.localStorage?.setItem('milan_simulated_offline', 'true');
+    window.dispatchEvent(new Event('offline'));
+  } else {
+    window.localStorage?.removeItem('milan_simulated_offline');
+    window.dispatchEvent(new Event('online'));
+  }
+}
+
 /**
  * Adds an intake report to the offline queue when internet is unavailable.
  */

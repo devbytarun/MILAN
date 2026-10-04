@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { parseDisasterVoiceTranscript } from '../../lib/voice-parser.ts';
 import type { ParsedVoiceReport } from '../../lib/voice-parser.ts';
+import { useI18n } from '../../context/I18nContext.tsx';
 import { Button } from '../ui/Button.tsx';
 
 // Web Audio API zero-dependency chime synthesizer
@@ -57,6 +58,16 @@ function playAssistantChime(type: 'start' | 'lock') {
 
 // Sample transcripts for field demonstration
 const SAMPLE_TRANSCRIPTS = [
+  {
+    badge: '⚡ हिन्दी परिदृश्य',
+    label: 'आरव शर्मा — एनडीआरएफ बचाव कॉल (बालक, ६ वर्ष)',
+    text: `कंट्रोल, यह एनडीआरएफ का संदेश है। हमने अलकनंदा नदी तट के पास से एक 6 साल के लड़के को बचाया है। बच्चे का नाम आरव शर्मा है। लड़का सदमे में है और बोल नहीं सकता। उसने नीली टी-शर्ट और गहरे रंग का निक्कर पहना है। दाहिनी भौंह पर चोट का निशान है और दाहिनी कलाई पर काला धागा है। रक्त समूह बी पॉजिटिव है। हल्का शरीर और छोटे काले बाल हैं।`,
+  },
+  {
+    badge: '⚡ हिन्दी उत्तरजीवी',
+    label: 'वीर कुमार — जीवित बचाए गए युवा का विवरण (२४ वर्ष)',
+    text: `भीमताल राहत शिविर से एनडीआरएफ टीम। एक 24 साल का पुरुष मिला है। उसने काली जैकेट और जींस पहनी है। दाहिनी कलाई पर ॐ का टैटू है और बाएं हाथ पर तिल है। पूरा नाम वीर कुमार है और वह बात कर सकता है। रक्त समूह ओ पॉजिटिव है। कद 175 सेमी और वजन 70 किलो है। एथलेटिक शरीर है।`,
+  },
   {
     badge: '⚡ DEMO SCENARIO',
     label: 'Aarav Sharma — NDRF Rescue Dispatch (Child, 6)',
@@ -114,6 +125,8 @@ function cleanSpeechStatement(rawText: string): string {
 }
 
 export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplete }) => {
+  const { language } = useI18n();
+  const [speechLang, setSpeechLang] = useState<'hi-IN' | 'en-IN'>(language === 'hi' ? 'hi-IN' : 'en-IN');
   const [transcript, setTranscript] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [listeningState, setListeningState] = useState<'idle' | 'listening' | 'recognizing' | 'committed'>('idle');
@@ -123,6 +136,10 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
   const [showSamples, setShowSamples] = useState(false);
   const [micSupported, setMicSupported] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
+
+  useEffect(() => {
+    setSpeechLang(language === 'hi' ? 'hi-IN' : 'en-IN');
+  }, [language]);
 
   const recognitionRef = useRef<any>(null);
   const isListeningRef = useRef<boolean>(false);
@@ -211,7 +228,7 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = 'en-IN';
+    recognition.lang = speechLang;
     recognition.maxAlternatives = 1;
 
     recognition.onresult = (event: any) => {
@@ -284,7 +301,7 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
     } catch (err) {
       console.warn('Speech recognition immediate activation note:', err);
     }
-  }, [commitSpeechBuffer, soundEnabled]);
+  }, [commitSpeechBuffer, soundEnabled, speechLang]);
 
   const stopListening = useCallback(() => {
     isListeningRef.current = false;
@@ -339,7 +356,33 @@ export const VoiceInputPanel: React.FC<VoiceInputPanelProps> = ({ onParseComplet
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Audio Language Switcher */}
+          <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
+            <button
+              type="button"
+              onClick={() => setSpeechLang('hi-IN')}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                speechLang === 'hi-IN'
+                  ? 'bg-orange-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              🇮🇳 हिन्दी
+            </button>
+            <button
+              type="button"
+              onClick={() => setSpeechLang('en-IN')}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                speechLang === 'en-IN'
+                  ? 'bg-orange-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              🇬🇧 English
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
