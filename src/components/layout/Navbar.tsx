@@ -19,15 +19,20 @@ import {
   PlusCircle,
   Wifi,
   WifiOff,
+  Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   isNetworkOffline,
   setSimulatedOffline,
+  clearSimulatedOffline,
   getPendingOfflineCount,
   flushOfflineQueue,
 } from '../../lib/offline-sync.ts';
 import { Button } from '../ui/Button.tsx';
 import { LanguageSwitcher } from '../common/LanguageSwitcher.tsx';
+
+type NetworkState = 'online' | 'connecting' | 'offline' | 'disconnecting';
 
 export const Navbar: React.FC = () => {
   const { profile, signOut, switchDemoRole, isDemoMode } = useAuth();
@@ -38,12 +43,17 @@ export const Navbar: React.FC = () => {
   const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
   const [intakeMenuOpen, setIntakeMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isOffline, setIsOffline] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return isNetworkOffline();
+  const [networkState, setNetworkState] = useState<NetworkState>(() => {
+    if (typeof window === 'undefined') return 'online';
+    return isNetworkOffline() ? 'offline' : 'online';
   });
   const [pendingQueueCount, setPendingQueueCount] = useState<number>(0);
-  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [statusBanner, setStatusBanner] = useState<{ message: string; type: 'success' | 'warning' | 'info' } | null>(null);
+  const bannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTransitioningRef = useRef<boolean>(false);
+  const networkStateRef = useRef<NetworkState>(networkState);
+  networkStateRef.current = networkState;
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const intakeMenuRef = useRef<HTMLDivElement>(null);
 
@@ -97,40 +107,124 @@ export const Navbar: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const updateStatus = () => {
-      setIsOffline(isNetworkOffline());
+  const triggerOnlineTransition = async (forceClearSimulated = false) => {
+    if (isTransitioningRef.current) return;
+    if (networkStateRef.current === 'online' && !forceClearSimulated) return;
+
+    isTransitioningRef.current = true;
+    setNetworkState('connecting');
+
+    if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
+    setStatusBanner({
+      message: 'Network link detected • Establishing connection & synchronizing offline queue...',
+      type: 'info',
+    });
+
+    if (forceClearSimulated) {
+      setSimulatedOffline(false);
+    } else {
+      clearSimulatedOffline();
+    }
+
+    // Handshake animation duration
+    await new Promise((resolve) => setTimeout(resolve, 850));
+
+    try {
+      const syncResult = await flushOfflineQueue();
+      setNetworkState('online');
+      setStatusBanner({
+        message:
+          syncResult.syncedCount > 0
+            ? `Satellite link active • Synchronized ${syncResult.syncedCount} queued disaster report(s)`
+            : 'Satellite link active • Connected directly to central disaster database',
+        type: 'success',
+      });
+    } catch (err) {
+      console.warn('Sync flush note:', err);
+      setNetworkState('online');
+      setStatusBanner({
+        message: 'Satellite link active • Connected directly to central disaster database',
+        type: 'success',
+      });
+    } finally {
       setPendingQueueCount(getPendingOfflineCount());
+      isTransitioningRef.current = false;
+      bannerTimerRef.current = setTimeout(() => setStatusBanner(null), 3500);
+    }
+  };
+
+  const triggerOfflineTransition = async (forceSimulate = false) => {
+    if (isTransitioningRef.current) return;
+    if (networkStateRef.current === 'offline' && !forceSimulate) return;
+
+    isTransitioningRef.current = true;
+    setNetworkState('disconnecting');
+
+    if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
+    setStatusBanner({
+      message: forceSimulate
+        ? 'Simulating severe cellular & network blackout — offline fallback queue active'
+        : 'Network connection lost • Switching to offline blackout queue mode',
+      type: 'warning',
+    });
+
+    if (forceSimulate) {
+      setSimulatedOffline(true);
+    }
+
+    // Disconnecting animation duration
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    setNetworkState('offline');
+    setPendingQueueCount(getPendingOfflineCount());
+    isTransitioningRef.current = false;
+    bannerTimerRef.current = setTimeout(() => setStatusBanner(null), 4000);
+  };
+
+  // Automatic Network Detection & Event Listeners
+  useEffect(() => {
+    setPendingQueueCount(getPendingOfflineCount());
+
+    const handleBrowserOnline = () => {
+      clearSimulatedOffline();
+      triggerOnlineTransition(false);
     };
 
-    updateStatus();
+    const handleBrowserOffline = () => {
+      triggerOfflineTransition(false);
+    };
 
-    window.addEventListener('online', updateStatus);
-    window.addEventListener('offline', updateStatus);
-    const interval = setInterval(updateStatus, 3000);
+    const checkStatus = () => {
+      const offline = isNetworkOffline();
+      setPendingQueueCount(getPendingOfflineCount());
+
+      if (isTransitioningRef.current) return;
+
+      if (offline && networkStateRef.current === 'online') {
+        triggerOfflineTransition(false);
+      } else if (!offline && networkStateRef.current === 'offline') {
+        triggerOnlineTransition(false);
+      }
+    };
+
+    window.addEventListener('online', handleBrowserOnline);
+    window.addEventListener('offline', handleBrowserOffline);
+    const interval = setInterval(checkStatus, 1500);
 
     return () => {
-      window.removeEventListener('online', updateStatus);
-      window.removeEventListener('offline', updateStatus);
+      window.removeEventListener('online', handleBrowserOnline);
+      window.removeEventListener('offline', handleBrowserOffline);
       clearInterval(interval);
+      if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
     };
   }, []);
 
-  const handleToggleOffline = async () => {
-    const nextState = !isOffline;
-    setIsOffline(nextState);
-    setSimulatedOffline(nextState);
-
-    if (!nextState) {
-      setIsSyncing(true);
-      try {
-        await flushOfflineQueue();
-      } catch (err) {
-        console.warn('Sync flush note:', err);
-      } finally {
-        setIsSyncing(false);
-        setPendingQueueCount(getPendingOfflineCount());
-      }
+  const handleToggleOffline = () => {
+    if (isTransitioningRef.current) return;
+    if (networkState === 'offline') {
+      triggerOnlineTransition(true);
+    } else {
+      triggerOfflineTransition(true);
     }
   };
 
@@ -169,18 +263,57 @@ export const Navbar: React.FC = () => {
             <button
               type="button"
               onClick={handleToggleOffline}
+              disabled={networkState === 'connecting' || networkState === 'disconnecting'}
               title={
-                isOffline
+                networkState === 'offline'
                   ? 'Disaster Blackout Simulated (Offline queue active. Click to reconnect & sync)'
+                  : networkState === 'connecting'
+                  ? 'Connecting to satellite network...'
+                  : networkState === 'disconnecting'
+                  ? 'Disconnecting network...'
                   : 'Live Network Online (Click to simulate Disaster Blackout mode)'
               }
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-200 select-none shadow-2xs ${
-                isOffline
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide border transition-all duration-300 select-none shadow-2xs ${
+                networkState === 'connecting'
+                  ? 'bg-sky-50 text-sky-900 border-sky-300 ring-2 ring-sky-400/25 shadow-sm'
+                  : networkState === 'disconnecting'
+                  ? 'bg-amber-100/80 text-amber-950 border-amber-400 ring-2 ring-amber-400/25 shadow-sm'
+                  : networkState === 'offline'
                   ? 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100 hover:border-amber-400'
                   : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300'
               }`}
             >
-              {isOffline ? (
+              {networkState === 'connecting' && (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 text-sky-600 animate-spin shrink-0" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                    </span>
+                    <span className="font-mono text-[10px] font-bold tracking-wider text-sky-900">
+                      CONNECTING...
+                    </span>
+                  </span>
+                </>
+              )}
+
+              {networkState === 'disconnecting' && (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 text-amber-700 animate-spin shrink-0" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600"></span>
+                    </span>
+                    <span className="font-mono text-[10px] font-bold tracking-wider text-amber-900">
+                      DISCONNECTING...
+                    </span>
+                  </span>
+                </>
+              )}
+
+              {networkState === 'offline' && (
                 <>
                   <WifiOff className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                   <span className="flex items-center gap-1.5">
@@ -193,12 +326,14 @@ export const Navbar: React.FC = () => {
                     )}
                   </span>
                 </>
-              ) : (
+              )}
+
+              {networkState === 'online' && (
                 <>
                   <Wifi className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   <span className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>{isSyncing ? 'SYNCING...' : 'ONLINE'}</span>
+                    <span>ONLINE</span>
                   </span>
                 </>
               )}
@@ -623,6 +758,29 @@ export const Navbar: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* Connection Transition Status Banner */}
+      {statusBanner && (
+        <div
+          className={`w-full border-t border-b px-4 py-1.5 text-xs font-medium flex items-center justify-center gap-2 transition-all duration-300 animate-in fade-in slide-in-from-top-1 shadow-xs ${
+            statusBanner.type === 'success'
+              ? 'bg-emerald-600 text-white border-emerald-700'
+              : statusBanner.type === 'warning'
+              ? 'bg-amber-600 text-white border-amber-700'
+              : 'bg-sky-600 text-white border-sky-700'
+          }`}
+        >
+          {statusBanner.type === 'warning' ? (
+            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+          ) : statusBanner.type === 'success' ? (
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+          ) : (
+            <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" />
+          )}
+          <span>{statusBanner.message}</span>
+        </div>
+      )}
     </header>
   );
 };
+

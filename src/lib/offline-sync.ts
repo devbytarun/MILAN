@@ -53,8 +53,16 @@ export const offlineStorage = new OfflineStorageAdapter();
 
 export function isNetworkOffline(): boolean {
   if (typeof window === 'undefined') return false;
-  const simulated = window.localStorage?.getItem('milan_simulated_offline') === 'true';
-  return simulated || (typeof navigator !== 'undefined' && !navigator.onLine);
+  // If browser hardware or OS network is physically disconnected, always report offline
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return true;
+  }
+  return window.localStorage?.getItem('milan_simulated_offline') === 'true';
+}
+
+export function clearSimulatedOffline(): void {
+  if (typeof window === 'undefined') return;
+  window.localStorage?.removeItem('milan_simulated_offline');
 }
 
 export function setSimulatedOffline(offline: boolean): void {
@@ -63,7 +71,7 @@ export function setSimulatedOffline(offline: boolean): void {
     window.localStorage?.setItem('milan_simulated_offline', 'true');
     window.dispatchEvent(new Event('offline'));
   } else {
-    window.localStorage?.removeItem('milan_simulated_offline');
+    clearSimulatedOffline();
     window.dispatchEvent(new Event('online'));
   }
 }
