@@ -25,6 +25,7 @@ export const INITIAL_DEMO_CASES: FullCaseData[] = [
       case_uid: 'MILAN-2026-081',
       case_type: 'MISSING',
       status: 'POSSIBLE_MATCH',
+      family_contact_phone: '+919876543210',
       created_by: 'family-demo',
       created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
       updated_at: new Date(Date.now() - 3600000 * 1).toISOString(),
@@ -129,6 +130,7 @@ export const INITIAL_DEMO_CASES: FullCaseData[] = [
       case_uid: 'MILAN-2026-065',
       case_type: 'MISSING',
       status: 'VERIFIED_MATCH',
+      family_contact_phone: '+919812345678',
       created_by: 'family-demo',
       created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
       updated_at: new Date(Date.now() - 3600000 * 2).toISOString(),
@@ -300,6 +302,7 @@ export async function submitCaseReport(input: CreateCaseWithReportInput): Promis
       case_uid: generatedUid,
       case_type: input.p_case_type,
       status: 'SUBMITTED',
+      family_contact_phone: input.p_family_contact_phone || null,
       created_by: 'current-user',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -354,9 +357,10 @@ export async function submitCaseReport(input: CreateCaseWithReportInput): Promis
     enqueueOfflineReport(input);
   } else if (isSupabaseConfigured) {
     try {
-      await supabase.rpc('create_case_with_report', {
+      await (supabase.rpc as any)('create_case_with_report', {
         p_case_type: input.p_case_type,
         p_source_type: input.p_source_type,
+        p_family_contact_phone: input.p_family_contact_phone || undefined,
         p_comm_status: input.p_comm_status,
         p_report_notes: input.p_report_notes,
         p_found_location: input.p_found_location,

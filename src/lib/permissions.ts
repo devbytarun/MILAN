@@ -22,6 +22,11 @@ export type Permission =
   | 'VIEW_LOCATION_DETAILS'
   | 'VIEW_IDENTITY_DETAILS'
 
+  // DNA & Biometrics
+  | 'UPLOAD_DNA_REPORT'
+  | 'VIEW_DNA_REPORT'
+  | 'SEARCH_FACE_MATCH'
+
   // Reporting intake actions
   | 'CREATE_MISSING_REPORT'
   | 'CREATE_FOUND_REPORT'
@@ -76,6 +81,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, Set<Permission>> = {
     'VIEW_LOCATION_DETAILS',
     'VIEW_CONTACT_DETAILS',
     'USE_VOICE_AI',
+    'VIEW_DNA_REPORT',
+    'SEARCH_FACE_MATCH',
   ]),
 
   ARMY_RESCUE: new Set<Permission>([
@@ -90,6 +97,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, Set<Permission>> = {
     'VIEW_IDENTITY_DETAILS',
     'VIEW_LOCATION_DETAILS',
     'USE_VOICE_AI',
+    'VIEW_DNA_REPORT',
+    'SEARCH_FACE_MATCH',
   ]),
 
   HOSPITAL: new Set<Permission>([
@@ -98,11 +107,16 @@ export const ROLE_PERMISSIONS: Record<UserRole, Set<Permission>> = {
     'VIEW_ASSIGNED_CASE',
     'VIEW_OPERATIONAL_CASE',
     'VIEW_CASE_DIRECTORY',
+    'CREATE_FOUND_REPORT',
     'CREATE_HOSPITAL_REPORT',
     'VIEW_MEDICAL_DETAILS',
     'VIEW_IDENTITY_DETAILS',
+    'VIEW_CONTACT_DETAILS',
     'VIEW_OPERATIONAL_DASHBOARD',
     'USE_VOICE_AI',
+    'UPLOAD_DNA_REPORT',
+    'VIEW_DNA_REPORT',
+    'SEARCH_FACE_MATCH',
   ]),
 
   REVIEWER: new Set<Permission>([
@@ -125,6 +139,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, Set<Permission>> = {
     'VIEW_MEDICAL_DETAILS',
     'VIEW_CONTACT_DETAILS',
     'USE_VOICE_AI',
+    'VIEW_DNA_REPORT',
+    'SEARCH_FACE_MATCH',
   ]),
 
   ADMIN: new Set<Permission>([
@@ -152,6 +168,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Set<Permission>> = {
     'APPROVE_MATCH',
     'REJECT_MATCH',
     'OVERRIDE_MATCH',
+    'UPLOAD_DNA_REPORT',
+    'VIEW_DNA_REPORT',
+    'SEARCH_FACE_MATCH',
     'MANAGE_USERS',
     'MANAGE_CASES',
     'VIEW_AUDIT_LOGS',
@@ -276,7 +295,13 @@ export function canViewField(
     case 'medical':
       return role === 'HOSPITAL' || hasPermission(role, 'VIEW_MEDICAL_DETAILS');
     case 'contact':
-      return isOwner || role === 'NGO' || hasPermission(role, 'VIEW_CONTACT_DETAILS');
+      return (
+        isOwner ||
+        role === 'NGO' ||
+        role === 'ARMY_RESCUE' ||
+        role === 'HOSPITAL' ||
+        hasPermission(role, 'VIEW_CONTACT_DETAILS')
+      );
     case 'score':
       return hasPermission(role, 'VIEW_MATCH_SCORE');
     case 'internal_notes':
@@ -306,9 +331,15 @@ export function sanitizeCaseForUser(fullCase: FullCaseData, profile: Profile | n
 
   const sanitized: FullCaseData = {
     ...fullCase,
+    case: { ...fullCase.case },
     report: { ...fullCase.report },
     attributes: { ...fullCase.attributes },
   };
+
+  // Mask family contact number for unauthorized roles (e.g. unowned FAMILY, VOLUNTEER)
+  if (!canViewField(role, 'contact', isOwner)) {
+    sanitized.case.family_contact_phone = null;
+  }
 
   // Mask clinical trauma notes if not Hospital or Admin
   if (role !== 'HOSPITAL') {

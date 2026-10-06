@@ -17,10 +17,24 @@ import {
   Phone,
   Building,
   Heart,
+  Dna,
+  Upload,
+  Download,
+  FileCheck,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button.tsx';
 import { Badge } from '../components/ui/Badge.tsx';
 import { evaluateChildSafeguards } from '../lib/anti-trafficking.ts';
+import { canViewField } from '../lib/permissions.ts';
+import { formatIndianPhoneNumber } from '../lib/phoneValidation.ts';
+import {
+  getDnaReportsForCase,
+  uploadDnaReport,
+  getDnaReportDownloadUrl,
+  canUploadDnaReport,
+  canViewDnaReport,
+  DnaReport,
+} from '../services/dnaReportService.ts';
 
 export const CaseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +46,28 @@ export const CaseDetailPage: React.FC = () => {
     return all.find((c) => c.case.id === id || c.case.case_uid === id) || null;
   }, [id]);
 
-  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'ATTRIBUTES' | 'RECONCILIATION'>('OVERVIEW');
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'ATTRIBUTES' | 'RECONCILIATION' | 'DNA'>('OVERVIEW');
+  const [dnaReports, setDnaReports] = useState<DnaReport[]>([]);
+  const [dnaLoading, setDnaLoading] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadNotes, setUploadNotes] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadSuccessMsg, setUploadSuccessMsg] = useState<string | null>(null);
+  const [uploadErrorMsg, setUploadErrorMsg] = useState<string | null>(null);
+
+  const canViewDna = canViewDnaReport(profile?.role);
+  const caseId = caseData?.case?.id;
+
+  // Load DNA reports for case if authorized
+  React.useEffect(() => {
+    if (caseId && canViewDna) {
+      setDnaLoading(true);
+      getDnaReportsForCase(caseId)
+        .then((reports) => setDnaReports(reports))
+        .finally(() => setDnaLoading(false));
+    }
+  }, [caseId, canViewDna]);
 
   if (!caseData) {
     return (
@@ -74,6 +109,46 @@ export const CaseDetailPage: React.FC = () => {
   const isOwner =
     (c.created_by && (c.created_by === profile?.id || c.created_by === profile?.auth_user_id)) ||
     (isFamily && (c.created_by === 'family-demo' || c.id === 'case-demo-1'));
+
+  const canViewContact = canViewField(profile?.role, 'contact', isOwner);
+  const canUploadDna = canUploadDnaReport(profile?.role);
+
+  const handleFileUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedFile) {
+      setUploadErrorMsg('Please select a DNA report file to upload.');
+      return;
+    }
+
+    setUploading(true);
+    setUploadErrorMsg(null);
+
+    const res = await uploadDnaReport({
+      caseId: c.id,
+      file: selectedFile,
+      uploaderId: profile?.id || null,
+      uploaderName: profile?.full_name || profile?.organization_name || 'Hospital Triage Team',
+      uploaderRole: profile?.role || 'HOSPITAL',
+      notes: uploadNotes,
+    });
+
+    setUploading(false);
+
+    if (res.success && res.report) {
+      setDnaReports((prev) => [res.report!, ...prev.filter((r) => r.id !== res.report!.id)]);
+      setUploadSuccessMsg(`✓ DNA report uploaded successfully: ${res.report.file_name}`);
+      setSelectedFile(null);
+      setUploadNotes('');
+      setUploadModalOpen(false);
+    } else {
+      setUploadErrorMsg(res.error || 'Failed to upload DNA report.');
+    }
+  };
+
+  const handleDownload = async (report: DnaReport) => {
+    const url = await getDnaReportDownloadUrl(report);
+    window.open(url, '_blank');
+  };
 
   const timelineSteps = [
     {
@@ -237,6 +312,29 @@ export const CaseDetailPage: React.FC = () => {
           </div>
         )}
 
+        {/* Responder Family Contact Card */}
+        {canViewContact && c.family_contact_phone && (
+          <div className="p-4 sm:p-5 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="text-[11px] font-mono uppercase font-bold tracking-wider text-emerald-800 flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-emerald-600" /> Family Contact (Authorized Responders Only)
+              </div>
+              <div className="text-xl font-mono font-bold text-slate-900 tracking-wide flex items-center gap-2">
+                📞 {formatIndianPhoneNumber(c.family_contact_phone)}
+              </div>
+              <p className="text-xs text-slate-600">
+                Primary emergency contact registered by family. Authorized responders may use this number to coordinate family communication.
+              </p>
+            </div>
+            <a
+              href={`tel:${c.family_contact_phone.replace(/\s+/g, '')}`}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors shrink-0"
+            >
+              <Phone className="w-3.5 h-3.5" /> Contact Family
+            </a>
+          </div>
+        )}
+
         {/* Navigation Tabs */}
         <div className="flex border-b border-slate-200 gap-6 text-xs font-semibold">
           <button
@@ -269,6 +367,24 @@ export const CaseDetailPage: React.FC = () => {
           >
             Reconciliation & Shelter Info
           </button>
+          {canViewDna && (
+            <button
+              onClick={() => setActiveTab('DNA')}
+              className={`pb-3 border-b-2 transition-colors duration-150 flex items-center gap-1.5 ${
+                activeTab === 'DNA'
+                  ? 'border-indigo-600 text-indigo-700 font-bold'
+                  : 'border-transparent text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <Dna className="w-3.5 h-3.5" />
+              <span>DNA Reports</span>
+              {dnaReports.length > 0 && (
+                <span className="text-[10px] font-mono px-1.5 py-0.2 bg-indigo-100 text-indigo-800 rounded-full font-bold">
+                  {dnaReports.length}
+                </span>
+              )}
+            </button>
+          )}
         </div>
 
         {/* TAB 1: OVERVIEW */}
@@ -301,6 +417,82 @@ export const CaseDetailPage: React.FC = () => {
               <div className="p-4 bg-slate-50/80 border border-slate-200/80 rounded-xl text-xs space-y-1">
                 <div className="font-bold text-slate-900">Intake Notes:</div>
                 <p className="text-slate-600 leading-relaxed">{r.report_notes}</p>
+              </div>
+            )}
+
+            {/* DNA Report Quick Card — visible on OVERVIEW for authorized roles */}
+            {canViewDna && (
+              <div className="p-4 sm:p-5 bg-indigo-50/60 border border-indigo-200/80 rounded-2xl space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 bg-indigo-100 border border-indigo-300 rounded-xl flex items-center justify-center text-indigo-600 shrink-0">
+                      <Dna className="w-4.5 h-4.5" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900">Forensic DNA Reports</h4>
+                      <p className="text-[11px] text-slate-500">
+                        {dnaLoading
+                          ? 'Loading...'
+                          : dnaReports.length === 0
+                          ? 'No DNA reports attached to this case'
+                          : `${dnaReports.length} report${dnaReports.length > 1 ? 's' : ''} on file`}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {dnaReports.length > 0 && (
+                      <span
+                        className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-wider ${
+                          dnaReports[0].status === 'VERIFIED'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : dnaReports[0].status === 'REJECTED'
+                            ? 'bg-rose-50 text-rose-800 border-rose-200'
+                            : 'bg-amber-50 text-amber-800 border-amber-200'
+                        }`}
+                      >
+                        {dnaReports[0].status}
+                      </span>
+                    )}
+
+                    {canUploadDna && (
+                      <Button
+                        variant="brand"
+                        size="sm"
+                        onClick={() => {
+                          setActiveTab('DNA');
+                          setUploadModalOpen(true);
+                        }}
+                        leftIcon={<Upload className="w-3.5 h-3.5" />}
+                        className="shadow-sm"
+                      >
+                        Upload DNA Report
+                      </Button>
+                    )}
+
+                    {dnaReports.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('DNA')}
+                        className="text-xs font-semibold text-indigo-700 hover:text-indigo-900 underline underline-offset-2"
+                      >
+                        View All →
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Show first DNA report name if exists */}
+                {dnaReports.length > 0 && (
+                  <div className="flex items-center gap-2 text-xs text-slate-700 bg-white/60 rounded-lg p-2.5 border border-indigo-100">
+                    <FileCheck className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                    <span className="font-medium truncate">{dnaReports[0].file_name}</span>
+                    <span className="text-slate-400 shrink-0">•</span>
+                    <span className="text-slate-500 shrink-0">
+                      {new Date(dnaReports[0].uploaded_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -562,6 +754,204 @@ export const CaseDetailPage: React.FC = () => {
                 </p>
               </div>
             )}
+          </div>
+        )}
+
+        {/* TAB 4: DNA REPORTS */}
+        {activeTab === 'DNA' && canViewDna && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Dna className="w-4 h-4 text-indigo-600" /> Official Forensic DNA Reports
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Official hospital lab reference documentation and buccal swab records. (Candidate evidence only; MILAN does not perform automated sequencing).
+                </p>
+              </div>
+
+              {canUploadDna && (
+                <Button
+                  variant="brand"
+                  size="sm"
+                  onClick={() => setUploadModalOpen(true)}
+                  leftIcon={<Upload className="w-3.5 h-3.5" />}
+                  className="shadow-sm"
+                >
+                  Upload DNA Report
+                </Button>
+              )}
+            </div>
+
+            {uploadSuccessMsg && (
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-start justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{uploadSuccessMsg}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setUploadSuccessMsg(null)}
+                  className="text-emerald-700 hover:text-emerald-900 font-bold ml-2"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Upload Modal / Form */}
+            {uploadModalOpen && (
+              <div className="p-6 bg-slate-50 border border-indigo-200 rounded-2xl space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <h4 className="font-bold text-sm text-slate-900 flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-indigo-600" /> Attach Official Hospital DNA Report
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUploadModalOpen(false);
+                      setUploadErrorMsg(null);
+                    }}
+                    className="text-slate-400 hover:text-slate-600 font-bold text-sm"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <form onSubmit={handleFileUpload} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Report Document (PDF, JPG, JPEG, PNG • Max 15 MB) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="file"
+                      required
+                      accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setSelectedFile(file);
+                      }}
+                      className="block w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-300 rounded-lg p-1 bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Lab / Specimen Intake Notes
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={uploadNotes}
+                      onChange={(e) => setUploadNotes(e.target.value)}
+                      placeholder="e.g. Reference buccal swab specimen collected from maternal aunt at Disaster Triage Desk."
+                      className="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                    />
+                  </div>
+
+                  {uploadErrorMsg && (
+                    <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-700 flex items-center gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{uploadErrorMsg}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-end gap-2 pt-1">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setUploadModalOpen(false)}
+                      disabled={uploading}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      variant="brand"
+                      size="sm"
+                      disabled={uploading || !selectedFile}
+                    >
+                      {uploading ? 'Attaching Report...' : 'Attach DNA Report'}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* List of DNA Reports */}
+            {dnaLoading ? (
+              <div className="p-8 text-center text-xs text-slate-500">Loading DNA documentation...</div>
+            ) : dnaReports.length === 0 ? (
+              <div className="p-8 bg-slate-50 border border-slate-200/80 rounded-2xl text-center space-y-2">
+                <Dna className="w-8 h-8 text-slate-300 mx-auto" />
+                <div className="text-sm font-semibold text-slate-800">No DNA Reports Attached</div>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  No official forensic laboratory reports have been attached to this case. Authorized HOSPITAL personnel may upload reference documentation when face recognition is inconclusive.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {dnaReports.map((report) => (
+                  <div
+                    key={report.id}
+                    className="p-4 sm:p-5 bg-white border border-slate-200/90 rounded-2xl shadow-card space-y-3"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center justify-center text-indigo-600 shrink-0">
+                          <FileCheck className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-slate-900">{report.file_name}</div>
+                          <div className="text-[11px] text-slate-500">
+                            Uploaded by <strong className="text-slate-700">{report.uploader_name || 'Hospital Authority'}</strong> ({report.uploader_role || 'HOSPITAL'}) • {new Date(report.uploaded_at).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-wider ${
+                            report.status === 'VERIFIED'
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : report.status === 'REJECTED'
+                              ? 'bg-rose-50 text-rose-800 border-rose-200'
+                              : 'bg-amber-50 text-amber-800 border-amber-200'
+                          }`}
+                        >
+                          Status: {report.status}
+                        </span>
+                      </div>
+                    </div>
+
+                    {report.notes && (
+                      <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                        <strong className="text-slate-800">Lab Notes:</strong> {report.notes}
+                      </p>
+                    )}
+
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-[11px] text-slate-400 font-mono">
+                        {report.file_size ? `${(report.file_size / 1024).toFixed(0)} KB` : 'Attached Document'}
+                      </span>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleDownload(report)}
+                        leftIcon={<Download className="w-3.5 h-3.5" />}
+                      >
+                        Open / Download Report
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Forensic evidence note */}
+            <div className="p-4 bg-indigo-50/60 border border-indigo-200/80 rounded-xl text-xs text-indigo-950 leading-relaxed">
+              <strong>Forensic Chain-of-Custody Notice:</strong> DNA reports stored in MILAN are official reference documents securely associated with case files for cross-verification. MILAN does not perform automated genetic sequencing or statistical probability algorithms. Final verification requires authorized forensic coordinator sign-off.
+            </div>
           </div>
         )}
       </div>

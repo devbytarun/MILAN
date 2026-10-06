@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FormStepWrapper, FormStep } from '../components/forms/FormStepWrapper.tsx';
-import { submitCaseReport } from '../services/caseService.ts';
+import { submitCaseReport, getLocalCases } from '../services/caseService.ts';
 import type { CommunicationStatus } from '../types/index.ts';
 import {
   CheckCircle2,
   AlertCircle,
   Shield,
+  ScanFace,
 } from 'lucide-react';
 import { Badge } from '../components/ui/Badge.tsx';
 import { VoiceIntakeModal } from '../components/common/VoiceIntakeModal.tsx';
@@ -17,6 +18,11 @@ import { AccessDenied } from './AccessDenied.tsx';
 import { Button } from '../components/ui/Button.tsx';
 import { DemoAutoFillBar } from '../components/forms/DemoAutoFillBar.tsx';
 import { DEMO_PRESETS, DemoPresetKey } from '../data/demoPresets.ts';
+import { FacePhotoUpload, FaceUploadResult } from '../components/common/FacePhotoUpload.tsx';
+import { getLocalFaceEmbeddings, findFaceMatches, FaceMatchCandidate } from '../lib/faceSimilarity.ts';
+import { FaceMatchResults } from '../components/matching/FaceMatchResults.tsx';
+import { scoreCandidate } from '../lib/matching.ts';
+import type { PersonAttributes, CandidateRow } from '../types/index.ts';
 
 const FOUND_STEPS: FormStep[] = [
   { id: 'comm', title: 'Communication Status', subtitle: 'Determine if survivor can provide their own details' },
@@ -30,9 +36,18 @@ export const FoundReportPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submittedUid, setSubmittedUid] = useState<string | null>(null);
+  const [_submittedCaseId, setSubmittedCaseId] = useState<string | null>(null);
   const [commStatus, setCommStatus] = useState<CommunicationStatus>('CANNOT_COMMUNICATE');
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [voiceParseNotification, setVoiceParseNotification] = useState<string | null>(null);
+
+  // Face matching state
+  const [faceUploadResult, setFaceUploadResult] = useState<FaceUploadResult | null>(null);
+  const [faceMatches, setFaceMatches] = useState<FaceMatchCandidate[]>([]);
+  const [faceSearching, setFaceSearching] = useState(false);
+  const [faceSearchError, setFaceSearchError] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [profileMatchScores, setProfileMatchScores] = useState<Record<string, number>>({});
 
   // Form State
   const [formData, setFormData] = useState({
@@ -168,67 +183,249 @@ export const FoundReportPage: React.FC = () => {
     setSubmitting(false);
     if (res.success && res.caseUid) {
       setSubmittedUid(res.caseUid);
+      setSubmittedCaseId(res.caseId || null);
+    }
+  };
+
+  /**
+   * Run face search against all stored MISSING person face embeddings.
+   * Restricted to authorized roles (NGO, ARMY_RESCUE, HOSPITAL, REVIEWER, ADMIN).
+   */
+  const handleFaceSearch = async () => {
+    if (!faceUploadResult?.descriptor) {
+      setFaceSearchError('No face profile available. Please upload a photograph first.');
+      return;
+    }
+
+    if (!hasPermission(profile?.role, 'CREATE_FOUND_REPORT')) {
+      setFaceSearchError('You are not authorized to perform face searches.');
+      return;
+    }
+
+    setFaceSearching(true);
+    setFaceSearchError(null);
+    setHasSearched(false);
+
+    try {
+      // Get all stored MISSING person face embeddings from local store
+      const allEmbeddings = getLocalFaceEmbeddings();
+
+      // Run cosine similarity comparison
+      const matches = findFaceMatches(faceUploadResult.descriptor, allEmbeddings, 0.70, 3);
+      setFaceMatches(matches);
+
+      // Combine with profile-based match scoring
+      if (matches.length > 0) {
+        const allLocalCases = getLocalCases();
+        const scores: Record<string, number> = {};
+
+        // Build a pseudo source attributes object from current found-person form data
+        const sourceAttrs: PersonAttributes = {
+          id: 'found-search',
+          report_id: null,
+          full_name: formData.fullName || null,
+          alternative_names: null,
+          age: formData.approximateAge ? parseInt(formData.approximateAge, 10) : null,
+          approximate_age: formData.approximateAge ? parseInt(formData.approximateAge, 10) : null,
+          gender: formData.gender || null,
+          date_of_birth: null,
+          blood_group: formData.bloodGroup || null,
+          height_cm: null,
+          weight_kg: null,
+          build: formData.build || null,
+          hair_description: null,
+          hair_colour: formData.hairColour || null,
+          eye_colour: null,
+          skin_description: null,
+          birthmarks: formData.birthmarks || null,
+          scars: formData.scars || null,
+          tattoos: formData.tattoos || null,
+          anatomical_features: null,
+          clothing: formData.clothing || null,
+          footwear: formData.footwear || null,
+          accessories: formData.accessories || null,
+          belongings: null,
+          identifying_clue: formData.identifyingClue || null,
+          condition_status: formData.conditionStatus || null,
+        };
+
+        for (const match of matches) {
+          const matchCase = allLocalCases.find((c) => c.case.id === match.caseId);
+          if (matchCase) {
+            const candidateRow: CandidateRow = {
+              report_id: matchCase.report.id,
+              case_id: matchCase.case.id,
+              case_uid: matchCase.case.case_uid,
+              case_type: matchCase.case.case_type,
+              found_location: matchCase.report.found_location,
+              full_name: matchCase.attributes.full_name,
+              alternative_names: matchCase.attributes.alternative_names,
+              age: matchCase.attributes.age,
+              approximate_age: matchCase.attributes.approximate_age,
+              gender: matchCase.attributes.gender,
+              blood_group: matchCase.attributes.blood_group,
+              height_cm: matchCase.attributes.height_cm,
+              weight_kg: matchCase.attributes.weight_kg,
+              build: matchCase.attributes.build,
+              hair_description: matchCase.attributes.hair_description,
+              hair_colour: matchCase.attributes.hair_colour,
+              eye_colour: matchCase.attributes.eye_colour,
+              skin_description: matchCase.attributes.skin_description,
+              birthmarks: matchCase.attributes.birthmarks,
+              scars: matchCase.attributes.scars,
+              tattoos: matchCase.attributes.tattoos,
+              anatomical_features: matchCase.attributes.anatomical_features,
+              clothing: matchCase.attributes.clothing,
+              footwear: matchCase.attributes.footwear,
+              accessories: matchCase.attributes.accessories,
+              belongings: matchCase.attributes.belongings,
+              identifying_clue: matchCase.attributes.identifying_clue,
+              condition_status: matchCase.attributes.condition_status,
+            };
+            const profileResult = scoreCandidate(sourceAttrs, candidateRow, formData.foundLocation);
+            scores[match.caseId] = profileResult.score;
+          }
+        }
+        setProfileMatchScores(scores);
+      }
+
+      setHasSearched(true);
+    } catch (err) {
+      setFaceSearchError(
+        `Face search failed: ${err instanceof Error ? err.message : 'Unknown error'}. Please try again.`
+      );
+    } finally {
+      setFaceSearching(false);
     }
   };
 
   if (submittedUid) {
+    const allLocalCases = getLocalCases();
     return (
-      <div className="max-w-2xl mx-auto my-8 bg-white border border-slate-200/90 rounded-2xl p-8 shadow-card text-center space-y-6 font-body">
-        <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto border border-emerald-200 shadow-sm">
-          <CheckCircle2 className="w-8 h-8" />
+      <div className="max-w-2xl mx-auto my-8 space-y-6 font-body">
+        {/* Main confirmation card */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-8 shadow-card text-center space-y-6">
+          <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto border border-emerald-200 shadow-sm">
+            <CheckCircle2 className="w-8 h-8" />
+          </div>
+
+          <div>
+            <span className="inline-flex items-center text-[10px] font-mono font-semibold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-200">
+              Found Person Intake Registered
+            </span>
+            <h2 className="font-display text-2xl font-bold text-slate-900 tracking-tight mt-3">
+              Case Assigned to Shelter Registry
+            </h2>
+            <p className="text-xs text-slate-600 mt-1">
+              The record is live and actively matched against missing person inquiries from family members.
+            </p>
+          </div>
+
+          <div className="p-6 bg-slate-900 text-white rounded-xl shadow-sm max-w-sm mx-auto space-y-1 border border-slate-800">
+            <div className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-widest">
+              Milan Found UID
+            </div>
+            <div className="text-3xl font-mono font-bold tracking-wider text-orange-400">
+              {submittedUid}
+            </div>
+            <div className="text-[11px] text-slate-400">
+              Reference this UID on camp identification badges and triage logs.
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <Link to="/review" className="w-full sm:w-auto">
+              <Button
+                variant="brand"
+                size="md"
+                leftIcon={<Shield className="w-4 h-4" />}
+                className="w-full sm:w-auto"
+              >
+                Check Candidate Matches
+              </Button>
+            </Link>
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => {
+                setSubmittedUid(null);
+                setCurrentStep(0);
+                setFaceUploadResult(null);
+                setFaceMatches([]);
+                setHasSearched(false);
+                setFaceSearchError(null);
+              }}
+              className="w-full sm:w-auto"
+            >
+              Intake Next Person
+            </Button>
+          </div>
         </div>
 
-        <div>
-          <span className="inline-flex items-center text-[10px] font-mono font-semibold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-200">
-            Found Person Intake Registered
-          </span>
-          <h2 className="font-display text-2xl font-bold text-slate-900 tracking-tight mt-3">
-            Case Assigned to Shelter Registry
-          </h2>
-          <p className="text-xs text-slate-600 mt-1">
-            The record is live and actively matched against missing person inquiries from family members.
-          </p>
-        </div>
+        {/* === AI FACE MATCHING PANEL === */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-card space-y-5 text-left">
+          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shrink-0">
+              <ScanFace className="w-5 h-5 text-orange-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-900">AI Face Matching</h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Upload a photograph to search for possible missing person matches by face similarity.
+              </p>
+            </div>
+            <span className="ml-auto text-[10px] font-mono font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2 py-1 rounded-lg uppercase tracking-wider shrink-0">
+              Authorized Only
+            </span>
+          </div>
 
-        {/* UID Box */}
-        <div className="p-6 bg-slate-900 text-white rounded-xl shadow-sm max-w-sm mx-auto space-y-1 border border-slate-800">
-          <div className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-widest">
-            Milan Found UID
-          </div>
-          <div className="text-3xl font-mono font-bold tracking-wider text-orange-400">
-            {submittedUid}
-          </div>
-          <div className="text-[11px] text-slate-400">
-            Reference this UID on camp identification badges and triage logs.
-          </div>
-        </div>
+          <FacePhotoUpload
+            label="Found Person Photograph"
+            helperText="Upload a clear, front-facing photo of the found/rescued person for AI face matching."
+            accentColor="blue"
+            onResult={(result) => {
+              setFaceUploadResult(result);
+              setHasSearched(false);
+              setFaceMatches([]);
+              setFaceSearchError(null);
+            }}
+          />
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <Link to="/review" className="w-full sm:w-auto">
+          {faceUploadResult?.descriptor && !faceSearching && (
             <Button
               variant="brand"
               size="md"
-              leftIcon={<Shield className="w-4 h-4" />}
-              className="w-full sm:w-auto"
+              onClick={handleFaceSearch}
+              leftIcon={<ScanFace className="w-4 h-4" />}
+              className="w-full"
             >
-              Check Candidate Matches
+              Find Face Matches
             </Button>
-          </Link>
-          <Button
-            variant="secondary"
-            size="md"
-            onClick={() => {
-              setSubmittedUid(null);
-              setCurrentStep(0);
-            }}
-            className="w-full sm:w-auto"
-          >
-            Intake Next Person
-          </Button>
+          )}
+
+          {faceUploadResult && !faceUploadResult.descriptor && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+              <div>
+                Face could not be extracted from the uploaded photo. Face matching is unavailable for this image.
+                Profile-based matching will continue to run automatically.
+              </div>
+            </div>
+          )}
+
+          <FaceMatchResults
+            candidates={faceMatches}
+            allCases={allLocalCases}
+            isSearching={faceSearching}
+            searchError={faceSearchError}
+            hasSearched={hasSearched}
+            profileMatchScores={profileMatchScores}
+          />
         </div>
       </div>
     );
   }
+
 
   return (
     <div className="space-y-4">
@@ -446,6 +643,67 @@ export const FoundReportPage: React.FC = () => {
               onChange={(e) => handleChange('identifyingClue', e.target.value)}
               placeholder="e.g. Left forearm surgical scar, black wrist thread with charm"
               className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* === AI FACE MATCHING — DURING INTAKE === */}
+          <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-4 mt-2">
+            <div className="flex items-center gap-3 border-b border-slate-200 pb-3">
+              <div className="w-9 h-9 bg-slate-900 rounded-xl flex items-center justify-center shrink-0">
+                <ScanFace className="w-4.5 h-4.5 text-orange-400" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-900">AI Face Matching — Search Missing Persons</h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Upload a photo of this rescued person to search for possible missing person matches by face similarity.
+                </p>
+              </div>
+              <span className="ml-auto text-[10px] font-mono font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2 py-1 rounded-lg uppercase tracking-wider shrink-0">
+                Optional
+              </span>
+            </div>
+
+            <FacePhotoUpload
+              label="Found Person Photograph"
+              helperText="Upload a clear, front-facing photo of the found/rescued person for AI face matching."
+              accentColor="blue"
+              onResult={(result) => {
+                setFaceUploadResult(result);
+                setHasSearched(false);
+                setFaceMatches([]);
+                setFaceSearchError(null);
+              }}
+            />
+
+            {faceUploadResult?.descriptor && !faceSearching && (
+              <Button
+                variant="brand"
+                size="md"
+                onClick={handleFaceSearch}
+                leftIcon={<ScanFace className="w-4 h-4" />}
+                className="w-full"
+              >
+                Find Face Matches
+              </Button>
+            )}
+
+            {faceUploadResult && !faceUploadResult.descriptor && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+                <div>
+                  Face could not be extracted from the uploaded photo. Face matching is unavailable for this image.
+                  Profile-based matching will continue to run automatically.
+                </div>
+              </div>
+            )}
+
+            <FaceMatchResults
+              candidates={faceMatches}
+              allCases={getLocalCases()}
+              isSearching={faceSearching}
+              searchError={faceSearchError}
+              hasSearched={hasSearched}
+              profileMatchScores={profileMatchScores}
             />
           </div>
         </div>

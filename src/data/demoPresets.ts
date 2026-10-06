@@ -6,6 +6,7 @@
 export interface FamilyDemoPreset {
   fullName: string;
   alternativeNames: string;
+  familyContactPhone: string;
   age: string;
   gender: string;
   dateOfBirth: string;
@@ -83,6 +84,7 @@ export const DEMO_PRESETS = {
     family: {
       fullName: 'Aarav Sharma',
       alternativeNames: 'Golu / Chhotu',
+      familyContactPhone: '+91 98765 43210',
       age: '6',
       gender: 'Male',
       dateOfBirth: '2020-03-14',
@@ -163,6 +165,7 @@ export const DEMO_PRESETS = {
     family: {
       fullName: 'Veer Kumar Singhania',
       alternativeNames: 'Veer / Viru',
+      familyContactPhone: '+91 98123 45678',
       age: '24',
       gender: 'Male',
       dateOfBirth: '2002-08-10',

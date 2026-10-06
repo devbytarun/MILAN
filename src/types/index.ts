@@ -51,6 +51,7 @@ export interface Case {
   case_uid: string | null;
   case_type: CaseType;
   status: CaseStatus;
+  family_contact_phone?: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
@@ -141,6 +142,24 @@ export interface StatusHistory {
   created_at: string;
 }
 
+export type DnaReportStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
+
+export interface DnaReport {
+  id: string;
+  case_id: string;
+  uploaded_by: string | null;
+  uploader_name?: string | null;
+  uploader_role?: UserRole | null;
+  file_path: string;
+  file_name: string;
+  file_size?: number | null;
+  mime_type?: string | null;
+  report_type: string;
+  status: DnaReportStatus;
+  notes?: string | null;
+  uploaded_at: string;
+}
+
 // ======================== MATCHING TYPES ========================
 // Used by the TypeScript matching engine (B14-B15)
 
@@ -170,6 +189,7 @@ export interface MatchResult {
 export interface CreateCaseWithReportInput {
   p_case_type: CaseType;
   p_source_type: SourceType;
+  p_family_contact_phone?: string;
   p_comm_status?: CommunicationStatus;
   p_report_notes?: string;
   p_found_location?: string;

@@ -16,6 +16,9 @@ import { AccessDenied } from './AccessDenied.tsx';
 import { Button } from '../components/ui/Button.tsx';
 import { DemoAutoFillBar } from '../components/forms/DemoAutoFillBar.tsx';
 import { DEMO_PRESETS, DemoPresetKey } from '../data/demoPresets.ts';
+import { FacePhotoUpload, FaceUploadResult } from '../components/common/FacePhotoUpload.tsx';
+import { saveFaceEmbeddingLocally } from '../lib/faceSimilarity.ts';
+import { validateIndianPhoneNumber, formatIndianPhoneNumber } from '../lib/phoneValidation.ts';
 
 const FAMILY_STEPS: FormStep[] = [
   { id: 'identity', title: 'Basic Identity', subtitle: 'Name, age, gender and blood group' },
@@ -31,13 +34,18 @@ export const FamilyReportPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submittedUid, setSubmittedUid] = useState<string | null>(null);
+  const [_submittedCaseId, setSubmittedCaseId] = useState<string | null>(null);
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const [voiceParseNotification, setVoiceParseNotification] = useState<string | null>(null);
+  const [faceUploadResult, setFaceUploadResult] = useState<FaceUploadResult | null>(null);
+  const [faceEmbedStatus, setFaceEmbedStatus] = useState<'none' | 'stored' | 'failed'>('none');
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
     fullName: '',
     alternativeNames: '',
+    familyContactPhone: '',
     age: '',
     gender: 'Male',
     dateOfBirth: '',
@@ -104,6 +112,7 @@ export const FamilyReportPage: React.FC = () => {
     setFormData({
       fullName: preset.fullName,
       alternativeNames: preset.alternativeNames,
+      familyContactPhone: preset.familyContactPhone || '+91 98765 43210',
       age: preset.age,
       gender: preset.gender,
       dateOfBirth: preset.dateOfBirth,
@@ -135,6 +144,20 @@ export const FamilyReportPage: React.FC = () => {
   };
 
   const handleNext = () => {
+    if (currentStep === 0) {
+      if (!formData.fullName.trim()) {
+        alert('Please enter the missing person’s full legal name.');
+        return;
+      }
+      const phoneCheck = validateIndianPhoneNumber(formData.familyContactPhone);
+      if (!phoneCheck.isValid) {
+        setPhoneError(phoneCheck.error || 'Please enter a valid 10-digit Indian mobile number.');
+        return;
+      }
+      setPhoneError(null);
+      setFormData((prev) => ({ ...prev, familyContactPhone: phoneCheck.canonical }));
+    }
+
     if (currentStep < FAMILY_STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -149,10 +172,14 @@ export const FamilyReportPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    const phoneCheck = validateIndianPhoneNumber(formData.familyContactPhone);
+    const validPhone = phoneCheck.isValid ? phoneCheck.canonical : undefined;
+
     setSubmitting(true);
     const res = await submitCaseReport({
       p_case_type: 'MISSING',
       p_source_type: 'FAMILY',
+      p_family_contact_phone: validPhone,
       p_comm_status: 'CAN_COMMUNICATE',
       p_full_name: formData.fullName,
       p_alternative_names: formData.alternativeNames || undefined,
@@ -182,9 +209,26 @@ export const FamilyReportPage: React.FC = () => {
       p_identifying_clue: formData.identifyingClue || undefined,
     });
 
+    // Store face embedding if we have one
+    if (res.success && res.caseId && faceUploadResult?.descriptor) {
+      try {
+        saveFaceEmbeddingLocally({
+          caseId: res.caseId,
+          caseUid: res.caseUid || null,
+          embedding: faceUploadResult.descriptor,
+          personName: formData.fullName || null,
+          createdAt: new Date().toISOString(),
+        });
+        setFaceEmbedStatus('stored');
+      } catch {
+        setFaceEmbedStatus('failed');
+      }
+    }
+
     setSubmitting(false);
     if (res.success && res.caseUid) {
       setSubmittedUid(res.caseUid);
+      setSubmittedCaseId(res.caseId || null);
     }
   };
 
@@ -221,12 +265,31 @@ export const FamilyReportPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Face Embedding Status */}
+        {faceEmbedStatus === 'stored' && (
+          <div className="flex items-center gap-2.5 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div>
+              <strong>✓ Face Profile Generated & Stored.</strong> This case is now eligible for AI face-matching with found person reports.
+            </div>
+          </div>
+        )}
+        {faceEmbedStatus === 'failed' && (
+          <div className="flex items-center gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
+            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+            <div>
+              Face profile could not be stored. The case has been registered, but face matching will not be available for this case.
+            </div>
+          </div>
+        )}
+
         <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-xl text-left text-xs text-slate-700 space-y-2">
           <div className="font-semibold flex items-center gap-1.5 text-slate-900">
             <Sparkles className="w-4 h-4 text-orange-600" /> What Happens Next:
           </div>
           <ul className="list-disc pl-5 space-y-1 text-slate-600">
             <li>The algorithmic matching engine is actively cross-referencing field rescue intakes.</li>
+            {faceEmbedStatus === 'stored' && <li>AI face-matching is now active for this case — found-person photographs will be compared against this face profile.</li>}
             <li>If a high-confidence candidate is found, human reviewers will audit evidence before notifying you.</li>
             <li>You can check real-time progress anytime in the Cases Registry.</li>
           </ul>
@@ -390,6 +453,36 @@ export const FamilyReportPage: React.FC = () => {
                 <option value="O+">O+</option>
                 <option value="O-">O-</option>
               </select>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Family Contact Number <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="tel"
+                  required
+                  value={formData.familyContactPhone}
+                  onChange={(e) => {
+                    handleChange('familyContactPhone', e.target.value);
+                    if (phoneError) setPhoneError(null);
+                  }}
+                  placeholder="+91 98765 43210"
+                  className={`w-full px-3.5 py-2 text-sm border ${
+                    phoneError ? 'border-rose-400 focus:ring-rose-400 bg-rose-50/20' : 'border-slate-300 focus:ring-emerald-500'
+                  } rounded-lg outline-none focus:ring-2`}
+                />
+              </div>
+              {phoneError ? (
+                <p className="text-[11px] text-rose-600 mt-1 flex items-center gap-1 font-medium">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {phoneError}
+                </p>
+              ) : (
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Authorized MILAN responders may use this number to contact your family regarding this case.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -613,6 +706,24 @@ export const FamilyReportPage: React.FC = () => {
             <strong className="text-orange-900 font-semibold">Key Matching Feature:</strong> Physical clues (scars, birthmarks, accessories) are weighted highest in our algorithm when persons cannot speak their names.
           </div>
 
+          {/* Face Photo Upload — AI Face Matching */}
+          <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-xl space-y-3">
+            <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+              <span className="w-5 h-5 bg-slate-900 rounded-md flex items-center justify-center text-orange-400 text-[10px] font-bold">AI</span>
+              Face Photo — AI Matching (Optional)
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Upload a clear, recent photograph of the missing person. The system will generate a face profile to enable AI-assisted face matching with found persons.
+              <strong className="text-slate-800"> This does not replace identity verification — it is a candidate-finding tool.</strong>
+            </p>
+            <FacePhotoUpload
+              label="Missing Person Photograph"
+              helperText="Clear, front-facing photo required. No groups — only the missing person."
+              accentColor="emerald"
+              onResult={(result) => setFaceUploadResult(result)}
+            />
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
@@ -693,6 +804,15 @@ export const FamilyReportPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-y-2 text-slate-700">
               <div><strong>Name:</strong> {formData.fullName || 'Not provided'}</div>
               <div><strong>Age / Gender:</strong> {formData.age || 'Unknown'} yrs, {formData.gender}</div>
+              <div>
+                <strong>Family Contact:</strong>{' '}
+                <span className="font-mono font-semibold text-slate-900">
+                  {formData.familyContactPhone ? formatIndianPhoneNumber(formData.familyContactPhone) : 'Not provided'}
+                </span>
+                <span className="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 ml-1.5">
+                  Private
+                </span>
+              </div>
               <div><strong>Blood Group:</strong> {formData.bloodGroup || 'Unknown'}</div>
               <div><strong>Height / Weight:</strong> {formData.heightCm || '—'} cm, {formData.weightKg || '—'} kg</div>
               <div className="col-span-2"><strong>Clothing:</strong> {formData.clothing || 'Not specified'}</div>

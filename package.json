@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "test": "tsx test/matching.test.ts && tsx test/innovations.test.ts && tsx test/i18n.test.ts && tsx test/rbac.test.ts",
+    "test": "tsx test/matching.test.ts && tsx test/innovations.test.ts && tsx test/i18n.test.ts && tsx test/rbac.test.ts && tsx test/dna_and_contact.test.ts",
     "test:supabase": "tsx test/supabase-connection.test.ts",
     "lint": "oxlint",
     "preview": "vite preview"
@@ -15,6 +15,7 @@
     "@fontsource-variable/inter": "^5.3.0",
     "@hookform/resolvers": "^3.9.0",
     "@supabase/supabase-js": "^2.45.0",
+    "face-api.js": "^0.22.2",
     "gsap": "^3.15.0",
     "lucide-react": "^0.441.0",
     "react": "^18.3.0",
